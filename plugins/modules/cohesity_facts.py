@@ -1,40 +1,48 @@
 #!/usr/bin/python
 # Copyright (c) 2022 Cohesity Inc
-# Apache License Version 2.0
 
-from __future__ import (absolute_import, division, print_function)
+
+from __future__ import absolute_import, division, print_function
+
+
 __metaclass__ = type
-from ansible.module_utils.basic import AnsibleModule
 
-import json
-import traceback
-from ansible.module_utils.urls import open_url, urllib_error
-try:
-    from ansible_collections.cohesity.ansible_collection.plugins.module_utils.cohesity_auth import get__cohesity_auth__token
-    from ansible_collections.cohesity.ansible_collection.plugins.module_utils.cohesity_utilities import cohesity_common_argument_spec
-    from ansible_collections.cohesity.ansible_collection.plugins.module_utils.cohesity_hints import get__cluster, get__nodes, \
-        get__prot_source__all, get__prot_policy__all, get__prot_job__all, \
-        get__storage_domain_id__all, get__protection_run__all
+# GNU General Public License v3.0+ (see https://www.gnu.org/licenses/gpl-3.0.txt)
 
-except Exception as e:
-    pass # pass
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.0',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: '2.6.5'
-author: 'Jeremy Goodrum (github.com/goodrum)'
-
-
+version_added: '1.0.0'
+author: "Cohesity (@cohesity)"
 options:
+  cluster:
+    aliases:
+      - cohesity_server
+    description:
+      - "IP or FQDN for the Cohesity Cluster"
+    type: str
+  cohesity_admin:
+    aliases:
+      - admin_name
+      - cohesity_user
+      - username
+    description:
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
+      - username@AD.domain.com
+      - AD.domain.com/username@tenant
+      - LOCAL/username@tenant
+      - Domain/username (Will be deprecated in future)
+    type: str
+  cohesity_password:
+    aliases:
+      - password
+      - admin_pass
+    description:
+      - "Password belonging to the selected Username.  This parameter will not be logged."
+    type: str
   state:
     description:
       - Determines the level of data collection to perform. Complete will gather all details
@@ -44,6 +52,7 @@ options:
       - complete
       - minimal
     default: complete
+    type: str
   include_sources:
     description:
       - When True, will return the details about all registered Protection Sources.  This value
@@ -75,12 +84,9 @@ options:
     type: bool
     default: no
 
-extends_documentation_fragment:
-    - cohesity
-requirements: []
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Gather facts about all nodes and supported resources in a cluster
 - cohesity_facts:
     cluster: cohesity.lab
@@ -104,43 +110,32 @@ EXAMPLES = '''
     include_runs: True
     active_only: True
 
-'''
+"""
 
-RETURN = '''
-{
-  "cluster": {
-    "nodes": [
-          # Array of Cohesity Node Details
-    ],
-    "protection": {
-      "jobs": [
-        # Array of Job Details
-      ],
-      "policies": [
-        # Array of Backup Policy Information
-      ],
-      "runs": [
-        # Array of Backup executions
-      ],
-      "sources": {
-        "GenericNas": [
-          # Array of GenericNas Protection Sources
-        ],
-        "Physical": [
-          # Array of Physical Protection Sources
-        ],
-        "VMware":  [
-          # Array of VMware Protection Sources
-        ],
-      }
-    },
-    "storage_domains": [
-          # Array of Cohesity Backup Storage Domains
-    ],
-  }
-}
+from ansible.module_utils.basic import AnsibleModule
 
-'''
+import traceback
+from ansible.module_utils.urls import open_url, urllib_error
+
+try:
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
+        get__cohesity_auth__token,
+    )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
+        cohesity_common_argument_spec,
+    )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+        get__cluster,
+        get__nodes,
+        get__prot_source__all,
+        get__prot_policy__all,
+        get__prot_job__all,
+        get__storage_domain_id__all,
+        get__protection_run__all,
+    )
+
+except Exception as e:
+    pass
 
 
 class FactsError(Exception):
@@ -151,92 +146,88 @@ def main():
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
-            state=dict(choices=['complete', 'minimal'], default='complete'),
-            include_sources=dict(type='bool', default=False),
-            include_jobs=dict(type='bool', default=False),
-            include_runs=dict(type='bool', default=False),
-            active_only=dict(type='bool', default=False),
-            include_deleted=dict(type='bool', default=False)
+            state=dict(choices=["complete", "minimal"], default="complete"),
+            include_sources=dict(type="bool", default=False),
+            include_jobs=dict(type="bool", default=False),
+            include_runs=dict(type="bool", default=False),
+            active_only=dict(type="bool", default=False),
+            include_deleted=dict(type="bool", default=False),
         )
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
-    results = dict(
-        changed=False,
-        cluster=''
-    )
+    results = dict(changed=False, cluster="")
     params = dict(
-        server=module.params.get('cluster'),
-        username=module.params.get('username'),
-        password=module.params.get('password'),
-        validate_certs=module.params.get('validate_certs'),
-        active_only=module.params.get('active_only'),
-        is_deleted=module.params.get('is_deleted')
+        server=module.params.get("cluster"),
+        username=module.params.get("username"),
+        password=module.params.get("password"),
+        validate_certs=module.params.get("validate_certs"),
+        active_only=module.params.get("active_only"),
+        is_deleted=module.params.get("is_deleted"),
     )
-    params['token'] = get__cohesity_auth__token(module)
+    params["token"] = get__cohesity_auth__token(module)
     try:
         include_sources = True
         include_jobs = True
         include_runs = True
-        if module.params.get('state') == 'complete':
+        if module.params.get("state") == "complete":
             pass
         else:
-            if module.params.get('include_sources'):
+            if module.params.get("include_sources"):
                 include_sources = True
-            if module.params.get('include_jobs'):
+            if module.params.get("include_jobs"):
                 include_jobs = True
-            if module.params.get('include_runs'):
+            if module.params.get("include_runs"):
                 include_runs = True
 
-        results['cluster'] = get__cluster(params)
-        results['cluster']['nodes'] = get__nodes(params)
+        results["cluster"] = get__cluster(params)
+        results["cluster"]["nodes"] = get__nodes(params)
 
         # => Create a root node for all protection related items
-        results['cluster']['protection'] = dict()
+        results["cluster"]["protection"] = dict()
 
         # => We will group each Protection Source based on the
         # => environment type so to do this, we will declare
         # => sources as a dictionary.
-        results['cluster']['protection']['sources'] = dict()
+        results["cluster"]["protection"]["sources"] = dict()
 
         # => Iterate each supported Environment type and collect each grouped
         # => by type.
         if include_sources:
-            env_types = ['Physical', 'VMware', 'GenericNas']
+            env_types = ["Physical", "VMware", "GenericNas"]
             for env_type in env_types:
-                params['environment'] = env_type
-                results['cluster']['protection'][
-                    'sources'][env_type] = get__prot_source__all(params)
+                params["environment"] = env_type
+                results["cluster"]["protection"]["sources"][
+                    env_type
+                ] = get__prot_source__all(params)
                 # => Let's remove this key since it is not needed for further processing.
-                params.pop('environment')
+                params.pop("environment")
 
         # => Collect all Cohesity Protection Policies
-        results['cluster']['protection'][
-            'policies'] = get__prot_policy__all(params)
+        results["cluster"]["protection"]["policies"] = get__prot_policy__all(params)
 
         # => Collect all registered Protection Jobs
         # => This value can be filtered by choosing
         # => `active_only=True/False` and/or `is_deleted=True/False`
         if include_jobs:
-            results['cluster']['protection'][
-                'jobs'] = get__prot_job__all(params)
+            results["cluster"]["protection"]["jobs"] = get__prot_job__all(params)
 
         # => Collect all Storage Domains
-        results['cluster'][
-            'storage_domains'] = get__storage_domain_id__all(params)
+        results["cluster"]["storage_domains"] = get__storage_domain_id__all(params)
 
         # => Collect all Protection Jobs execution details
         # => This value can be filtered by choosing
         # => `active_only=True/False` and/or `is_deleted=True/False`
         if include_runs:
-            results['cluster']['protection'][
-                'runs'] = get__protection_run__all(params)
+            results["cluster"]["protection"]["runs"] = get__protection_run__all(params)
 
     except Exception as error:
-        module.fail_json(msg="Failure while collecting Cohesity Facts",
-                         exception=traceback.format_exc())
+        module.fail_json(
+            msg="Failure while collecting Cohesity Facts",
+            exception=traceback.format_exc(),
+        )
     module.exit_json(**results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

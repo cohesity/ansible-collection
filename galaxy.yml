@@ -6,10 +6,10 @@
 namespace: cohesity
 
 # The name of the collection. Has the same character restrictions as 'namespace'
-name: cluster
+name: dataprotect
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 0.0.1
+version: 1.0.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -25,18 +25,21 @@ authors:
 # A short summary description of the collection
 description: Cohesity Ansible Collections
 
-# Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
-# accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
-license:
-  - Apache-2.0
-
 # The path to the license file for the collection. This path is relative to the root of the collection. This key is
 # mutually exclusive with 'license'
-license_file: ''
+license_file: LICENSE
 
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
-tags: []
+tags:
+  - cohesity
+  - cluster
+  - cloud
+  - database
+  - infrastructure
+  - linux
+  - windows
+  - storage
 
 # Collections that this collection requires to be installed for it to be usable. The key of the dict is the
 # collection label 'namespace.name'. The value is a version range
@@ -45,7 +48,7 @@ tags: []
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/cohesity/cohesity-ansible-role
+repository: https://github.com/cohesity/ansible-collection
 
 # The URL to any online docs
 documentation: https://developer.cohesity.com
@@ -54,4 +57,7 @@ documentation: https://developer.cohesity.com
 homepage: www.cohesity.com
 
 # The URL to the collection issue tracker
-issues: https://github.com/cohesity/cohesity-ansible-role/issues/new/choose
+issues: https://github.com/cohesity/ansible-collection/issues/new/choose
+
+build_ignore:
+  - '*.gz'

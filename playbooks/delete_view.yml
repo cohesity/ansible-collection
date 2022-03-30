@@ -3,7 +3,7 @@
 - hosts: workstation
   gather_facts: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   vars:
     name: ViewName
     domain: DefaultStorageDomain

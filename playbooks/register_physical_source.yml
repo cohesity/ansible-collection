@@ -3,7 +3,7 @@
 - hosts: localhost
   become: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: "Cohesity Protection Source: Set Source to state of present }}"
       cohesity_source:

@@ -1,6 +1,6 @@
 # => Cohesity Agent Management
 # =>
-# => Collection: cohesity.ansible_collection
+# => Collection: cohesity.dataprotect
 # =>
 
 # => Install the Cohesity Agent on each Linux host
@@ -18,7 +18,7 @@
   gather_facts: true
   become: true
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     # Alert: Don't edit these tasks.
     - name: Install Prerequisite Packages for CentOS or RedHat

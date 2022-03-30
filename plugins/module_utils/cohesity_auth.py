@@ -2,21 +2,22 @@
 # cohesity_authentication
 #
 # Copyright (c) 2022 Cohesity Inc
-# Apache License Version 2.0
+
 #
 
+from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+__metaclass__ = type
+
+DOCUMENTATION = """
 module_utils: cohesity_auth
-author:
-  - Naveena (naveena.maplelabs@cohesity.com)
 short_description: The **CohesityAuth** utils module provides the authentication token manage
 for Cohesity Platforms.
 version_added: 1.0.0
 description:
     - The **CohesityAuth** utils module provides the authentication token manage
 for Cohesity Platforms.
-'''
+"""
 
 
 import json
@@ -34,7 +35,7 @@ class TokenException(Exception):
 
 
 class Authentication(object):
-    ''' Cohesity API Authentication Mechanism '''
+    """Cohesity API Authentication Mechanism"""
 
     def __init__(self):
         self.token = ""
@@ -44,7 +45,7 @@ class Authentication(object):
         self.ssl_validation = False
 
     def get_token(self, server):
-        '''
+        """
         Retrieve a Bearer Token
 
         requires:
@@ -56,7 +57,7 @@ class Authentication(object):
           accessToken
           privileges
           tokenType
-        '''
+        """
 
         # => Parameter Validation Handler.  Only run this validation, if no Token exists
         errors = []
@@ -81,15 +82,20 @@ class Authentication(object):
             payload = {"username": self.username, "password": self.password}
             # => If the domain property is set, then we should include this into the Dict
             if self.domain:
-                payload['domain'] = self.domain
+                payload["domain"] = self.domain
             data = json.dumps(payload)
             try:
                 # => Attempt to POST the data to the /public/accessTokens endpoint and get back
                 # => a valid Token that will be placed into `self.token`.
-                data = open_url(url=uri, data=data, headers=headers,
-                                validate_certs=self.ssl_validation, timeout=120)
+                data = open_url(
+                    url=uri,
+                    data=data,
+                    headers=headers,
+                    validate_certs=self.ssl_validation,
+                    timeout=120,
+                )
                 response = json.loads(data.read())
-                self.token = response['accessToken']
+                self.token = response["accessToken"]
                 return self.token
             except urllib_error.URLError as error:
                 try:
@@ -104,7 +110,7 @@ class Authentication(object):
             return self.token
 
     def check_token(self, server):
-        '''
+        """
         Verify an existing Bearer Token
 
         If the token is expired, then clear the stored Token and return execute
@@ -115,19 +121,25 @@ class Authentication(object):
           password
           domain
           token
-        '''
+        """
         # => This method will validate an existing Token if configured to see if
         # => this object needs to be refreshed.
         check_uri = "https://" + server + "/irisservices/api/v1/public/nodes"
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + self.token}
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + self.token,
+        }
         try:
-            open_url(url=check_uri, headers=headers,
-                     validate_certs=self.ssl_validation, timeout=120)
+            open_url(
+                url=check_uri,
+                headers=headers,
+                validate_certs=self.ssl_validation,
+                timeout=120,
+            )
             return self
         except urllib_error.HTTPError as e:
             try:
-                msg = json.loads(e.read())['message']
+                msg = json.loads(e.read())["message"]
             except Exception as e:
                 # => For HTTPErrors that return no JSON with a message (bad errors), we
                 # => will need to handle this by setting the msg variable to some default.
@@ -140,15 +152,15 @@ class Authentication(object):
 
 
 def get__cohesity_auth__token(self):
-    server = self.params.get('cluster')
-    validate_certs = self.params.get('validate_certs')
+    server = self.params.get("cluster")
+    validate_certs = self.params.get("validate_certs")
 
     auth = Authentication()
-    auth.username = self.params.get('username')
-    auth.password = self.params.get('password')
+    auth.username = self.params.get("username")
+    auth.password = self.params.get("password")
 
-    if self.params.get('domain'):
-        auth.domain = self.params.get('domain')
+    if self.params.get("domain"):
+        auth.domain = self.params.get("domain")
 
     if "/" in auth.username:
         user_domain = auth.username.split("/")

@@ -6,7 +6,7 @@
     state: present
   become: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: "Cohesity Protection Source: Set {{ endpoint | default('endpoint') }} to state of {{ cohesity_source.state | default('present') }}"
       cohesity_source:

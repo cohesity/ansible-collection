@@ -1,11 +1,11 @@
-# => Collection: cohesity.ansible_collection
+# => Collection: cohesity.dataprotect
 # =>
 # => Start a protection job run.
 ---
 - hosts: workstation
   gather_facts: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: Start Protection job
       cohesity_job:

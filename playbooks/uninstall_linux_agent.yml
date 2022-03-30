@@ -1,6 +1,6 @@
 # => Cohesity Agent Management
 # =>
-# => Collection: cohesity.ansible_collection
+# => Collection: cohesity.dataprotect
 # =>
 
 # => UnInstall the Cohesity Agent on each Linux host
@@ -13,7 +13,7 @@
   gather_facts: true
   become: true
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: "Cohesity agent: Set Agent to state of absent }}"
       cohesity_agent:

@@ -3,7 +3,7 @@
 
 ![](../assets/images/cohesity_ansible.png)
 ---
-[![License: Apache2](https://img.shields.io/hexpm/l/plug.svg?style=popout)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
+[![License: GNU General Public License v3.0](https://img.shields.io/hexpm/l/plug.svg?style=popout)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
 
 [Go back to Documentation home page ](../README.md)
 

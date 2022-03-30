@@ -1,6 +1,6 @@
 # => Cohesity Agent Management
 # =>
-# => Collection: cohesity.ansible_collection
+# => Collection: cohesity.dataprotect
 # =>
 
 # => Install the Cohesity Agent on each Windows host
@@ -11,7 +11,7 @@
   gather_facts: true
   become: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   vars:
     state: present
     reboot: true

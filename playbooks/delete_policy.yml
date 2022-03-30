@@ -3,7 +3,7 @@
 - hosts: localhost
   become: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: Delete protection policy from cohesity server.
       cohesity_policy:

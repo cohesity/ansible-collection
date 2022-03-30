@@ -1,17 +1,15 @@
 #!/usr/bin/python
 # Copyright (c) 2022 Cohesity Inc
-# Apache License Version 2.0
 
-from __future__ import (absolute_import, division, print_function)
+
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.0',
-    'supported_by': 'community',
-    'status': ['preview']
-}
+# GNU General Public License v3.0+ (see https://www.gnu.org/licenses/gpl-3.0.txt)
 
-DOCUMENTATION = '''
+
+DOCUMENTATION = """
 module: cohesity_win_agent
 short_description: Management of Cohesity Physical Windows Agent
 description:
@@ -19,10 +17,34 @@ description:
     - When executed in a playbook, the Cohesity Agent installation will be validated and the appropriate
     - state action will be applied.  The most recent version of the Cohesity Agent will be automatically
     - downloaded to the host.
-version_added: '2.6.5'
-author: 'Jeremy Goodrum (github.com/goodrum)'
-
+version_added: '1.0.0'
+author: "Cohesity (@cohesity)"
 options:
+  cluster:
+    aliases:
+      - cohesity_server
+    description:
+      - "IP or FQDN for the Cohesity Cluster"
+    type: str
+  cohesity_admin:
+    aliases:
+      - admin_name
+      - cohesity_user
+      - username
+    description:
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
+      - username@AD.domain.com
+      - AD.domain.com/username@tenant
+      - LOCAL/username@tenant
+      - Domain/username (Will be deprecated in future)
+    type: str
+  cohesity_password:
+    aliases:
+      - password
+      - admin_pass
+    description:
+      - "Password belonging to the selected Username.  This parameter will not be logged."
+    type: str
   state:
     description:
       - Determines if the agent should be C(present) or C(absent) from the host
@@ -51,13 +73,11 @@ options:
     type: bool
     default: 'no'
 
-
 extends_documentation_fragment:
-    - cohesity
-requirements: []
-'''
+- cohesity.dataprotect.cohesity
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Install the current version of the agent on Windows
 - cohesity_win_agent:
     server: cohesity.lab
@@ -81,7 +101,7 @@ EXAMPLES = '''
     password: password
     state: present
     install_type: fscbt
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = """
+"""

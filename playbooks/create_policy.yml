@@ -6,7 +6,7 @@
   gather_facts: true
   become: false
   collections:
-    - cohesity.ansible_collection
+    - cohesity.dataprotect
   tasks:
     - name: Create protection policy to cohesity server.
       cohesity_policy:

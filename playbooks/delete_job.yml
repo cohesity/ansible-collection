@@ -3,7 +3,7 @@
 - hosts: workstation
   gather_facts: false
   collections:
-  - cohesity.ansible_collection
+  - cohesity.dataprotect
   tasks:
     - name: Delete Protection job
       cohesity_job:
