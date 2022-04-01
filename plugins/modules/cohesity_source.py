@@ -54,6 +54,7 @@ options:
       - VMware
       - Physical
       - GenericNas
+      - SQL
     default: Physical
     description:
       - "Specifies the environment type (such as VMware or SQL) of the Protection Source this Job"
@@ -139,7 +140,18 @@ options:
     description:
       - "Determines the state of the Protection Source"
     type: str
-
+  update_source:
+    default: false
+    description:
+      - "Switch determines whether to update the existing source."
+    type: bool
+  validate_certs:
+    aliases:
+      - cohesity_validate_certs
+    default: true
+    description:
+      - "Switch determines if SSL Validation should be enabled."
+    type: bool
   vmware_type:
     choices:
       - VCenter
@@ -312,7 +324,7 @@ def get__protection_source_registration__status(module, self):
         source = get__prot_source__all(source_obj)
 
         if source:
-            env_types = ["Physical", "GenericNas"]
+            env_types = ["Physical", "GenericNas", "SQL"]
             if self["environment"] in env_types:
                 for node in source["nodes"]:
                     if node["protectionSource"]["name"] == self["endpoint"]:
@@ -326,6 +338,44 @@ def get__protection_source_registration__status(module, self):
                         return node["protectionSource"]["id"]
 
         return False
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
+def register_sql_source(module, self):
+    """
+    Function to register Sql Source.
+    """
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources/applicationServers"
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.0.0",
+        }
+        sql_payload = dict(applications=["kSQL"],
+                           hasPersistentAgent=True,
+                           protectionSourceId=self["sourceId"])
+        data = json.dumps(sql_payload)
+        response = open_url(
+            url=uri,
+            data=data,
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
+        response = json.loads(response.read())
+        return response
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -357,8 +407,17 @@ def register_source(module, self):
         elif self["environment"] == "VMware":
             payload["vmwareType"] = "k" + self["vmwareType"]
         data = json.dumps(payload)
+        request_method = "POST"
+        if module.params.get("update_source"):
+            uri = (
+                "https://"
+                + server
+                + "/irisservices/api/v1/public/protectionSources/"
+                + str(self["sourceId"]))
+        request_method = "PATCH"
         response = open_url(
             url=uri,
+            method=request_method,
             data=data,
             headers=headers,
             validate_certs=validate_certs,
@@ -366,7 +425,9 @@ def register_source(module, self):
         )
 
         response = json.loads(response.read())
-
+        # Incase of source update, no response is returned.
+        if module.params.get("update_source"):
+            response = response["nodes"][0]["protectionSource"]
         # => This switcher will allow us to return a standardized output
         # => for all Protection Sources.
         if self["environment"] == "Physical":
@@ -428,7 +489,7 @@ def main():
             # => For future enhancements, the below list should be consulted.
             # => 'SQL', 'View', 'Puppeteer', 'Pure', 'Netapp', 'HyperV', 'Acropolis', 'Azure'
             environment=dict(
-                choices=["VMware", "Physical", "GenericNas"], default="Physical"
+                choices=["VMware", "Physical", "SQL", "GenericNas"], default="Physical"
             ),
             host_type=dict(choices=["Linux", "Windows", "Aix"], default="Linux"),
             physical_type=dict(choices=["Host", "WindowsCluster"], default="Host"),
@@ -461,6 +522,7 @@ def main():
             nas_password=dict(type="str", no_log=True, default=""),
             nas_type=dict(type="str", default="Host"),
             skip_validation=dict(type="bool", default=False),
+            update_source=dict(type="bool", default=False)
         )
     )
 
@@ -478,7 +540,19 @@ def main():
         endpoint=module.params.get("endpoint"),
         environment=module.params.get("environment"),
     )
+    is_sql = False
+    is_physical_source = False
+    source_id = ""
+    if module.params.get("environment") == "SQL":
+        is_sql = True
+        prot_sources["environment"] = "Physical"
     current_status = get__protection_source_registration__status(module, prot_sources)
+    if current_status and is_sql:
+        source_id = current_status
+        is_physical_source = True
+        prot_sources["environment"] = "SQL"
+        current_status = get__protection_source_registration__status(module, prot_sources)
+
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
@@ -509,7 +583,9 @@ def main():
 
     elif module.params.get("state") == "present":
         check__mandatory__params(module)
-        if prot_sources["environment"] == "Physical":
+        # Incase of SQL source, register the source as physical source primarily and
+        # register the Mssql using physical sourceId.
+        if (prot_sources["environment"] == "Physical") or (is_sql and not is_physical_source):
             prot_sources["hostType"] = module.params.get("host_type")
             prot_sources["physicalType"] = module.params.get("physical_type")
         if prot_sources["environment"] == "VMware":
@@ -540,11 +616,10 @@ def main():
                 "skip_validation"
             )
         prot_sources["forceRegister"] = module.params.get("force_register")
-
         results["changed"] = True
         results["source_vars"] = prot_sources
 
-        if current_status:
+        if current_status and not module.params.get("update_source"):
             results = dict(
                 changed=False,
                 msg="The Protection Source for this host is already registered",
@@ -552,12 +627,21 @@ def main():
                 endpoint=module.params.get("endpoint"),
             )
         else:
+            if (not is_sql or not is_physical_source):
+                response = register_source(module, prot_sources)
+                current_status = get__protection_source_registration__status(module, prot_sources)
 
-            response = register_source(module, prot_sources)
+            prot_sources["sourceId"] = current_status
 
+            # Register the physical source as SQL source.
+            if is_sql:
+                response = register_sql_source(module, prot_sources)
+            msg = "Registration of Cohesity Protection Source Complete"
+            if module.params.get("update_source"):
+                msg = "Updation of Cohesity Protection Source Complete"
             results = dict(
                 changed=True,
-                msg="Registration of Cohesity Protection Source Complete",
+                msg=msg,
                 **response
             )
 
