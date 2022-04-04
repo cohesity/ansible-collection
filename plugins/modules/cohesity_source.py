@@ -409,12 +409,12 @@ def register_source(module, self):
         data = json.dumps(payload)
         request_method = "POST"
         if module.params.get("update_source"):
+            request_method = "PATCH"
             uri = (
                 "https://"
                 + server
                 + "/irisservices/api/v1/public/protectionSources/"
                 + str(self["sourceId"]))
-        request_method = "PATCH"
         response = open_url(
             url=uri,
             method=request_method,
@@ -553,6 +553,7 @@ def main():
         prot_sources["environment"] = "SQL"
         current_status = get__protection_source_registration__status(module, prot_sources)
 
+
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
@@ -627,11 +628,11 @@ def main():
                 endpoint=module.params.get("endpoint"),
             )
         else:
+            prot_sources["sourceId"] = current_status
             if (not is_sql or not is_physical_source):
                 response = register_source(module, prot_sources)
                 current_status = get__protection_source_registration__status(module, prot_sources)
-
-            prot_sources["sourceId"] = current_status
+                prot_sources["sourceId"] = current_status
 
             # Register the physical source as SQL source.
             if is_sql:

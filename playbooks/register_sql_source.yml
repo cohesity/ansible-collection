@@ -1,0 +1,19 @@
+# => Register windows machines as Cohesity protection sources
+---
+  - hosts: workstation
+    gather_facts: no
+    become: False
+    collections:
+      - cohesity.dataprotect
+    tasks:
+      # => Cycle through each member of the Sql hosts and register as Cohesity Protection Source
+      - name: Create new Protection Source for each Sql Server
+        cohesity_source:
+            state: present
+            cluster: "{{ cohesity_server }}"
+            username: "{{ cohesity_username }}"
+            password: "{{ cohesity_password }}"
+            validate_certs: "{{ cohesity_validate_certs }}"
+            environment: SQL
+            endpoint: "{{ item }}"
+        with_items: "{{ groups['sql'] }}"
