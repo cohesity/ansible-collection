@@ -1,0 +1,20 @@
+# => Update VMware Vcenter source already available in the cluster.
+---
+  - hosts: workstation
+    gather_facts: no
+    become: False
+    collections:
+      - cohesity.dataprotect
+    tasks:
+      - name: Update the existing Protection Source for given Vmware source.
+        cohesity_source:
+            state: present
+            endpoint: "vcenter-domain.com"
+            environment: VMware
+            cluster: "{{ cohesity_server }}"
+            username: "{{ cohesity_username }}"
+            password: "{{ cohesity_password }}"
+            validate_certs: "{{ cohesity_validate_certs }}"
+            source_password: vcenter_user
+            source_username: vcenter_password
+            update_source: True
