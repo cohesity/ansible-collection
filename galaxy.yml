@@ -54,7 +54,7 @@ repository: https://github.com/cohesity/ansible-collection
 documentation: https://developer.cohesity.com
 
 # The URL to the homepage of the collection/project
-homepage: www.cohesity.com
+homepage: cohesity
 
 # The URL to the collection issue tracker
 issues: https://github.com/cohesity/ansible-collection/issues/new/choose

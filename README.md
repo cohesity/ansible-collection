@@ -33,7 +33,7 @@ collections:
 - python version >= '3.6'
 - cohesity_management_sdk >= 1.6.0
 
-## Table of contents :scroll:
+## Table of contents
 
  - [Getting Started](https://github.com/cohesity/ansible-collection/blob/main/README.md#get-started)
  - [More samples playbooks](https://github.com/cohesity/ansible-collection/blob/main/README.md#examples)
@@ -41,7 +41,7 @@ collections:
  - [Suggestions and Feedback](https://github.com/cohesity/ansible-collection/blob/main/README.md#suggest)
 
 
-## <a name="get-started"></a> Let's get started :hammer_and_pick:
+## <a name="get-started"></a> Let's get started
 
 * [Documentation for Cohesity Ansible Collection](https://github.com/cohesity/ansible-collection/tree/main/docs).
 
@@ -49,11 +49,11 @@ collections:
 
 * Refer [`playbooks`](https://github.com/cohesity/ansible-collection/tree/main/playbooks) folder to find more examples.
 
-## <a name="contribute"></a> Contribute :handshake:
+## <a name="contribute"></a> Contribute
 
 * [Refer our contribution guideline](https://github.com/cohesity/ansible-collection/tree/main/CONTRIBUTING.md).
 
-## <a name="suggest"></a> Suggestions and Feedback :raised_hand:
+## <a name="suggest"></a> Suggestions and Feedback
 
 We would love to hear from you. Please send your suggestions and feedback to: [cohesity-api-sdks@cohesity.com](mailto:cohesity-api-sdks@cohesity.com)
 
@@ -62,6 +62,4 @@ This collection follows the [Ansible project's Code of Conduct](https://docs.ans
 
 ## License
 
-GNU General Public License v3.0 or later
-
-See LICENCE to see the full text.
+GNU General Public License v3.0.
