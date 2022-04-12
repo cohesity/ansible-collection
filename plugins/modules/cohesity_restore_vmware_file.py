@@ -14,8 +14,8 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: '1.0.0'
-author: "Cohesity (@cohesity)"
+version_added: 1.0.1
+author: "Naveena (@naveena-maplelabs)"
 
 options:
   backup_timestamp:
@@ -159,7 +159,6 @@ try:
         get__restore_job__by_type,
         get_cohesity_client,
     )
-    from cohesity_management_sdk.cohesity_client import CohesityClient
     from cohesity_management_sdk.controllers.base_controller import BaseController
     from cohesity_management_sdk.exceptions.api_exception import APIException
 except ImportError:
@@ -266,7 +265,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         payload = self.copy()
 
@@ -354,7 +353,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.

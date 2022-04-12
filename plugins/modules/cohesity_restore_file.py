@@ -15,8 +15,8 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: '1.0.0'
-author: "Cohesity (@cohesity)"
+version_added: 1.0.1
+author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
     aliases:
@@ -201,7 +201,6 @@ try:
         get__prot_source_id__by_endpoint,
         get__protection_jobs__by_environment,
         get__file_snapshot_information__by_filename,
-        get__prot_source_root_id__by_environment,
         get__restore_job__by_type,
     )
 except ImportError:
@@ -381,7 +380,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         payload = self.copy()
 
@@ -430,7 +429,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -502,7 +501,7 @@ def main():
             ),
             job_name=dict(type="str", required=True),
             endpoint=dict(type="str", required=True),
-            backup_id=dict(type="int", default=""),
+            backup_id=dict(type="int", default=0),
             backup_timestamp=dict(type="str", default=""),
             file_names=dict(type="list", elements="str", required=True),
             wait_for_job=dict(type="bool", default=True),

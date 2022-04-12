@@ -2,6 +2,8 @@
 # =>
 ---
 - hosts: localhost
+  collections:
+    - cohesity.dataprotect
   gather_facts: true
   tasks:
       # => Gather Cohesity Facts

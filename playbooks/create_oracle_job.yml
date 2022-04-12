@@ -1,0 +1,20 @@
+#=> Create a Oracle protection job for oracle sources.
+---
+- hosts: localhost
+  gather_facts: no
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Oracle Protection job"
+      cohesity_oracle_job:
+        state: present
+        job_name: protect_oracle
+        storage_domain: "DefaultStorageDomain"
+        policy: "Silver"
+        endpoint: "orcl-serv2-eng-db.com"
+        cancel_active: true
+        databases:
+          - "clone1"
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"

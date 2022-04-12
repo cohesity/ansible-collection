@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to register, remove, start, and stop the Cohesity Protection Job on a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Job will be validated and the appropriate state action"
@@ -132,7 +132,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 EXAMPLES = """
@@ -156,7 +156,6 @@ RETURN = """
 import copy
 import time
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.cohesity_client import CohesityClient
 from cohesity_management_sdk.exceptions.api_exception import APIException
 from cohesity_management_sdk.models.delete_protection_job_param import (
     DeleteProtectionJobParam,
@@ -176,10 +175,7 @@ from cohesity_management_sdk.models.oracle_special_parameters import OracleSpeci
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
-    from ansible.module_utils.urls import open_url, urllib_error
-    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
-        get__cohesity_auth__token,
-    )
+    from ansible.module_utils.urls import urllib_error
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         cohesity_common_argument_spec,
         raise__cohesity_exception__handler,
@@ -187,7 +183,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -213,7 +209,7 @@ def get_timezone():
         for line in out.split("\n"):
             if "Time zone" in line:
                 default_timezone = line.split()[2]
-    except Exception as err:
+    except Exception:
         pass
     return default_timezone
 
@@ -379,7 +375,7 @@ def start_job(module):
     try:
         body = RunProtectionJobParam()
         body.run_type = "k" + module.params.get("ondemand_run_type")
-        response = cohesity_client.protection_jobs.create_run_protection_job(
+        cohesity_client.protection_jobs.create_run_protection_job(
             job_id, body
         )
 
@@ -421,7 +417,7 @@ def stop_job(module, _id):
         )
         body = CancelProtectionJobRunParam()
         body.job_run_id = last_run.backup_run.job_run_id
-        resp = cohesity_client.protection_runs.create_cancel_protection_job_run(
+        cohesity_client.protection_runs.create_cancel_protection_job_run(
             _id, body
         )
 
@@ -561,7 +557,7 @@ def main():
                     break
             if copy_database:
                 module.fail_json(
-                    "Following list of databases are not available in the "
+                    msg="Following list of databases are not available in the "
                     "Oracle Server: %s" % ", ".join(copy_database)
                 )
             spl_params = SourceSpecialParameter()

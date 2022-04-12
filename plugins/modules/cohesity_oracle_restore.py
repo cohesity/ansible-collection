@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action"
@@ -136,7 +136,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 EXAMPLES = """
@@ -158,20 +158,6 @@ EXAMPLES = """
 import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
-from cohesity_management_sdk.cohesity_client import CohesityClient
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.delete_protection_job_param import (
-    DeleteProtectionJobParam,
-)
-from cohesity_management_sdk.models.cancel_protection_job_run_param import (
-    CancelProtectionJobRunParam,
-)
-from cohesity_management_sdk.models.protection_job_request_body import (
-    ProtectionJobRequestBody,
-)
-from cohesity_management_sdk.models.run_protection_job_param import (
-    RunProtectionJobParam,
-)
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -181,13 +167,12 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         cohesity_common_argument_spec,
-        raise__cohesity_exception__handler,
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -241,8 +226,8 @@ def create_recover_job(module, token, database_info):
     source_db = module.params.get("source_db")
     source_server = module.params.get("source_server")
     validate_certs = module.params.get("validate_certs")
-    target_db = newDatabaseName = module.params.get("target_db")
-    target_server = newDatabaseName = module.params.get("target_server")
+    target_db = module.params.get("target_db")
+    target_server = module.params.get("target_server")
     oracle_restore_params = dict(captureTailLogs=False)
 
     if clone_app_view:
@@ -403,7 +388,7 @@ def main():
 
     results = dict(
         changed=True,
-        msg='Successfully created restore task "%s"' % module.params.get("task_name"),
+        msg="Successfully created restore task '%s'" % module.params.get("task_name"),
     )
     module.exit_json(**results)
 

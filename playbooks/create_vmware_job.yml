@@ -1,0 +1,31 @@
+# => Create/Update a new Physical protection job for list of Sources.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Create Physical Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "present"
+        job_name: "protect_vm"
+        policy: Gold
+        storage_domain: "DefaultStorageDomain"
+        sources:
+          - endpoint: "endpoint"
+        environment: "VMware"
+        include: 
+          - AnsibleVM01
+          - AnsibleVM02
+        exclude:
+          - WindowsServer
+        # Enabling append_to_existing will add the new list of VMs to the
+        # existing vms available in the job.
+        # append_to_existing: true
+        cancel_active: true
+        time_zone: "America/Los_Angeles"
+        start_time: "00:00"

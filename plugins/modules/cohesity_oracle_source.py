@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to register or remove the Oracle Sources to/from a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Source will be validated and the appropriate"
@@ -77,7 +77,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 
@@ -106,12 +106,9 @@ import json
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
-from cohesity_management_sdk.cohesity_client import CohesityClient
-from cohesity_management_sdk.exceptions.api_exception import APIException
 from cohesity_management_sdk.models.register_protection_source_parameters import (
     RegisterProtectionSourceParameters,
 )
-from cohesity_management_sdk.models.environment_enum import EnvironmentEnum as env_enum
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -127,7 +124,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -177,7 +174,7 @@ def register_oracle_source(module, self, _id):
 
         response = json.loads(response.read())
         return response
-    except Exception as err:
+    except Exception:
         return payload
 
 

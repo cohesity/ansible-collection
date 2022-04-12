@@ -1,0 +1,24 @@
+# => restore vms from VMware Backup based on timestamp provided or recent job run is used for the operation.
+---
+- hosts: localhost
+  tasks:
+    - name: Restore VMs
+      cohesity_restore_vm:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        name: "Testing"
+        job_name: "protect_vm"
+        vm_names:
+          - chandra-pwsh01
+        network_name: "VLAN21"
+        vm_folder_name: "cohesity_folder"
+        wait_for_job: true
+        state: "present"
+        # restore_to_source: "myvmware.host.com"
+        resource_pool_name: "cohesity-resource_pool"
+        datastore_name: "cohesity_datastore"
+        network_connected: false
+        interface_group_name: "iface_name"
+        endpoint: vcenter.domain.com

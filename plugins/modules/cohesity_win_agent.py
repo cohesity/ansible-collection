@@ -17,8 +17,8 @@ description:
     - When executed in a playbook, the Cohesity Agent installation will be validated and the appropriate
     - state action will be applied.  The most recent version of the Cohesity Agent will be automatically
     - downloaded to the host.
-version_added: '1.0.0'
-author: "Cohesity (@cohesity)"
+version_added: 1.0.1
+author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
     aliases:

@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to clone the Virtual Machine."
 module: cohesity_clone_vm
@@ -33,12 +33,12 @@ options:
       - cohesity_user
       - username
     description:
-      - "Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats"
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
       - Formats,
       - username@AD.domain.com
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
-      - "Domain/username (Will be deprecated in future)"
+      - Domain/username (Will be deprecated in future)
     type: str
   cohesity_password:
     aliases:
@@ -120,7 +120,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 
@@ -165,7 +165,6 @@ import json
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.cohesity_client import CohesityClient
 from cohesity_management_sdk.controllers.base_controller import BaseController
 from cohesity_management_sdk.models.clone_task_request import CloneTaskRequest
 from cohesity_management_sdk.models.vmware_clone_parameters import VmwareCloneParameters
@@ -182,7 +181,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -487,7 +486,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.0"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.1"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 

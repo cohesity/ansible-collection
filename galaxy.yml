@@ -9,7 +9,7 @@ namespace: cohesity
 name: dataprotect
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.0
+version: 1.0.1
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -51,7 +51,7 @@ dependencies: {}
 repository: https://github.com/cohesity/ansible-collection
 
 # The URL to any online docs
-documentation: https://developer.cohesity.com
+# documentation: https://developer.cohesity.com
 
 # The URL to the homepage of the collection/project
 homepage: cohesity

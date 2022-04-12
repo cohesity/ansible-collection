@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to register or remove the Cohesity Protection Sources to/from a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Source will be validated and the appropriate"
@@ -177,7 +177,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 EXAMPLES = """
@@ -263,7 +263,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__prot_source__all,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -361,7 +361,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         sql_payload = dict(applications=["kSQL"],
                            hasPersistentAgent=True,
@@ -397,7 +397,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -459,7 +459,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
 
         response = open_url(
@@ -542,17 +542,14 @@ def main():
     )
     is_sql = False
     is_physical_source = False
-    source_id = ""
     if module.params.get("environment") == "SQL":
         is_sql = True
         prot_sources["environment"] = "Physical"
     current_status = get__protection_source_registration__status(module, prot_sources)
     if current_status and is_sql:
-        source_id = current_status
         is_physical_source = True
         prot_sources["environment"] = "SQL"
         current_status = get__protection_source_registration__status(module, prot_sources)
-
 
     if module.check_mode:
         check_mode_results = dict(

@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action"
@@ -181,7 +181,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 EXAMPLES = """
@@ -229,7 +229,7 @@ RETURN = """"""
 import json
 try:
     from urllib import quote
-except ImportError as e:
+except ImportError:
     from urllib.parse import quote
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error

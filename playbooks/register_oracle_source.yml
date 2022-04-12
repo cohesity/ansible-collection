@@ -1,0 +1,16 @@
+# Playbook to register Oracle source to the cluster.
+---
+- hosts: localhost
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Cohesity Protection Source: Set Source to state of present"
+      cohesity_oracle_source:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: present
+        force_register: true
+        endpoint: "orcl-serv2-eng-db.com"

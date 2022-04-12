@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Cohesity (@cohesity)"
+author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to deploy or remove the Cohesity Physical Agent from supported Linux Machines."
   - "When executed in a playbook, the Cohesity Agent installation will be validated and the appropriate"
@@ -119,7 +119,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Physical Agent"
-version_added: "1.0.0"
+version_added: 1.0.1
 """
 
 import os
@@ -128,9 +128,9 @@ import time
 import shutil
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils._text import to_bytes
 from ansible.module_utils.urls import open_url, urllib_error
-from tempfile import mkstemp, mkdtemp
+from tempfile import mkdtemp
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
@@ -141,7 +141,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
         get__cohesity_auth__token,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -335,13 +335,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.0",
+                "user-agent": "cohesity-ansible/v1.0.1",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.0.0",
+                "user-agent": "cohesity-ansible/v1.0.1",
             }
 
         agent = open_url(
@@ -428,7 +428,7 @@ def install_agent(module, installer, native):
             install_opts += "--skip-lvm-check "
         try:
             cmd = "{0}/setup.sh --install --yes {1}".format(installer, install_opts)
-        except Exception as e:
+        except Exception:
             cmd = "%s/setup.sh --install --yes %s" % (installer, install_opts)
     else:
         try:
@@ -454,7 +454,7 @@ def install_agent(module, installer, native):
                     str(module.params.get("operating_system"))
                     + " isn't supported by cohesity ansible module",
                 )
-        except Exception as e:
+        except Exception:
             if module.params.get("operating_system") == "Ubuntu":
                 cmd = "sudo COHESITYUSER=%s dpkg -i %s" % (user, installer)
             elif module.params.get("operating_system") in (
@@ -484,7 +484,7 @@ def extract_agent(module, filename):
     create_download_dir(module, target)
     try:
         cmd = "{0} --nox11 --noexec --target {1} ".format(filename, target)
-    except Exception as e:
+    except Exception:
         cmd = "%s --nox11 --noexec --target %s " % (filename, target)
 
     rc, stdout, stderr = module.run_command(cmd)
@@ -508,7 +508,7 @@ def remove_agent(module, installer, native):
     if not native:
         try:
             cmd = "{0}/setup.sh --full-uninstall --yes".format(installer)
-        except Exception as e:
+        except Exception:
             cmd = "%s/setup.sh --full-uninstall --yes" % (installer)
         rc, out, err = module.run_command(cmd, cwd=installer)
 
@@ -616,7 +616,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.0",
+            "user-agent": "cohesity-ansible/v1.0.1",
         }
         response = open_url(
             url=uri,
@@ -668,10 +668,10 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.0",
+                "user-agent": "cohesity-ansible/v1.0.1",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
-            response = open_url(
+            open_url(
                 url=uri,
                 data=json.dumps(payload),
                 headers=headers,

@@ -13,7 +13,7 @@ DOCUMENTATION = """
 module_utils: cohesity_auth
 short_description: The **CohesityAuth** utils module provides the authentication token manage
 for Cohesity Platforms.
-version_added: 1.0.0
+version_added: 1.0.1
 description:
     - The **CohesityAuth** utils module provides the authentication token manage
 for Cohesity Platforms.
@@ -22,8 +22,6 @@ for Cohesity Platforms.
 
 import json
 from ansible.module_utils.urls import open_url, urllib_error
-import ansible.module_utils.six.moves.urllib.error as urllib_error
-from ansible.module_utils._text import to_bytes, to_native, to_text
 
 
 class ParameterViolation(Exception):
@@ -101,7 +99,7 @@ class Authentication(object):
                 try:
                     # => Fixing this to deal with issues during unit testing
                     error = error.read()
-                except Exception as e:
+                except Exception:
                     pass
                 raise TokenException(error)
             except IOError as error:
@@ -140,7 +138,7 @@ class Authentication(object):
         except urllib_error.HTTPError as e:
             try:
                 msg = json.loads(e.read())["message"]
-            except Exception as e:
+            except Exception:
                 # => For HTTPErrors that return no JSON with a message (bad errors), we
                 # => will need to handle this by setting the msg variable to some default.
                 msg = "no-json-data"
@@ -153,7 +151,6 @@ class Authentication(object):
 
 def get__cohesity_auth__token(self):
     server = self.params.get("cluster")
-    validate_certs = self.params.get("validate_certs")
 
     auth = Authentication()
     auth.username = self.params.get("username")

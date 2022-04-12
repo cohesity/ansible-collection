@@ -15,8 +15,8 @@ module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: '1.0.0'
-author: "Cohesity (@cohesity)"
+version_added: 1.0.1
+author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
     aliases:
@@ -115,7 +115,6 @@ EXAMPLES = """
 from ansible.module_utils.basic import AnsibleModule
 
 import traceback
-from ansible.module_utils.urls import open_url, urllib_error
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
@@ -134,7 +133,7 @@ try:
         get__protection_run__all,
     )
 
-except Exception as e:
+except Exception:
     pass
 
 
@@ -221,7 +220,7 @@ def main():
         if include_runs:
             results["cluster"]["protection"]["runs"] = get__protection_run__all(params)
 
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Failure while collecting Cohesity Facts",
             exception=traceback.format_exc(),

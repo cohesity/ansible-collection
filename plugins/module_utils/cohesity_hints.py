@@ -13,7 +13,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.0.0
+version_added: 1.0.1
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -26,7 +26,7 @@ import traceback
 
 try:
     from urllib import quote
-except ImportError as e:
+except ImportError:
     from urllib.parse import quote
 
 from ansible.module_utils.urls import open_url, urllib_error
@@ -37,16 +37,10 @@ try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
     from cohesity_management_sdk.cohesity_client import CohesityClient
-    from ansible_collections.cohesity.cluster.plugins.module_utils.cohesity_auth import (
-        Authentication,
-        TokenException,
-        ParameterViolation,
-    )
-    from ansible_collections.cohesity.cluster.plugins.module_utils.cohesity_utilities import (
-        cohesity_common_argument_spec,
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         raise__cohesity_exception__handler,
     )
-except Exception as e:
+except Exception:
     pass
 
 
@@ -107,11 +101,12 @@ def get__cluster(self):
         cluster = json.loads(cluster.read())
     except urllib_error.HTTPError as e:
         try:
-            msg = json.loads(e.read())["message"]
-        except Exception as e:
+            json.loads(e.read())["message"]
+        except Exception:
             # => For HTTPErrors that return no JSON with a message (bad errors), we
             # => will need to handle this by setting the msg variable to some default.
-            msg = "no-json-data"
+            # msg = "no-json-data"
+            pass
         else:
             raise HTTPException(e.read())
     return cluster
@@ -131,11 +126,12 @@ def get__nodes(self):
         nodes = json.loads(nodes.read())
     except urllib_error.HTTPError as e:
         try:
-            msg = json.loads(e.read())["message"]
-        except Exception as e:
+            json.loads(e.read())["message"]
+        except Exception:
             # => For HTTPErrors that return no JSON with a message (bad errors), we
             # => will need to handle this by setting the msg variable to some default.
-            msg = "no-json-data"
+            # msg = "no-json-data"
+            pass
         else:
             raise HTTPException(e.read())
     return nodes
@@ -333,7 +329,7 @@ def get__prot_source_root_id__by_environment(module, self):
         raise ProtectionException(
             "There was a very serious situation where the chosen environment did not return a valid Root Node ID"
         )
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Source.",
             exception=traceback.format_exc(),
@@ -361,7 +357,7 @@ def get__prot_policy_id__by_name(module, self):
             + self["policyId"]
             + ") did not return a valid ID"
         )
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Source.",
             exception=traceback.format_exc(),
@@ -399,7 +395,7 @@ def get__storage_domain_id__by_name(module, self):
             + self["viewBoxId"]
             + ") did not return a valid ID"
         )
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Source.",
             exception=traceback.format_exc(),
@@ -436,7 +432,7 @@ def get__prot_source_id__by_endpoint(module, self):
                         return node["protectionSource"]["id"]
 
         return False
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Source.",
             exception=traceback.format_exc(),
@@ -457,7 +453,7 @@ def get__protection_jobs__by_environment(module, self):
         )
         return get__prot_job__all(source_obj)
 
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Jobs.",
             exception=traceback.format_exc(),
@@ -481,7 +477,7 @@ def get__protection_run__all__by_id(module, self):
 
         return get__protection_run__all(source_obj)
 
-    except Exception as error:
+    except Exception:
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Jobs.",
             exception=traceback.format_exc(),
