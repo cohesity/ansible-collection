@@ -1,0 +1,56 @@
+# => Cohesity Agent Management
+# =>
+# => Collection: cohesity.dataprotect
+# =>
+
+# => Install the Cohesity Agent on each Ubuntu host
+# => specified in the Ansible inventory
+# =>
+---
+- hosts: ubuntu
+  vars:
+    state: present
+    create_user: false
+    native_package: false
+
+  # => We need to gather facts to determine the OS type of
+  # => the machine
+  gather_facts: true
+  become: true
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    # Alert: Don't edit these tasks.
+    - name: Install Prerequisite Packages for Ubuntu
+      action: >
+        {{ ansible_pkg_mgr }} name="wget,rsync,lsof,lvm2,nfs-common" state=present
+      when:
+        - ansible_distribution == "Ubuntu"
+      tags: always
+
+    - name: Check if firewall is enabled on Ubuntu
+      command: "ufw status"
+      register: firewall_status_ubuntu
+      when:
+        - ansible_distribution == "Ubuntu"
+      tags: always
+
+    - name: Enable tcp port 50051 for Ubuntu
+      command: ufw allow 50051/tcp
+      when:
+        - ansible_distribution == "Ubuntu"
+        - 'firewall_status_ubuntu.stdout_lines[0] == "Status: active"'
+      tags: always
+
+    - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
+      cohesity_agent:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "{{ state | default('present') }}"
+        create_user: "{{ create_user | default(false) }}"
+        native_package: "{{ native_package | default(false) }}"
+        # Please don't overwrite/edit the operating_system. Will be automatically
+        # fetched from server.
+        operating_system: "{{ ansible_distribution }}"

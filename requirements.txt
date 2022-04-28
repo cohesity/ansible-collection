@@ -1,1 +1,2 @@
 cohesity-management-sdk
+pywinrm

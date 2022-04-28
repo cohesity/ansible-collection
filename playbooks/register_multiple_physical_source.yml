@@ -1,0 +1,26 @@
+# Playbook to register list of Physical source to the cluster.
+---
+- hosts: localhost
+  become: false
+  collections:
+    - cohesity.dataprotect
+  vars:
+    linux_servers:
+      - ServerA
+      - ServerB
+  tasks:
+    - name: "Cohesity Protection Source: Set Source to state of present }}"
+      cohesity_source:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: present
+        endpoint: "{{ item }}"
+        environment: "Physical"
+        force_register: true
+      with_items: "{{ linux_servers }}"
+
+      # If the list of sources to be registered is available in the inventory
+      # as groups we can access them as follows.
+      # with_items: "{{ groups['linux'] }}"

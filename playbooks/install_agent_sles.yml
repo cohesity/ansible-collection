@@ -1,0 +1,59 @@
+# => Cohesity Agent Management
+# =>
+# => Collection: cohesity.dataprotect
+# =>
+
+# => Install the Cohesity Agent on each Sles host
+# => specified in the Ansible inventory
+# =>
+---
+- hosts: sles
+  vars:
+    create_user: false
+    native_package: false
+
+  # => We need to gather facts to determine the OS type of
+  # => the machine
+  gather_facts: true
+  become: true
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    # Alert: Don't edit these tasks.
+    - name: Install Prerequisite Packages for SLES
+      action: >
+        {{ ansible_pkg_mgr }} name="wget,rsync,lsof,lvm2,libcap-progs" state=present
+      when:
+        - ansible_distribution == "SLES"
+      tags: always
+
+    - name: Check if firewall is enabled on SLES
+      command: "firewall-cmd --state"
+      ignore_errors: true
+      register: firewall_status_centos
+      when:
+        - ansible_distribution == "SLES"
+      tags: always
+
+    - name: Enable tcp port 50051 for SLES
+      command: "firewall-cmd {{ item }}"
+      with_items:
+        - --zone=public --permanent --add-port 50051/tcp
+        - --reload
+      when:
+        - ansible_distribution == "SLES"
+        - firewall_status_centos.rc == 0
+      tags: always
+
+    - name: "Cohesity agent: Set Agent to state of present"
+      cohesity_agent:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "{{ state | default('present') }}"
+        create_user: "{{ create_user | default(false) }}"
+        native_package: "{{ native_package | default(false) }}"
+        # Please don't overwrite/edit the operating_system. Will be automatically
+        # fetched from server.
+        operating_system: "{{ ansible_distribution }}"

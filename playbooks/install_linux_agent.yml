@@ -106,4 +106,6 @@
         state: "{{ state | default('present') }}"
         create_user: "{{ create_user | default(false) }}"
         native_package: "{{ native_package | default(false) }}"
+        # Please don't overwrite/edit the operating_system. Will be automatically
+        # fetched from server.
         operating_system: "{{ ansible_distribution }}"

@@ -1,0 +1,41 @@
+# => Cohesity Agent Management
+# =>
+# => Collection: cohesity.dataprotect
+# =>
+
+# => Install the Cohesity Agent on each AIX host
+# => specified in the Ansible inventory
+# =>
+---
+- hosts: aix
+  vars:
+    create_user: false
+    native_package: false
+
+  # => We need to gather facts to determine the OS type of
+  # => the machine
+  gather_facts: true
+  become: true
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    # Alert: Don't edit these tasks.
+    - name: Install Prerequisite Packages for AIX
+      action: >
+        {{ ansible_pkg_mgr }} name="wget,rsync" state=present
+      when:
+        - ansible_distribution == "AIX"
+      tags: always
+
+    - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
+      cohesity_agent:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "{{ state | default('present') }}"
+        create_user: "{{ create_user | default(false) }}"
+        native_package: "{{ native_package | default(false) }}"
+        # Please don't overwrite/edit the operating_system. Will be automatically
+        # fetched from server.
+        operating_system: "{{ ansible_distribution }}"
