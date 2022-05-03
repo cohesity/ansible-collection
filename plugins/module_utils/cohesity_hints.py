@@ -13,7 +13,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.0.1
+version_added: 1.0.2
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.

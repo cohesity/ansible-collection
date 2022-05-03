@@ -120,7 +120,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: 1.0.1
+version_added: 1.0.2
 """
 
 
@@ -486,7 +486,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.1"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.2"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 

@@ -119,7 +119,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Physical Agent"
-version_added: 1.0.1
+version_added: 1.0.2
 """
 
 import os
@@ -335,13 +335,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.1",
+                "user-agent": "cohesity-ansible/v1.0.2",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.0.1",
+                "user-agent": "cohesity-ansible/v1.0.2",
             }
 
         agent = open_url(
@@ -616,7 +616,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.1",
+            "user-agent": "cohesity-ansible/v1.0.2",
         }
         response = open_url(
             url=uri,
@@ -668,7 +668,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.1",
+                "user-agent": "cohesity-ansible/v1.0.2",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(

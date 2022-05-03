@@ -8,7 +8,7 @@
 ![](docs/assets/images/cohesity_ansible.png)
 
 ## Overview
-[![License: GNU General Public License v3.0](https://img.shields.io/hexpm/l/plug.svg?style=popout)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
+[![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
 
 This project provides an Ansible Collection for interacting with the [Cohesity DataPlatform](https://www.cohesity.com/products/data-platform).
 

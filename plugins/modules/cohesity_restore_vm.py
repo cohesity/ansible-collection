@@ -181,7 +181,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: 1.0.1
+version_added: 1.0.2
 """
 
 EXAMPLES = """
