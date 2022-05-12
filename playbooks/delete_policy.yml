@@ -13,3 +13,6 @@
         validate_certs: "{{ cohesity_validate_certs }}"
         name: 'Ansible'
         state: 'absent'
+        incremental_backup_schedule:
+          periodicity: Daily
+

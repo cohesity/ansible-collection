@@ -25,7 +25,7 @@ assignees: ''
 
 <!--
   How did you expect your project to behave?
-  It’s fine if you’re not sure your understanding is correct.
+  It's fine if you're not sure your understanding is correct.
   Just write down what you thought would happen.
 -->
 

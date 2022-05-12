@@ -21,7 +21,7 @@ The Cohesity Ansible collection includes several Demo and Complete plays designe
 ### What is it?
 [top](#Configure-Your-Ansible-Inventory)
 
-> Ansible works against multiple systems in your infrastructure at the same time. It does this by selecting portions of systems listed in Ansible’s inventory, which defaults to being saved in the `/etc/ansible/hosts` location. You can specify a different inventory file using the *-i <path>* option on the command line.
+> Ansible works against multiple systems in your infrastructure at the same time. It does this by selecting portions of systems listed in Ansible's inventory, which defaults to being saved in the `/etc/ansible/hosts` location. You can specify a different inventory file using the *-i <path>* option on the command line.
 
 For more details on the Ansible Inventory File, see [Working with Inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) in the *Ansible User Guide*.
 
