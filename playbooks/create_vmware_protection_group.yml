@@ -1,11 +1,11 @@
-# => Create/Update a new Physical protection job for list of Sources.
+# => Create/Update a new Vmware protection job for list of Sources.
 ---
 - hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: Create Physical Protection job.
+    - name: Create Vmware Protection job.
       cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
@@ -16,7 +16,7 @@
         policy: Gold
         storage_domain: "DefaultStorageDomain"
         sources:
-          - endpoint: "endpoint"
+          - endpoint: "vcenter.domain.com"
         environment: "VMware"
         include: 
           - AnsibleVM01
