@@ -16,7 +16,7 @@ description:
   - "Ansible Module used to register or remove the Cohesity Protection Sources to/from a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Source will be validated and the appropriate"
   - "state action will be applied."
-module: cohesity_source
+module: cohesity_plugin
 options:
   cluster:
     aliases:
@@ -31,10 +31,9 @@ options:
       - username
     description:
       - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
-      - username@AD.domain.com
+      - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
-      - Domain/username (Will be deprecated in future)
     type: str
   cohesity_password:
     aliases:
@@ -86,49 +85,39 @@ EXAMPLES = """
 
 RETURN = """
 """
-
-class InstallError(Exception):
-    pass
-                                                                                                        
+                  
+# Builtin imports.                                                                                      
 import os
-import json
+
+# Ansible Imports.
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
 
-try:
-    # => When unit testing, we need to look in the correct location however, when run via ansible,
-    # => the expectation is that the modules will live under ansible.
-    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
-        get__cohesity_auth__token,
-    )
-    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
-        cohesity_common_argument_spec,
-        raise__cohesity_exception__handler,
-        REQUEST_TIMEOUT,
-    )
-    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all,
-    )
-except Exception:
-    pass
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
+    get__cohesity_auth__token,
+)
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
+    cohesity_common_argument_spec,
+    raise__cohesity_exception__handler,
+    REQUEST_TIMEOUT,
+)
 
+
+class InstallError(Exception):
+    pass
 
 class ProtectionException(Exception):
     pass
 
-
-# => Determine if the Endpoint is presently registered to the Cohesity Cluster
-# => and if so, then return the Protection Source ID.
-
+COHESITY_POSTGRES_CONNECTOR = "cohesity-postgres-connector"
 
 def check__mandatory__params(module):
-    # => This method will perform validations of optionally mandatory parameters
-    # => required for specific states and environments.
-    pass
+    """
+    This method will perform validations of optionally mandatory parameters
+    required for specific states and environments.
+    """
     success = True
     missing_params = list()
-    environment = module.params.get("environment")
-    nas_protocol = module.params.get("nas_protocol")
 
     if module.params.get("state") == "present":
         action = "creation"
@@ -140,24 +129,23 @@ def check__mandatory__params(module):
         module.fail_json(
             msg="The following variables are mandatory for this action ("
             + action
-            + ") when working with environment type ("
-            + environment
-            + ")",
+            + ") when working with environment type (UDA)",
             missing=missing_params,
             changed=False,
         )
 
 
 def check_plugin(module, results):
-    # => Determine if the Cohesity Plugin is currently installed
+    """
+    Determine if the Cohesity Plugin is currently installed in the host.
+    """
     return
-    # cmd = "yum list|grep  cohesity-postgres-connector"
-    cmd = "rpm -qa|grep cohe"
+    cmd = "rpm -qa|grep " + COHESITY_POSTGRES_CONNECTOR
     rc, out, err = module.run_command(cmd)
     split_out = out.split("\n")
     version = ""
     for v in split_out:
-        if "cohesity-postgres-connector" in v:
+        if COHESITY_POSTGRES_CONNECTOR in v:
             version = v.split()[-2]
             break
     if version:
@@ -172,8 +160,10 @@ def check_plugin(module, results):
     return results
 
 
-# => Register the new Endpoint as a Cohesity Protection Source.
 def download_datastore_plugin(module):
+    """
+    Download the datastore plugin from the cohesity server.
+    """
     path = os.path.curdir
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
@@ -220,19 +210,23 @@ def download_datastore_plugin(module):
 
 
 def install_plugin(module, filename):
-
+    """"""
     script_dir = module.params.get("script_dir")
     cmd = "rpm -ivh %s -prefix %s" % (filename, script_dir)
     rc, stdout, stderr = module.run_command(cmd)
     # => Any return code other than 0 is considered a failure.
+    if rc:
+        return(False, "Partially installed the Cohesity Plugin")
     return (True, "Successfully Installed the Cohesity plugin")
 
 
 def uninstall_plugin(module):
     try:
-        cmd = "rpm remove cohesity-postgres-connector -y"
+        cmd = "rpm remove " + COHESITY_POSTGRES_CONNECTOR + " -y"
         rc, stdout, stderr = module.run_command(cmd)
         # => Any return code other than 0 is considered a failure.
+        if rc:
+            return(False, "Failed to uninstall the Cohesity plugin")
         return (True, "Successfully Uninstalled the Cohesity plugin")
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
@@ -305,18 +299,10 @@ def main():
 
     elif module.params.get("state") == "present":
         check__mandatory__params(module)
+
         # Download the user scripts from the cluster.
         filename = download_datastore_plugin(module)
-        # Create folder for user scripts.
-        from pathlib import Path
-        scripts_dir = module.params.get("scripts_dir")
-        # The following command will create parent directory if not available.
-        # Setting exist_ok to true will not throw error is folder is already
-        # available.
-        Path(scripts_dir).mkdir(parents=True, exist_ok=True)
-
-        response = install_plugin(module, filename)
-        
+        response = install_plugin(module, filename)        
         results = dict(
             changed=True,
             msg="Successfully installed datatstore plugin",

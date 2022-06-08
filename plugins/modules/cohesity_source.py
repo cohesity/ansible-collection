@@ -31,10 +31,9 @@ options:
       - username
     description:
       - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
-      - username@AD.domain.com
+      - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
-      - Domain/username (Will be deprecated in future)
     type: str
   cohesity_password:
     aliases:
@@ -261,7 +260,7 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all,
+        get__prot_source__all, unregister_source
     )
 except Exception:
     pass
@@ -443,41 +442,6 @@ def register_source(module, self):
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
-
-# => Unregister an existing Cohesity Protection Source.
-def unregister_source(module, self):
-    server = module.params.get("cluster")
-    validate_certs = module.params.get("validate_certs")
-    token = self["token"]
-    try:
-        uri = (
-            "https://"
-            + server
-            + "/irisservices/api/v1/public/protectionSources/"
-            + str(self["id"])
-        )
-        headers = {
-            "Accept": "application/json",
-            "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.3",
-        }
-
-        response = open_url(
-            url=uri,
-            method="DELETE",
-            headers=headers,
-            validate_certs=validate_certs,
-            timeout=REQUEST_TIMEOUT,
-        )
-
-        return response
-    except urllib_error.URLError as e:
-        # => Capture and report any error messages.
-        raise__cohesity_exception__handler(e.read(), module)
-    except Exception as error:
-        raise__cohesity_exception__handler(error, module)
-
-
 def main():
     # => Load the default arguments including those specific to the Cohesity Agent.
     argument_spec = cohesity_common_argument_spec()
@@ -646,7 +610,7 @@ def main():
     elif module.params.get("state") == "absent":
         if current_status:
             prot_sources["id"] = current_status
-
+            prot_sources["timeout"] = REQUEST_TIMEOUT
             response = unregister_source(module, prot_sources)
 
             results = dict(
