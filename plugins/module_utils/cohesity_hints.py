@@ -6,6 +6,7 @@
 #
 
 from __future__ import absolute_import, division, print_function
+from http.client import REQUEST_TIMEOUT
 
 __metaclass__ = type
 
@@ -139,7 +140,7 @@ def get__nodes(self):
 
 def get__prot_source__all(self):
     try:
-        if self["environment"] == "VMware":
+        if self["environment"] in ["UDA", "VMware"]:
             uri = (
                 "https://"
                 + self["server"]
@@ -162,7 +163,7 @@ def get__prot_source__all(self):
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
         )
         objects = json.loads(objects.read())
-        if len(objects) and self["environment"] != "VMware":
+        if len(objects) and self["environment"] not in ["UDA", "VMware"]:
             objects = objects[0]
         return objects
     except urllib_error.URLError as error:
@@ -573,3 +574,39 @@ def get__restore_job__by_type(module, self):
         return objects
     except urllib_error.URLError as error:
         raise HTTPException(error.read())
+
+
+
+# => Unregister an existing Cohesity Protection Source.
+def unregister_source(module, self):
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources/"
+            + str(self["id"])
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.0.3",
+        }
+
+        response = open_url(
+            url=uri,
+            method="DELETE",
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
+
+        return response
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+

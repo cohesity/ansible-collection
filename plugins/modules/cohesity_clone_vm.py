@@ -35,10 +35,9 @@ options:
     description:
       - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
       - Formats,
-      - username@AD.domain.com
+      - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
-      - Domain/username (Will be deprecated in future)
     type: str
   cohesity_password:
     aliases:
