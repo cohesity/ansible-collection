@@ -78,6 +78,7 @@ def get_cohesity_client(module):
             username = user_domain[0]
             domain = user_domain[1]
 
+        global cohesity_client
         cohesity_client = CohesityClient(
             cluster_vip=cluster_vip, username=username, password=password, domain=domain
         )
@@ -576,7 +577,6 @@ def get__restore_job__by_type(module, self):
         raise HTTPException(error.read())
 
 
-
 # => Unregister an existing Cohesity Protection Source.
 def unregister_source(module, self):
     server = module.params.get("cluster")
@@ -607,6 +607,74 @@ def unregister_source(module, self):
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
+
+
+def get__prot_policy_id__by_name(module):
+    try:
+        name = module.params.get("protection_policy")
+        resp = cohesity_client.protection_policies.get_protection_policies(names=name)
+        if not resp:
+            module.exit_json(output="Please provide a valid protection policy name")
+        return resp[0].id
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
+def get__storage_domain_id__by_name(module):
+    try:
+        name = module.params.get("storage_domain")
+        resp = cohesity_client.view_boxes.get_view_boxes(names=name)
+        if not resp:
+            module.exit_json(output="Please provide a valid storage domain name")
+        return resp[0].id
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
+def get_protection_run__status__by_id(module, group_id):
+    try:
+        group_run = cohesity_client.protection_runs.get_protection_runs(group_id=group_id)
+        if not group_run:
+            return False, "", ""
+        # Fetch the status of last group run.
+        last_run = group_run[0]
+        status = last_run.backup_run.status
+        if status == "kAccepted":
+            return True, status, last_run
+        elif status in ["kCanceled", "kSuccess"]:
+            return False, status, last_run
+        return False, status, ""
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
+def check__protection_group__exists(module, self):
+    try:
+        name = module.params.get("name")
+        environment = "k" + module.params.get("environment")
+        server = module.params.get("cluster")
+        validate_certs = module.params.get("validate_certs")
+        uri = "https://" + server + "/v2/data-protect/protection-groups?environments=" + environment
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + self["token"],
+            "user-agent": "cohesity-ansible/v1.0.3",
+        }
+        response = open_url(
+            url=uri,
+            method="GET",
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=self["timeout"],
+        )
+        if not response.getcode() == 200:
+            raise Exception(response.read())
+        group_list = json.loads(response.read())
+        for group in group_list.get("protectionGroups", None):
+            if group["name"] == name:
+                return group["id"], group
+            
+        return False, ""
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 

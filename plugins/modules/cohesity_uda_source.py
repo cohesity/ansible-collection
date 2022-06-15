@@ -9,7 +9,7 @@ __metaclass__ = type
 # GNU General Public License v3.0+ (see https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
-DOCUMENTATION = r"""
+DOCUMENTATION = """
 ---
 author: "Naveena (@naveena-maplelabs)"
 description:
@@ -24,6 +24,23 @@ options:
     description:
       - "IP or FQDN for the Cohesity Cluster"
     type: str
+  hosts:
+    type: list
+    elements: str
+    description:
+      - Specifies the list of Ips/hostnames for the nodes forming UDA Source Cluster.
+  mount_view:
+    type: bool
+    default: False
+    description: Specifies if SMB/NFS view mounting should be enabled or not.
+  state:
+    type: str
+    choices:
+      - present
+      - absent
+    default: present
+    description:
+      - "Determines the state of the Protection Source"
   cohesity_admin:
     aliases:
       - admin_name
@@ -35,6 +52,22 @@ options:
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
     type: str
+  source_type:
+    type: str
+    description:
+      - Type of the UDA source to be registered.
+    default: Linux
+    choices:
+      - Linux
+      - Windows
+      - Aix
+      - Solaris
+      - SapHana
+      - SapOracle
+      - CockroachDB
+      - MySQL
+      - VMWareCDPFilter
+      - PostgreSQL
   cohesity_password:
     aliases:
       - password
@@ -42,12 +75,39 @@ options:
     description:
       - "Password belonging to the selected Username.  This parameter will not be logged."
     type: str
+  db_username:
+    type: str
+    description:
+      - Username of the database.
+  db_password:
+    type: str
+    description:
+      - Password of the database.
+  scripts_dir:
+    type: str
+    description:
+      - Absolute path of the scripts used to interact with the UDA source.
+    default: /opt/cohesity/postgres/scripts/
+  source_registration_args:
+    type: str
+    description:
+      - Specifies the custom arguments to be supplied to the source registration scripts.
+  source_name:
+    type: str
+    required: True
+    description:
+      - Specifies the name of the protection source while registering.
   endpoint:
     description:
       - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
       - "be an URL or hostname or an IP address of the Protection Source"
     required: true
     type: str
+  update_source:
+    type: bool
+    default: False
+    description:
+      - Specifies whether to update the source, if the source is already registered.
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
@@ -142,7 +202,7 @@ def register_source(module, self):
         payload = dict(
             environment="kUDA",
             udaParams=dict(
-                sourceType= 'k' + module.params.get("source_type"),
+                sourceType='k' + module.params.get("source_type"),
                 hosts=module.params.get("hosts"),
                 credentials=dict(
                     username=module.params.get("db_username"),
@@ -153,7 +213,7 @@ def register_source(module, self):
                 sourceRegistrationArgs=module.params.get("source_registration_args"),
             ),
         )
-        data=json.dumps(payload)
+        data = json.dumps(payload)
         request_method = "POST"
         if module.params.get("update_source"):
             request_method = "PUT"
@@ -172,7 +232,6 @@ def register_source(module, self):
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
     except Exception as error:
-        return {}
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(error, module)
 
@@ -224,11 +283,12 @@ def main():
                 ],
                 default="Linux",
             ),
+            endpoint=dict(type="str", required=True),
             hosts=dict(type="list", default=[], elements="str"),
             mount_view=dict(default=False, type="bool"),
             scripts_dir=dict(default="/opt/cohesity/postgres/scripts/", type="str"),
             db_username=dict(type="str", default=""),
-            db_password=dict(type="str", default=""),
+            db_password=dict(type="str", default="", no_log=True),
             source_registration_args=dict(type="str"),
             source_name=dict(type="str", required=True),
             update_source=dict(type="bool", default=False),

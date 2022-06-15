@@ -1,0 +1,22 @@
+#=> Create a Cohesity protection job for UDA hosts.
+---
+- hosts: localhost
+  gather_facts: no
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Uda Protection job"
+      cohesity_uda_protection_group:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        state: present
+        protection_group_name: protect_uda
+        storage_domain: "DefaultStorageDomain"
+        policy: "Silver"
+        endpoint: "x.x.x.x"
+        cancel_active: true
+        objects:
+          - object
+        time_zone: Asia/Kolkata
+        start_time: "12:30"
