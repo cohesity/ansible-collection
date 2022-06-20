@@ -18,7 +18,7 @@
         sources:
           - endpoint: "vcenter.domain.com"
         environment: "VMware"
-        include: 
+        include:
           - AnsibleVM01
           - AnsibleVM02
         exclude:

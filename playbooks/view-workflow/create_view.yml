@@ -8,7 +8,7 @@
     name: ViewName
     state: present
   tasks:
-    - name: "Cohesity view: Set {{ name }} to state of {{ state | default('present') }}"
+    - name: "Cohesity view: Set {{ name }} to state of present"
       cohesity_view:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

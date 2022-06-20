@@ -15,4 +15,3 @@
         state: 'absent'
         incremental_backup_schedule:
           periodicity: Daily
-
