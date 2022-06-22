@@ -1,0 +1,19 @@
+#=> restore files from linux machine, recent job run is used for the operation
+---
+- hosts: localhost
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Restore UDA objects.
+      cohesity_uda_restore:
+          cluster: "{{ cohesity_server }}"
+          username: "{{ cohesity_username }}"
+          password: "{{ cohesity_password }}"
+          validate_certs: "{{ cohesity_validate_certs }}"
+          task_name: "Ansible UDA Restore Tasks"
+          group_name: "NewSaphana"
+          source_server: 10.2.194.52
+          overwrite: false
+          rename_to: null
+          object: SSS
+          state: "present"

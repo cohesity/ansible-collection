@@ -427,6 +427,9 @@ def get__prot_source_id__by_endpoint(module, self):
                         return node["protectionSource"]["id"]
             else:
                 for node in source:
+                    if self["environment"] == "UDA" and node["protectionSource"]["name"] == self["endpoint"]:
+                        return node["protectionSource"]["id"]
+                        
                     if (
                         node["registrationInfo"]["accessInfo"]["endpoint"]
                         == self["endpoint"]

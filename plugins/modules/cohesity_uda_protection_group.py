@@ -189,7 +189,7 @@ RETURN = """
 
 import json
 import time
-
+from urllib.error import HTTPError
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
@@ -432,6 +432,12 @@ def create_group(module, self, body):
             )
         response = json.loads(response.read())
         return response
+    except HTTPError as err:
+        error = json.load(err)
+        module.fail_json(
+            msg='Error while creating/updating protection group, error '
+                'message: "%s"' % error["message"]
+        )
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
