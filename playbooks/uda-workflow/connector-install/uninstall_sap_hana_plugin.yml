@@ -1,0 +1,41 @@
+# => Cohesity Agent Management
+# =>
+# => Collection: cohesity.dataprotect
+# =>
+
+# => Install the Cohesity Datastore Agent on each SapHana host
+# => specified in the Ansible inventory
+# =>
+---
+- hosts: saphana
+  # => We need to gather facts to determine the OS type of
+  # => the machine
+  gather_facts: true
+  vars:
+    state: "absent"
+    platform: SapHana
+    sap_hana_user: sss_admin
+    sap_hana_password: password
+    sap_hana_home: /usr/sap/ABC/home
+    installer: cohesity_secure_connector_service_version_sap_hana_installer
+    SID: ABC
+    user_store_key: KEY
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Cohesity agent: Set Agent to state of absent"
+      cohesity_plugin:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "{{ state }}"
+        platform: "SapHana"
+        endpoint: "{{ inventory_hostname }}"
+        download_location: "{{ sap_hana_home }}"
+      register: result
+      when: state == "absent" and platform == "SapHana"
+
+    - name: "Uninstall the Cohesity UDA connector plugin"
+      shell: "echo {{ sap_hana_password}} | su - {{ sap_hana_user }} -c '{{ installer }}  -- -u -s {{ SID }} -k {{ user_store_key }} -w uda -a {{ cohesity_server }} -d {{ sap_hana_home }} -y'"
+      when: state == "absent" and platform == "SapHana"
