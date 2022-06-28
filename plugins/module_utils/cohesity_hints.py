@@ -609,7 +609,7 @@ def unregister_source(module, self):
         raise__cohesity_exception__handler(e.read(), module)
 
 
-def get__prot_policy_id__by_name(module):
+def get__prot_policy_id__by__name(module):
     try:
         name = module.params.get("protection_policy")
         resp = cohesity_client.protection_policies.get_protection_policies(names=name)
@@ -620,7 +620,7 @@ def get__prot_policy_id__by_name(module):
         raise__cohesity_exception__handler(error, module)
 
 
-def get__storage_domain_id__by_name(module):
+def get__storage_domain_id__by__name(module):
     try:
         name = module.params.get("storage_domain")
         resp = cohesity_client.view_boxes.get_view_boxes(names=name)

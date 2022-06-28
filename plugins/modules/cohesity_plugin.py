@@ -1,21 +1,21 @@
 #!/usr/bin/python
 # Copyright (c) 2022 Cohesity Inc
 
-
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
 # GNU General Public License v3.0+ (see https://www.gnu.org/licenses/gpl-3.0.txt)
 
-
-DOCUMENTATION = r"""
+DOCUMENTATION = """
 ---
 author: "Naveena (@naveena-maplelabs)"
 description:
   - "Ansible Module used to register or remove the Cohesity Protection Sources to/from a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Source will be validated and the appropriate"
   - "state action will be applied."
+extends_documentation_fragment:
+  - cohesity.dataprotect.cohesity
 module: cohesity_plugin
 options:
   cluster:
@@ -30,7 +30,7 @@ options:
       - cohesity_user
       - username
     description:
-      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
+      - "Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats"
       - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
@@ -42,22 +42,41 @@ options:
     description:
       - "Password belonging to the selected Username.  This parameter will not be logged."
     type: str
-  environment:
-    choices:
-      - VMware
-      - Physical
-      - GenericNas
-      - SQL
-    default: Physical
+  download_location:
     description:
-      - "Specifies the environment type (such as VMware or SQL) of the Protection Source this Job"
-      - "is protecting. Supported environment types include 'Physical', 'VMware', 'GenericNas'"
-    required: false
+      - "Absolute path of the scripts used to store the downloaded connection plugin."
     type: str
-  source_username:
+  endpoint:
     description:
-      - "Specifies username to access the target source."
-      - "Required when I(state=present) and I(environment=VMware)"
+      - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
+      - "be an URL or hostname or an IP address of the Protection Source"
+    required: true
+    type: str
+  netmask_bits:
+    description:
+      - "Applicable when the platform type is PostgreSQL and state is present."
+      - "Is required to add the SapHana hosts to the cluster's global allow lists."
+    type: int
+  platform:
+    choices:
+      - Linux
+      - Windows
+      - Aix
+      - Solaris
+      - SapHana
+      - SapOracle
+      - CockroachDB
+      - MySQL
+      - VMWareCDPFilter
+      - PostgreSQL
+    default: Linux
+    description:
+      - "Type of the UDA source to be registered."
+    type: str
+  scripts_dir:
+    default: /opt
+    description:
+      - "Absolute path of the scripts used to interact with the UDA source."
     type: str
   state:
     choices:
@@ -67,27 +86,32 @@ options:
     description:
       - "Determines the state of the Protection Source"
     type: str
-extends_documentation_fragment:
-- cohesity.dataprotect.cohesity
-short_description: "Management of Cohesity Datastore Plugin"
-version_added: 1.0.3
+  upgrade:
+    default: false
+    description:
+      - "Determines whether to upgrade the connector plugin if already installed."
+    type: bool
+short_description:"Management of Cohesity Datastore Plugin"
+version_added: "1.0.3"
 """
 
 EXAMPLES = """
 # Install cohesity connector plugin on a postgresql host.
+---
 - cohesity_source:
-    server: cohesity.lab
-    username: admin
     password: password
-    state: present
     platform: PostgreSQL
+    server: cohesity.lab
+    state: present
+    username: admin
 """
 
 RETURN = """
 """
-                  
-# Builtin imports.                                                                                      
+
+# Builtin imports.
 import os
+import json
 
 # Ansible Imports.
 from ansible.module_utils.basic import AnsibleModule
@@ -106,22 +130,26 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_util
 class InstallError(Exception):
     pass
 
+
 class ProtectionException(Exception):
     pass
 
+
 COHESITY_POSTGRES_CONNECTOR = "cohesity-postgres-connector"
+
 
 def check__mandatory__params(module):
     """
     This method will perform validations of optionally mandatory parameters
-    required for specific states and environments.
+    required for specific states.
     """
     success = True
     missing_params = list()
-
+    platform = module.params.get("platform")
     if module.params.get("state") == "present":
         action = "creation"
-
+        if platform == "PostgreSQL" and not module.params.get("netmask_bits"):
+            missing_params.append("netmask_bits")
     else:
         action = "remove"
 
@@ -129,7 +157,7 @@ def check__mandatory__params(module):
         module.fail_json(
             msg="The following variables are mandatory for this action ("
             + action
-            + ") when working with environment type (UDA)",
+            + ") when working with UDA environment platform type '%s'" % platform,
             missing=missing_params,
             changed=False,
         )
@@ -139,7 +167,6 @@ def check_plugin(module, results):
     """
     Determine if the Cohesity Plugin is currently installed in the host.
     """
-    return
     cmd = "rpm -qa|grep " + COHESITY_POSTGRES_CONNECTOR
     rc, out, err = module.run_command(cmd)
     split_out = out.split("\n")
@@ -164,10 +191,7 @@ def download_datastore_plugin(module):
     """
     Download the datastore plugin from the cohesity server.
     """
-    path = os.path.curdir
-    server = module.params.get("cluster")
-    validate_certs = module.params.get("validate_certs")
-    token = get__cohesity_auth__token(module)
+    path = module.params.get("download_location")
     try:
         platform = "k" + module.params.get("platform")
         uri = (
@@ -201,7 +225,10 @@ def download_datastore_plugin(module):
             raise InstallError(e)
         finally:
             f.close()
-        return filename
+        # Plugin installation commands will be exectued through playbooks.
+        if platform == "kSapHana":
+            module.exit_json(filename=filename, changed=True)
+            return filename
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -209,25 +236,104 @@ def download_datastore_plugin(module):
         raise__cohesity_exception__handler(error, module)
 
 
+def update_global_allow_lists(module):
+    """"
+    Function to update the cluster global allow lists.
+    Required only for SapHana platform.
+    : returns: None
+    """
+    try:
+        API = uri = (
+            "https://" + server + "/irisservices/api/v1/public/externalClientSubnets"
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-plugin": "cohesity-ansible/v1.0.3",
+        }
+        response = open_url(
+            url=uri,
+            method="GET",
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
+        if response.code == 200:
+            resp = json.loads(response.read())
+
+        endpoint = module.params.get("endpoint")
+        mask_bits = module.params.get("netmask_bits")
+        # Fetch existing subnets available in the cluster, to avoid
+        # overwriting existing subnets.
+        client_subnets = resp.get("clientSubnets", [])
+        # Check host is already added ot the existing subnets.
+        for subnet in client_subnets:
+            if subnet["ip"] == endpoint:
+                return
+        subnet = {
+            "ip": endpoint,
+            "netmaskBits": mask_bits,
+            "nfsAccess": "kReadWrite",
+            "s3Access": "kReadWrite",
+            "smbAccess": "kReadWrite",
+        }
+        client_subnets.append(subnet)
+        body = {"clientSubnets": client_subnets}
+        response = open_url(
+            url=uri,
+            method="PUT",
+            data=json.dumps(body),
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        module.fail_json(
+            msg="Error while updating global subnets, err %s" % str(e.read())
+        )
+    except Exception as e:
+        module.fail_json(msg="Error while updating global subnets, err %s" % str(e))
+
+
+def upgrade_plugin(module):
+    # TODO: Add support for upgrade.
+    return
+
+
 def install_plugin(module, filename):
-    """"""
-    script_dir = module.params.get("script_dir")
-    cmd = "rpm -ivh %s -prefix %s" % (filename, script_dir)
-    rc, stdout, stderr = module.run_command(cmd)
-    # => Any return code other than 0 is considered a failure.
-    if rc:
-        return(False, "Partially installed the Cohesity Plugin")
-    return (True, "Successfully Installed the Cohesity plugin")
+    """
+    Function to install the cohesity datastore plugin on the hosts.
+    """
+    try:
+        scripts_dir = module.params.get("scripts_dir")
+        platform = module.params.get("platform")
+        # The scripts will be stored under following location
+        # <scripts_dir>/cohesity/postgres/scripts/.
+        if platform in ["Postgres"]:
+            cmd = "rpm -ivh %s --prefix %s" % (filename, scripts_dir)
+        rc, stdout, stderr = module.run_command(cmd)
+        # => Any return code other than 0 is considered a failure.
+        if rc:
+            module.fail_json(
+                msg="Error while installing connector plugin %s" % stderr)
+        return (True, "Successfully Installed the Cohesity plugin")
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
 
 
 def uninstall_plugin(module):
     try:
-        cmd = "rpm remove " + COHESITY_POSTGRES_CONNECTOR + " -y"
-        rc, stdout, stderr = module.run_command(cmd)
-        # => Any return code other than 0 is considered a failure.
-        if rc:
-            return(False, "Failed to uninstall the Cohesity plugin")
-        return (True, "Successfully Uninstalled the Cohesity plugin")
+        if module.params.get("platform") == "PostgreSQL":
+            cmd = "rpm remove " + COHESITY_POSTGRES_CONNECTOR + " -y"
+            rc, stdout, stderr = module.run_command(cmd)
+            # => Any return code other than 0 is considered a failure.
+            if rc:
+                return (
+                    False,
+                    "Failed to uninstall the Cohesity plugin, err msg '%s'" % stderr,
+                )
+            return (True, "Successfully Uninstalled the Cohesity plugin")
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
@@ -249,13 +355,15 @@ def main():
                     "CockroachDB",
                     "MySQL",
                     "VMWareCDPFilter",
-                    "PostgreSQL"
+                    "PostgreSQL",
                 ],
                 default="Linux",
             ),
-            scripts_dir=dict(type="str", default="/opt/cohesity/postgres/scripts/"),
-            download_location=dict(type="str", default=""),
-            upgrade=dict(type="bool", default=False)
+            endpoint=dict(type="str", required=True),
+            netmask_bits=dict(type="int"),
+            scripts_dir=dict(type="str", default="/opt"),
+            download_location=dict(type="str", default=os.getcwd()),
+            upgrade=dict(type="bool", default=False),
         )
     )
 
@@ -266,7 +374,10 @@ def main():
         msg="Attempting to install datastore plugin on the datastore server",
         state=module.params.get("state"),
     )
-
+    global server, validate_certs, token
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = get__cohesity_auth__token(module)
     result = check_plugin(module, results)
     if module.check_mode:
         check_mode_results = dict(
@@ -280,10 +391,10 @@ def main():
                     "msg"
                 ] = "Check Mode: Plugin is currently installed.  No changes"
             else:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Plugin is currently not installed." + \
-                    " This action would install the Plugin."
+                check_mode_results["msg"] = (
+                    "Check Mode: Plugin is currently not installed."
+                    + " This action would install the Plugin."
+                )
                 check_mode_results["version"] = result["version"]
         else:
             if result["version"]:
@@ -300,9 +411,13 @@ def main():
     elif module.params.get("state") == "present":
         check__mandatory__params(module)
 
+        # Endpoint should be added to global allowlists for SapHana platform.
+        if module.params.get("platform") == "SapHana":
+            update_global_allow_lists(module)
+
         # Download the user scripts from the cluster.
         filename = download_datastore_plugin(module)
-        response = install_plugin(module, filename)        
+        install_plugin(module, filename)
         results = dict(
             changed=True,
             msg="Successfully installed datatstore plugin",
@@ -311,10 +426,10 @@ def main():
     elif module.params.get("state") == "absent":
         status, resp = uninstall_plugin(module)
         results = dict(
-            changed=False,
-            msg="Successfully uninstalled the plugin",
+            changed=status,
+            msg=resp,
             status=status,
-            resp=resp
+            resp=resp,
         )
     else:
         # => This error should never happen based on the set assigned to the parameter.

@@ -222,8 +222,8 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
         get__prot_source_id__by_endpoint,
-        get__prot_policy_id__by_name,
-        get__storage_domain_id__by_name,
+        get__prot_policy_id__by__name,
+        get__storage_domain_id__by__name,
         get_protection_run__status__by_id,
         check__protection_group__exists,
     )
@@ -542,9 +542,9 @@ def main():
         check__mandatory__params(module)
         body = dict(
             name=module.params.get("name"),
-            storageDomainId=get__storage_domain_id__by_name(module),
+            storageDomainId=get__storage_domain_id__by__name(module),
             environment="k" + module.params.get("environment"),
-            policyId=get__prot_policy_id__by_name(module),
+            policyId=get__prot_policy_id__by__name(module),
             timezone=module.params.get("time_zone").strip(),
             description=module.params.get("description"),
         )
