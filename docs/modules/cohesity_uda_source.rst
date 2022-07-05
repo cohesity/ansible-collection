@@ -36,26 +36,64 @@ Parameters
     IP or FQDN for the Cohesity Cluster
 
 
+  hosts (optional, list, None)
+    Specifies the list of Ips/hostnames for the nodes forming UDA Source Cluster.
+
+
+  mount_view (optional, bool, False)
+    Specifies if SMB/NFS view mounting should be enabled or not.
+
+
+  state (optional, str, present)
+    Determines the state of the Protection Source
+
+
   cohesity_admin (optional, str, None)
     Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
 
-    username@AD.domain.com
+    AD.domain.com/username
 
     AD.domain.com/username@tenant
 
     LOCAL/username@tenant
 
-    Domain/username (Will be deprecated in future)
+
+  source_type (optional, str, Linux)
+    Type of the UDA source to be registered.
 
 
   cohesity_password (optional, str, None)
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
+  db_username (optional, str, None)
+    Username of the database.
+
+
+  db_password (optional, str, None)
+    Password of the database.
+
+
+  scripts_dir (optional, str, /opt/cohesity/postgres/scripts/)
+    Absolute path of the scripts used to interact with the UDA source.
+
+
+  source_registration_args (optional, str, None)
+    Specifies the custom arguments to be supplied to the source registration scripts.
+
+
+  source_name (True, str, None)
+    Specifies the name of the protection source while registering.
+
+
   endpoint (True, str, None)
     Specifies the network endpoint of the Protection Source where it is reachable. It could
 
     be an URL or hostname or an IP address of the Protection Source
+
+
+  update_source (optional, bool, False)
+    Specifies whether to update the source, if the source is already registered.
 
 
   validate_certs (optional, bool, True)

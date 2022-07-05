@@ -41,13 +41,11 @@ Parameters
 
     Formats,
 
-    username@AD.domain.com
+    AD.domain.com/username
 
     AD.domain.com/username@tenant
 
     LOCAL/username@tenant
-
-    Domain/username (Will be deprecated in future)
 
 
   cohesity_password (optional, str, None)

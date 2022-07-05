@@ -91,7 +91,7 @@ options:
     description:
       - "Determines whether to upgrade the connector plugin if already installed."
     type: bool
-short_description:"Management of Cohesity Datastore Plugin"
+short_description: "Management of Cohesity Datastore Plugin"
 version_added: "1.0.3"
 """
 

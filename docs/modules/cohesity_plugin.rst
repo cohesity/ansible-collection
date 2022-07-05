@@ -39,33 +39,47 @@ Parameters
   cohesity_admin (optional, str, None)
     Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
 
-    username@AD.domain.com
+    AD.domain.com/username
 
     AD.domain.com/username@tenant
 
     LOCAL/username@tenant
-
-    Domain/username (Will be deprecated in future)
 
 
   cohesity_password (optional, str, None)
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
-  environment (False, str, Physical)
-    Specifies the environment type (such as VMware or SQL) of the Protection Source this Job
-
-    is protecting. Supported environment types include 'Physical', 'VMware', 'GenericNas'
+  download_location (optional, str, None)
+    Absolute path of the scripts used to store the downloaded connection plugin.
 
 
-  source_username (optional, str, None)
-    Specifies username to access the target source.
+  endpoint (True, str, None)
+    Specifies the network endpoint of the Protection Source where it is reachable. It could
 
-    Required when *state=present* and *environment=VMware*
+    be an URL or hostname or an IP address of the Protection Source
+
+
+  netmask_bits (optional, int, None)
+    Applicable when the platform type is PostgreSQL and state is present.
+
+    Is required to add the SapHana hosts to the cluster's global allow lists.
+
+
+  platform (optional, str, Linux)
+    Type of the UDA source to be registered.
+
+
+  scripts_dir (optional, str, /opt)
+    Absolute path of the scripts used to interact with the UDA source.
 
 
   state (optional, str, present)
     Determines the state of the Protection Source
+
+
+  upgrade (optional, bool, False)
+    Determines whether to upgrade the connector plugin if already installed.
 
 
   validate_certs (optional, bool, True)
@@ -91,12 +105,13 @@ Examples
 
     
     # Install cohesity connector plugin on a postgresql host.
+    ---
     - cohesity_source:
-        server: cohesity.lab
-        username: admin
         password: password
-        state: present
         platform: PostgreSQL
+        server: cohesity.lab
+        state: present
+        username: admin
 
 
 
