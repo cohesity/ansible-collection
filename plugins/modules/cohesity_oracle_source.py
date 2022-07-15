@@ -76,7 +76,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.3
+version_added: 1.0.4
 """
 
 
