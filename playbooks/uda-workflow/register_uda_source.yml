@@ -19,5 +19,6 @@
              - x.x.x.x
             # The source will be registered with the provided source_name.
             source_name: endpoint.domain.name
+            endpoint: endpoint.domain.name
             source_registration_args: "--source-name=x.x.x.x --port=5433"
             update_source: true
