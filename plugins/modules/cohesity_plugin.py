@@ -92,7 +92,7 @@ options:
       - "Determines whether to upgrade the connector plugin if already installed."
     type: bool
 short_description: "Management of Cohesity Datastore Plugin"
-version_added: "1.0.4"
+version_added: "1.0.5"
 """
 
 EXAMPLES = """
@@ -191,7 +191,7 @@ def download_datastore_plugin(module):
     """
     Download the datastore plugin from the cohesity server.
     """
-    path = module.params.get("download_location")
+    path = module.params.get("download_location") or os.getcwd()
     try:
         platform = "k" + module.params.get("platform")
         uri = (
@@ -202,7 +202,7 @@ def download_datastore_plugin(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.4",
+            "user-plugin": "cohesity-ansible/v1.0.5",
         }
         response = open_url(
             url=uri,
@@ -249,7 +249,7 @@ def update_global_allow_lists(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.4",
+            "user-plugin": "cohesity-ansible/v1.0.5",
         }
         response = open_url(
             url=uri,
@@ -362,7 +362,7 @@ def main():
             endpoint=dict(type="str", required=True),
             netmask_bits=dict(type="int"),
             scripts_dir=dict(type="str", default="/opt"),
-            download_location=dict(type="str", default=os.getcwd()),
+            download_location=dict(type="str"),
             upgrade=dict(type="bool", default=False),
         )
     )

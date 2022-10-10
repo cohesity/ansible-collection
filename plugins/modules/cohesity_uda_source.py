@@ -52,6 +52,11 @@ options:
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
     type: str
+  os_type:
+    type: str
+    description:
+      - Type of the UDA source to be registered.
+      - Field is applicable for few cluster versions.
   source_type:
     type: str
     description:
@@ -68,6 +73,7 @@ options:
       - MySQL
       - VMWareCDPFilter
       - PostgreSQL
+      - Other
   cohesity_password:
     aliases:
       - password
@@ -111,7 +117,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
-version_added: 1.0.4
+version_added: 1.0.5
 """
 
 EXAMPLES = """
@@ -196,7 +202,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.4",
+            "user-agent": "cohesity-ansible/v1.0.5",
         }
         payload = dict(
             environment="kUDA",
@@ -212,6 +218,8 @@ def register_source(module, self):
                 sourceRegistrationArgs=module.params.get("source_registration_args"),
             ),
         )
+        if module.params.get("os_type", None):
+            payload["osType"] = 'k' + module.params.get("os_type")
         data = json.dumps(payload)
         request_method = "POST"
         if module.params.get("update_source"):
@@ -279,9 +287,11 @@ def main():
                     "MySQL",
                     "VMWareCDPFilter",
                     "PostgreSQL",
+                    "Other",
                 ],
                 default="Linux",
             ),
+            os_type=dict(type="str", required=False),
             endpoint=dict(type="str", required=True),
             hosts=dict(type="list", default=[], elements="str"),
             mount_view=dict(default=False, type="bool"),

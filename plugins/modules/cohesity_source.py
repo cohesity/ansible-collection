@@ -176,7 +176,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.4
+version_added: 1.0.5
 """
 
 EXAMPLES = """
@@ -267,6 +267,7 @@ except Exception:
     pass
 
 SLEEP_TIME = 10
+
 
 class ProtectionException(Exception):
     pass
@@ -364,7 +365,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.4",
+            "user-agent": "cohesity-ansible/v1.0.5",
         }
         sql_payload = dict(applications=["kSQL"],
                            hasPersistentAgent=True,
@@ -372,10 +373,10 @@ def register_sql_source(module, self):
         data = json.dumps(sql_payload)
         if self.get("refresh", False):
             uri = (
-            "https://"
-            + server
-            + "/irisservices/api/v1/public/protectionSources/refresh/"
-            + str(self["physicalSourceId"])
+                "https://"
+                + server
+                + "/irisservices/api/v1/public/protectionSources/refresh/"
+                + str(self["physicalSourceId"])
         )
 
         response = open_url(
@@ -410,7 +411,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.4",
+            "user-agent": "cohesity-ansible/v1.0.5",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -424,7 +425,7 @@ def register_source(module, self):
         if module.params.get("update_source"):
             if not self.get("sourceId", None):
                 module.fail_json(
-                        msg="Could find the source, skipping source updation!")
+                    msg="Could find the source, skipping source updation!")
             request_method = "PATCH"
             uri = (
                 "https://"
@@ -615,7 +616,7 @@ def main():
                 current_status = get__protection_source_registration__status(module, prot_sources)
                 if not current_status:
                     module.fail_json(
-                            msg="Failed to register %s source" % prot_sources["environment"])
+                        msg="Failed to register %s source" % prot_sources["environment"])
                 prot_sources["physicalSourceId"] = current_status
                 prot_sources["sourceId"] = current_status
 

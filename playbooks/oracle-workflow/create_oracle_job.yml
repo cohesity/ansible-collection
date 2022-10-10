@@ -18,3 +18,4 @@
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
+        archive_log_keep_days: 1

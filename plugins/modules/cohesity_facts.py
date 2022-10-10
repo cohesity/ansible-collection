@@ -15,7 +15,7 @@ module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: 1.0.4
+version_added: 1.0.5
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -82,6 +82,11 @@ options:
       - will filter the Protection Sources, Jobs, and Executions data and return only current information if I(include_deleted=no)
     type: bool
     default: no
+  validate_certs:
+    default: false
+    description:
+      - "Switch determines if SSL Validation should be enabled."
+    type: bool
 
 """
 
