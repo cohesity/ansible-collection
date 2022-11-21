@@ -40,7 +40,7 @@ options:
       - password
       - admin_pass
     description:
-      - "Password belonging to the selected Username.  This parameter will not be logged."
+      - "Password belonging to the selected Username. This parameter will not be logged."
     type: str
   endpoint:
     description:
@@ -245,6 +245,7 @@ RETURN = """
 """
 
 import json
+import subprocess
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
@@ -547,21 +548,31 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is currently registered.  No changes"
             else:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
+                # Check source is reachable.
+                endpoint = module.params.get("endpoint")
+                command = ["ping", "-c", "1", endpoint, "-w", "10"]
+                if subprocess.call(command) == 0:
+                    check_mode_results["msg"] = "Check Mode: Protection Source '%s' is not reachable" % endpoint
+                    check_mode_results["status"] = False
+                else:
+                    check_mode_results[
+                        "msg"
+                    ] = "Check Mode: Cohesity Protection Source is not currently registered. This action would register the Protection Source."
                 check_mode_results["id"] = current_status
         else:
             if current_status:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Source is currently registered.  This action would unregister the Protection Source."
+                ] = "Check Mode: Cohesity Protection Source is currently registered. This action would unregister the Protection Source."
                 check_mode_results["id"] = current_status
             else:
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  No changes."
-        module.exit_json(**check_mode_results)
+        if check_mode_results.get("status", True):
+            module.exit_json(**check_mode_results)
+        else:
+            module.fail_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
         check__mandatory__params(module)

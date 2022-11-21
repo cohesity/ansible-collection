@@ -546,6 +546,7 @@ def main():
             environment="k" + module.params.get("environment"),
             policyId=get__prot_policy_id__by__name(module),
             timezone=module.params.get("time_zone").strip(),
+            timeZone=module.params.get("time_zone").strip(),
             description=module.params.get("description"),
         )
         objects = [{"name": name for name in module.params.get("objects")}]

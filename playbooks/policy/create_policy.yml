@@ -16,5 +16,8 @@
         validate_certs: "{{ cohesity_validate_certs }}"
         name: 'Ansible'
         state: 'present'
+        replication_copy:
+          - cluster_name: ClusterA
+          - cluster_name: ClusterB
         incremental_backup_schedule:
           periodicity: Daily

@@ -1382,10 +1382,11 @@ def main():
                     else:
                         module.params.get("protection_sources")[i]["endpoint"] = None
                     i += 1
-
                 job_details[
                     "parentSourceId"
                 ] = get__prot_source_root_id__by_environment(module, job_details)
+                if job_details["environment"] == "VMware":
+                    job_details["parentSourceId"] = source_id
                 job_details["viewBoxId"] = get__storage_domain_id__by_name(
                     module, job_details
                 )

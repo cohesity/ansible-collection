@@ -78,6 +78,10 @@ options:
     description: "Specifies the name of the protection policy."
     required: true
     type: str
+  replication_copy:
+    description: Specifies the list of replication cluster to be added while creating policy.
+    elements: dict
+    type: list
   retries:
     default: 3
     description: "Specifies the retry count while policy creation."
@@ -141,7 +145,13 @@ from cohesity_management_sdk.models.monthly_schedule import MonthlySchedule
 from cohesity_management_sdk.models.protection_policy_request import (
     ProtectionPolicyRequest,
 )
+from cohesity_management_sdk.models.replication_target_settings import (
+    ReplicationTargetSettings,
+)
 from cohesity_management_sdk.models.scheduling_policy import SchedulingPolicy
+from cohesity_management_sdk.models.snapshot_replication_copy_policy import (
+    SnapshotReplicationCopyPolicy,
+)
 from cohesity_management_sdk.models.snapshot_archival_copy_policy import (
     SnapshotArchivalCopyPolicy,
 )
@@ -275,6 +285,28 @@ def extended_retention(module):
         raise__cohesity_exception__handler(error, module)
 
 
+def get_remote_cluster_id(module, cluster_name):
+    """
+    function to get the remote cluster id
+    :param module: object that holds parameters passed to the module
+    :param target_name: remote cluster name
+    :return:
+    """
+    try:
+        clusters = cohesity_client.remote_cluster.get_remote_clusters(
+                cluster_names=cluster_name)
+        for cluster in clusters:
+            if cluster.name == cluster_name:
+                return cluster.cluster_id
+        if module.check_mode:
+            return None
+        raise__cohesity_exception__handler(
+            "Failed to find replication cluster " + str(cluster_name), module
+        )
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def get_external_target_id(module, target_name):
     """
     function to get the external target id
@@ -287,12 +319,40 @@ def get_external_target_id(module, target_name):
         for vault in vaults:
             if vault.name == target_name:
                 return vault.id
+        if module.check_mode:
+            return None
         raise__cohesity_exception__handler(
             "Failed to find external target " + str(target_name), module
         )
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
+
+def replication_copy_policies(module):
+    """
+    :param module: object that holds parameters passed to the module
+    :return:
+    """
+    try:
+        replication_policies = []
+        for policy in module.params.get("replication_copy"):
+            replication_policy = SnapshotReplicationCopyPolicy()
+            replication_policy.multiplier = policy.get("multiplier", 1)
+            replication_policy.copy_partial = policy.get("copy_partial", True)
+            replication_policy.days_to_keep = policy.get(
+                "days_to_retain", module.params.get("days_to_retain")
+            )
+            replication_policy.periodicity = "k" + policy.get("periodicity", "Day")
+            replication_target = ReplicationTargetSettings()
+            replication_target.cluster_id = get_remote_cluster_id(
+                module, policy.get("cluster_name")
+            )
+            replication_target.cluster_name = policy.get("cluster_name")
+            replication_policy.target = replication_target
+            replication_policies.append(replication_policy)
+        return replication_policies
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
 
 def archival_copy_policies(module):
     """
@@ -367,6 +427,10 @@ def create_policy(module):
         if module.params.get("extended_retention"):
             policy_request.extended_retention_policies = extended_retention(module)
 
+        if module.params.get("replication_copy"):
+            policy_request.snapshot_replication_copy_policies = replication_copy_policies(
+                module
+            )
         if module.params.get("archival_copy"):
             policy_request.snapshot_archival_copy_policies = archival_copy_policies(
                 module
@@ -426,6 +490,7 @@ def main():
             log_backup_schedule=dict(type="dict"),
             extended_retention=dict(type="list", elements="dict"),
             archival_copy=dict(type="list", elements="dict"),
+            replication_copy=dict(type="list", elements="dict"),
         )
     )
 
@@ -460,6 +525,25 @@ def main():
                     "Check Mode: Cohesity protection policy doesn't exist."
                     " This action would create a protection policy"
                 )
+                if module.params.get("extended_retention"):
+                    remote_clusters = cohesity_client.remote_cluster.get_remote_clusters()
+
+                if module.params.get("archival_copy"):
+                    unavailable_targets = []
+                    for target in module.params.get("archival_copy"):
+                        if not get_external_target_id(target["target_name"]):
+                            unavailable_targets.append(target["target_name"])
+                    if unavailable_targets:
+                        check_mode_results["msg"] += "Following list of external targets " \
+                            "are not available, '%s'" % ", ".join(unavailable_targets)
+                if module.params.get("replication_copy"):
+                    unavailable_remote_clusters = []
+                    for cluster in module.params.get("replication_copy"):
+                        if not get_remote_cluster_id(target["cluster_name"]):
+                            unavailable_remote_clusters.append(target["cluster_name"])
+                    if unavailable_remote_clusters:
+                        check_mode_results["msg"] += "Following list of remote clusters " \
+                            "are not available, '%s'" % ", ".join(unavailable_remote_clusters)
                 check_mode_results["changed"] = True
         else:
             if policy_exists:
