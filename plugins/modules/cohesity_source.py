@@ -176,7 +176,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.5
+version_added: 1.0.8
 """
 
 EXAMPLES = """
@@ -365,7 +365,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.8",
         }
         sql_payload = dict(applications=["kSQL"],
                            hasPersistentAgent=True,
@@ -377,7 +377,7 @@ def register_sql_source(module, self):
                 + server
                 + "/irisservices/api/v1/public/protectionSources/refresh/"
                 + str(self["physicalSourceId"])
-        )
+            )
 
         response = open_url(
             url=uri,
@@ -411,7 +411,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.8",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]

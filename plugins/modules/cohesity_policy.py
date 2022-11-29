@@ -99,7 +99,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Cohesity Protection Policy"
-version_added: 1.0.5
+version_added: 1.0.8
 """
 
 EXAMPLES = """
@@ -439,7 +439,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.5"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.8"
     cohesity_client = get_cohesity_client(module)
     policy_exists, policy_details = get_policy_details(module)
 
