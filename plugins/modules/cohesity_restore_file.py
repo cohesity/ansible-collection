@@ -552,6 +552,7 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
+                get__snapshot_information__for_file(module, job_details)
         else:
             if job_exists:
                 check_mode_results[

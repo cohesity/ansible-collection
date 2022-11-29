@@ -46,6 +46,11 @@ options:
     description:
       - "Password belonging to the selected Username.  This parameter will not be logged."
     type: str
+  end_timestamp:
+    description:
+      - "Option to identify backups based on a end timestamp"
+    required: false
+    type: str
   environment:
     choices:
     - VMware
@@ -83,6 +88,11 @@ options:
     description:
       - "Specifies the resource pool where the cloned or recovered objects are attached."
     type: str
+  start_timestamp:
+    description:
+      - "Option to identify backups based on a start timestamp."
+    required: false
+    type: str
   state:
     choices:
       - present
@@ -94,12 +104,10 @@ options:
   suffix:
     description: "Specifies a suffix to appended to the original source object name to derive a new name      for the recovered or cloned object."
     type: str
-
   view_name:
     description:
       - "Name of the view"
     type: str
-    required: true
   vm_names:
     description:
       - "List of virtual machines"
@@ -235,6 +243,8 @@ def get_protection_job_details(module):
         if protection_jobs:
             return protection_jobs[0]
         else:
+            if module.check_mode:
+                return False
             raise__cohesity_exception__handler(
                 "Failed to find the job name for the selected environment type", module
             )
@@ -260,6 +270,13 @@ def get_snapshot_details(module, timestamp, vm_name, job_id):
         object_details = cohesity_client.restore_tasks.search_objects(
             search=vm_name, job_ids=[job_id]
         )
+        if module.params.get("start_timestamp") and module.params.get("end_timestamp"):
+            object_details = cohesity_client.restore_tasks.search_objects(
+                search=vm_name,
+                job_ids=[job_id],
+                start_time_usecs=module.params.get("start_timestamp"),
+                end_time_usecs=module.params.get("end_timestamp")
+            )
         if object_details.total_count == 0:
             raise__cohesity_exception__handler(
                 "There are no existing snapshots for " + str(vm_name), module
@@ -338,6 +355,8 @@ def get_resource_pool_id(module, resource_pool, protection_source_id):
                     == "kResourcePool"
                 ):
                     return node["protectionSource"]["id"]
+        if module.check_mode:
+            return False
         raise__cohesity_exception__handler(
             "Failed to find the resource pool " + str(resource_pool), module
         )
@@ -461,8 +480,10 @@ def main():
             name=dict(type="str", required=True),
             state=dict(choices=["present", "absent"], default="present"),
             job_name=dict(type="str", required=True),
-            view_name=dict(type="str", required=True),
+            view_name=dict(type="str"),
             backup_timestamp=dict(type="str", default=""),
+            start_timestamp=dict(type="str", default=""),
+            end_timestamp=dict(type="str", default=""),
             environment=dict(choices=["VMware"], default="VMware"),
             vm_names=dict(type="list", required=True, elements="str"),
             wait_for_job=dict(type="bool", default=True),
@@ -500,10 +521,22 @@ def main():
                 ] = "Check Mode: Cohesity clone task is already present. No changes"
                 check_mode_results["id"] = clone_details.id
             else:
+                check_mode_results["changed"] = True
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity clone task doesn't exist. This action would clone VMs"
-                check_mode_results["changed"] = True
+                job_details = get_protection_job_details(module)
+                if not job_details:
+                    check_mode_results["msg"] += "Job '%s' doesn't exist in the cluster" \
+                            % module.params.get("job_name")
+                    check_mode_results["changed"] = False
+                resource_pool_id = get_resource_pool_id(
+                        module, module.params.get("resource_pool"), job_details.parent_source_id)
+                if not resource_pool_id:
+                    check_mode_results["msg"] += "Resource pool '%s' is not available in " \
+                        "the server" % module.params.get("resource_pool_name")
+                    check_mode_results["changed"] = False
+
         else:
             if clone_exists:
                 check_mode_results["msg"] = (

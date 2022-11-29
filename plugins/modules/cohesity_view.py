@@ -475,19 +475,15 @@ def main():
                 check_mode_results["name"] = view_details.name
                 check_mode_results["changed"] = True
             else:
-                domain_id = get_storage_domain_id(module)
-                if not domain_id:
-                    check_mode_results["msg"] = (
-                        "Check Mode: Failed to find storage domain " + \
-                                module.params.get("storage_domain")
-                    )
-                    check_mode_results["changed"] = False
-                else:
-                    check_mode_results["msg"] = (
-                        "Check Mode: Cohesity view doesn't exist."
-                        " This action would create a new Cohesity view"
-                    )
-                    check_mode_results["changed"] = True
+                check_mode_results["msg"] = (
+                    "Check Mode: Cohesity view doesn't exist."
+                    " This action would create a new Cohesity view."
+                )
+                name = module.params.get("storage_domain")
+                storage_domains = cohesity_client.view_boxes.get_view_boxes(names=name)
+                if not storage_domains or storage_domains[0].name == name:
+                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % name
+                check_mode_results["changed"] = True
         else:
             if view_exists:
                 check_mode_results["msg"] = (

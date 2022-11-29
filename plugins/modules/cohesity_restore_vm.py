@@ -699,6 +699,20 @@ def main():
                 check_mode_results[
                     'msg'] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results['id'] = job_exists
+                restore_to_source_details = get_source_details(module, True)
+                restore_to_source_objects = get_vmware_source_objects(module, restore_to_source_details['id'])
+                if module.params.get('resource_pool_name'):
+                    resource_pool_id =\
+                        get_vmware_object_id(restore_to_source_objects,
+                                             module.params.get('resource_pool_name'), 'kResourcePool')
+                    if not resource_pool_id:
+                        check_mode_results["msg"] += "Resource Pool %s is not available in the source" % module.params.get('resource_pool_name')
+                if module.params.get('datastore_name'):
+                    datastore_id = get_vmware_object_id(restore_to_source_objects,
+                                                        module.params.get('datastore_name'), 'kDatastore')
+                    if not datastore_id:
+                        check_mode_results["msg"] += "Datastore %s is not available in the source" % module.params.get('datastore_name')
+
         else:
             if job_exists:
                 check_mode_results[

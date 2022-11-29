@@ -122,6 +122,7 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
+        check_source_reachability,
     )
 except Exception:
     pass
@@ -288,6 +289,14 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
                 check_mode_results["id"] = current_status
+                status = check_source_reachability(module.params.get("endpoint"))
+                if status == None:
+                    check_mode_results[
+                       "msg"
+                    ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
+                elif not status:
+                    check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")
+
         else:
             if current_status:
                 check_mode_results[

@@ -12,15 +12,15 @@
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         state: "present"
-        job_name: "protect_vm"
+        job_name: "protect_vm_5"
         policy: Gold
         storage_domain: "DefaultStorageDomain"
         sources:
-          - endpoint: "vcenter.domain.com"
+                - endpoint: "sv16-eng-api-vcenter.eng.cohesity.com"
         environment: "VMware"
         include:
-          - AnsibleVM01
-          - AnsibleVM02
+          - automation_vm_1-KsZ4
+          - CentOS-Default
         exclude:
           - WindowsServer
         # Enabling append_to_existing will add the new list of VMs to the

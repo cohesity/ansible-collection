@@ -286,6 +286,7 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+        check_source_reachability,
         get__prot_source_id__by_endpoint,
         get__prot_source_root_id__by_environment,
         get__prot_policy_id__by_name,
@@ -1321,6 +1322,21 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
+                # Check all the endpoints are reachable
+                for source in module.params.get("protection_sources"):
+                    status = check_source_reachability(source["endpoint"])
+                    if not status:
+                        if status == None:
+                            check_mode_results[
+                               "msg"
+                            ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % source["endpoint"]
+                        else:
+                            check_mode_results["msg"] += "Source '%s' is not reachable." % source["endpoint"]
+                if not get__prot_policy_id__by_name(module, job_details):
+                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % job_details["policyId"] 
+                if not get__storage_domain_id__by_name(module, job_details):
+                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % job_details["viewBoxId"]
+
         else:
             if job_exists:
                 check_mode_results[

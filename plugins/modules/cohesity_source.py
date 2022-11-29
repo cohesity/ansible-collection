@@ -262,7 +262,7 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all, unregister_source
+        get__prot_source__all, check_source_reachability, unregister_source
     )
 except Exception:
     pass
@@ -548,16 +548,17 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is currently registered.  No changes"
             else:
-                # Check source is reachable.
-                endpoint = module.params.get("endpoint")
-                command = ["ping", "-c", "1", endpoint, "-w", "10"]
-                if subprocess.call(command) == 0:
-                    check_mode_results["msg"] = "Check Mode: Protection Source '%s' is not reachable" % endpoint
-                    check_mode_results["status"] = False
-                else:
-                    check_mode_results[
-                        "msg"
-                    ] = "Check Mode: Cohesity Protection Source is not currently registered. This action would register the Protection Source."
+                check_mode_results[
+                    "msg"
+                ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
+                status = check_source_reachability(module.params.get("endpoint"))
+                if not status:
+                    if status == None:
+                        check_mode_results[
+                           "msg"
+                        ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
+                    else:
+                        check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")
                 check_mode_results["id"] = current_status
         else:
             if current_status:
