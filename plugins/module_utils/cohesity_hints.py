@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.0.5
+version_added: 1.0.9
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -595,7 +595,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
 
         response = open_url(
@@ -661,7 +661,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         response = open_url(
             url=uri,

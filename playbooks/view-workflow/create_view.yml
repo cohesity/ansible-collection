@@ -16,7 +16,7 @@
         state: "{{ state | default('present') }}"
         name: "s3-view"
         description: "View is created using Ansible"
-        storage_domain: "DefaultStorageDomainii"
+        storage_domain: "DefaultStorageDomain"
         qos_policy: "Backup Target Low"
         protocol: "All"
         case_insensitive: false

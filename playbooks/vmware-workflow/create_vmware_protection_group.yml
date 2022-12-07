@@ -16,7 +16,7 @@
         policy: Gold
         storage_domain: "DefaultStorageDomain"
         sources:
-                - endpoint: "sv16-eng-api-vcenter.eng.cohesity.com"
+          - endpoint: "vcenter.domain.com"
         environment: "VMware"
         include:
           - automation_vm_1-KsZ4

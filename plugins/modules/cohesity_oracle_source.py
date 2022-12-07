@@ -76,7 +76,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.5
+version_added: 1.0.9
 """
 
 
@@ -290,9 +290,9 @@ def main():
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
                 check_mode_results["id"] = current_status
                 status = check_source_reachability(module.params.get("endpoint"))
-                if status == None:
+                if status is None:
                     check_mode_results[
-                       "msg"
+                        "msg"
                     ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
                 elif not status:
                     check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")

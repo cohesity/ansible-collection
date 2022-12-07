@@ -127,7 +127,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: 1.0.5
+version_added: 1.0.9
 """
 
 
@@ -506,7 +506,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.5"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 
@@ -528,10 +528,10 @@ def main():
                 job_details = get_protection_job_details(module)
                 if not job_details:
                     check_mode_results["msg"] += "Job '%s' doesn't exist in the cluster" \
-                            % module.params.get("job_name")
+                        % module.params.get("job_name")
                     check_mode_results["changed"] = False
                 resource_pool_id = get_resource_pool_id(
-                        module, module.params.get("resource_pool"), job_details.parent_source_id)
+                    module, module.params.get("resource_pool"), job_details.parent_source_id)
                 if not resource_pool_id:
                     check_mode_results["msg"] += "Resource pool '%s' is not available in " \
                         "the server" % module.params.get("resource_pool_name")

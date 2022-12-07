@@ -103,7 +103,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Cohesity Protection Policy"
-version_added: 1.0.5
+version_added: 1.0.9
 """
 
 EXAMPLES = """
@@ -294,7 +294,7 @@ def get_remote_cluster_id(module, cluster_name):
     """
     try:
         clusters = cohesity_client.remote_cluster.get_remote_clusters(
-                cluster_names=cluster_name)
+            cluster_names=cluster_name)
         for cluster in clusters:
             if cluster.name == cluster_name:
                 return cluster.cluster_id
@@ -353,6 +353,7 @@ def replication_copy_policies(module):
         return replication_policies
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
+
 
 def archival_copy_policies(module):
     """
@@ -504,7 +505,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.5"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
     cohesity_client = get_cohesity_client(module)
     policy_exists, policy_details = get_policy_details(module)
 

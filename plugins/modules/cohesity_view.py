@@ -14,7 +14,7 @@ module: cohesity_view
 short_description: Management of Cohesity View
 description:
     - Ansible Module to create View.
-version_added: 1.0.5
+version_added: 1.0.9
 author: "Naveena (@naveena-maplelabs)"
 options:
   case_insensitive:
@@ -191,9 +191,11 @@ def get_storage_domain_id(module):
         )
         for view_box in view_boxes:
             if view_box.name == module.params.get("storage_domain"):
-                if module.check_mode:return True
+                if module.check_mode:
+                    return True
                 return view_box.id
-        if module.check_mode:return
+        if module.check_mode:
+            return
         raise__cohesity_exception__handler(
             "Failed to find storage domain " + name,
             module,
@@ -461,7 +463,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.5"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 
@@ -496,7 +498,7 @@ def main():
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity view doesn't exist. No changes."
-        if check_mode_results["changed"] == True:
+        if check_mode_results["changed"] is True:
             module.exit_json(**check_mode_results)
         else:
             module.fail_json(**check_mode_results)

@@ -176,7 +176,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.5
+version_added: 1.0.9
 """
 
 EXAMPLES = """
@@ -366,7 +366,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         sql_payload = dict(applications=["kSQL"],
                            hasPersistentAgent=True,
@@ -378,7 +378,7 @@ def register_sql_source(module, self):
                 + server
                 + "/irisservices/api/v1/public/protectionSources/refresh/"
                 + str(self["physicalSourceId"])
-        )
+            )
 
         response = open_url(
             url=uri,
@@ -412,7 +412,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -553,9 +553,9 @@ def main():
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
                 status = check_source_reachability(module.params.get("endpoint"))
                 if not status:
-                    if status == None:
+                    if status is None:
                         check_mode_results[
-                           "msg"
+                            "msg"
                         ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
                     else:
                         check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")

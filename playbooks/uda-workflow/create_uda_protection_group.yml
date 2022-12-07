@@ -12,9 +12,9 @@
         password: "{{ cohesity_password }}"
         state: present
         protection_group_name: protect_udaa
-        storage_domain: "DefaultStorageDomaain"
-        policy: "Silvera"
-        endpoint: "10.14.20.19"
+        storage_domain: "DefaultStorageDomain"
+        policy: "Silver"
+        endpoint: "x.x.x.x"
         cancel_active: true
         objects:
           - DB2-199-RR-db2inst1

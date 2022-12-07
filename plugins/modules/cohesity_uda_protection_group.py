@@ -166,7 +166,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity UDA Protection Groups"
-version_added: 1.0.5
+version_added: 1.0.9
 """
 
 EXAMPLES = """
@@ -418,7 +418,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.5",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         response = open_url(
             url=uri,
@@ -532,9 +532,9 @@ def main():
                 # Check the endpoint reachability.
                 status = check_source_reachability(module.params.get("endpoint"))
                 if not status:
-                    if status == None:
+                    if status is None:
                         check_mode_results[
-                           "msg"
+                            "msg"
                         ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % module.params.get("endpoint")
                     else:
                         check_mode_results["msg"] += "Source '%s' is not reachable." % module.params.get("endpoint")
