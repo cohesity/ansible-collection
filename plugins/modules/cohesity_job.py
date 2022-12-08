@@ -599,7 +599,7 @@ def get_view_storage_domain_id(module, self):
         uri = "https://" + server + "/irisservices/api/v1/public/views/" + view_name
         headers = {
             "Accept": "application/json",
-            "DOCUMENT": "Bearer " + token,
+            "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v1.0.9",
         }
         response = open_url(

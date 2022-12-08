@@ -118,7 +118,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Physical Agent"
-version_added: 1.0.9
+version_added: 1.0.8
 """
 
 import os
