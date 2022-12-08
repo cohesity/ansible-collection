@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.0.8
+version_added: 1.0.9
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -23,6 +23,7 @@ from Cohesity Platforms.
 
 
 import json
+import socket
 import traceback
 
 try:
@@ -248,9 +249,7 @@ def get__storage_domain_id__all(self):
         uri = "https://" + self["server"] + "/irisservices/api/v1/public/viewBoxes"
         if "viewBoxId" in self:
             if "type" not in self:
-                self["type"] = "name"
-                if isinstance(self["viewBoxId"], int):
-                    self["type"] = "id"
+                self["type"] = "id" if isinstance(self["viewBoxId"], int) else "name"
             uri = uri + "?" + urllib_parse.urlencode({self["type"]: self["viewBoxId"]})
 
         headers = {
@@ -354,12 +353,16 @@ def get__prot_policy_id__by_name(module, self):
             if obj["name"] == self["policyId"]:
                 return obj["id"]
 
+        if module.check_mode:
+            return None
         raise ProtectionException(
             "There was a very serious situation where the chosen Protection Policy Name ("
             + self["policyId"]
             + ") did not return a valid ID"
         )
     except Exception:
+        if module.check_mode:
+            return None
         module.fail_json(
             msg="Unexpected error caused while managing the Cohesity Protection Source.",
             exception=traceback.format_exc(),
@@ -377,12 +380,11 @@ def get__storage_domain_id__by_name(module, self):
             validate_certs=validate_certs,
             viewBoxId=self["viewBoxId"],
         )
-        for obj_type in ["names", "ids"]:
+        for obj_type in ["names"]:
             source_obj["type"] = obj_type
             objects = get__storage_domain_id__all(source_obj)
             if objects:
                 break
-
         for obj in objects:
             if obj["name"] == self["viewBoxId"]:
                 return int(obj["id"])
@@ -391,7 +393,8 @@ def get__storage_domain_id__by_name(module, self):
             else:
                 # => We really should land here but if so then
                 pass
-
+        if module.check_mode:
+            return None
         raise ProtectionException(
             "There was a very serious situation where the chosen Storage Domain Name ("
             + self["viewBoxId"]
@@ -399,7 +402,7 @@ def get__storage_domain_id__by_name(module, self):
         )
     except Exception:
         module.fail_json(
-            msg="Unexpected error caused while managing the Cohesity Protection Source.",
+            msg="Unexpected error caused while managing the Cohesity Protection Source..",
             exception=traceback.format_exc(),
         )
 
@@ -592,7 +595,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
 
         response = open_url(
@@ -658,7 +661,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         response = open_url(
             url=uri,
@@ -676,3 +679,18 @@ def check__protection_group__exists(module, self):
         return False, ""
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
+
+
+def check_source_reachability(source, timeout=3, port=50051):
+    """
+    Function to check the source reachability.
+    """
+    try:
+        socket.create_connection((source, port), timeout=timeout)
+    except socket.timeout as err:
+        return False
+    except ConnectionRefusedError as err:
+        # Source is reachable, but port is not opened.
+        return None
+    else:
+        return True

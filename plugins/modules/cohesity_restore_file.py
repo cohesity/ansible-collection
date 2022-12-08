@@ -15,7 +15,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.0.8
+version_added: 1.0.9
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -380,7 +380,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         payload = self.copy()
 
@@ -429,7 +429,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -552,6 +552,7 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
+                get__snapshot_information__for_file(module, job_details)
         else:
             if job_exists:
                 check_mode_results[

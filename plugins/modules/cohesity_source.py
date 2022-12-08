@@ -40,7 +40,7 @@ options:
       - password
       - admin_pass
     description:
-      - "Password belonging to the selected Username.  This parameter will not be logged."
+      - "Password belonging to the selected Username. This parameter will not be logged."
     type: str
   endpoint:
     description:
@@ -176,7 +176,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.8
+version_added: 1.0.9
 """
 
 EXAMPLES = """
@@ -245,6 +245,7 @@ RETURN = """
 """
 
 import json
+import subprocess
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
@@ -261,7 +262,7 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all, unregister_source
+        get__prot_source__all, check_source_reachability, unregister_source
     )
 except Exception:
     pass
@@ -365,7 +366,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         sql_payload = dict(applications=["kSQL"],
                            hasPersistentAgent=True,
@@ -411,7 +412,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -550,18 +551,29 @@ def main():
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
+                status = check_source_reachability(module.params.get("endpoint"))
+                if not status:
+                    if status is None:
+                        check_mode_results[
+                            "msg"
+                        ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
+                    else:
+                        check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")
                 check_mode_results["id"] = current_status
         else:
             if current_status:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Source is currently registered.  This action would unregister the Protection Source."
+                ] = "Check Mode: Cohesity Protection Source is currently registered. This action would unregister the Protection Source."
                 check_mode_results["id"] = current_status
             else:
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  No changes."
-        module.exit_json(**check_mode_results)
+        if check_mode_results.get("status", True):
+            module.exit_json(**check_mode_results)
+        else:
+            module.fail_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
         check__mandatory__params(module)

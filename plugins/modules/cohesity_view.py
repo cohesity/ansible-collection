@@ -14,7 +14,7 @@ module: cohesity_view
 short_description: Management of Cohesity View
 description:
     - Ansible Module to create View.
-version_added: 1.0.8
+version_added: 1.0.9
 author: "Naveena (@naveena-maplelabs)"
 options:
   case_insensitive:
@@ -185,14 +185,19 @@ def get_storage_domain_id(module):
     :return:
     """
     try:
+        name = module.params.get("storage_domain")
         view_boxes = cohesity_client.view_boxes.get_view_boxes(
-            names=module.params.get("storage_domain")
+            names=name
         )
         for view_box in view_boxes:
             if view_box.name == module.params.get("storage_domain"):
+                if module.check_mode:
+                    return True
                 return view_box.id
+        if module.check_mode:
+            return
         raise__cohesity_exception__handler(
-            "Failed to find storage domain " + module.params.get("storage_domain"),
+            "Failed to find storage domain " + name,
             module,
         )
     except APIException as ex:
@@ -458,7 +463,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.8"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 
@@ -474,8 +479,12 @@ def main():
             else:
                 check_mode_results["msg"] = (
                     "Check Mode: Cohesity view doesn't exist."
-                    " This action would create a new Cohesity view"
+                    " This action would create a new Cohesity view."
                 )
+                name = module.params.get("storage_domain")
+                storage_domains = cohesity_client.view_boxes.get_view_boxes(names=name)
+                if not storage_domains or storage_domains[0].name == name:
+                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % name
                 check_mode_results["changed"] = True
         else:
             if view_exists:
@@ -489,7 +498,10 @@ def main():
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity view doesn't exist. No changes."
-        module.exit_json(**check_mode_results)
+        if check_mode_results["changed"] is True:
+            module.exit_json(**check_mode_results)
+        else:
+            module.fail_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
         if view_exists:

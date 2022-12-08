@@ -166,7 +166,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity UDA Protection Groups"
-version_added: 1.0.8
+version_added: 1.0.9
 """
 
 EXAMPLES = """
@@ -226,6 +226,9 @@ try:
         get__storage_domain_id__by__name,
         get_protection_run__status__by_id,
         check__protection_group__exists,
+        check_source_reachability,
+        get__prot_policy_id__by_name,
+        get__storage_domain_id__by_name,
     )
 except Exception:
     pass
@@ -415,7 +418,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.8",
+            "user-agent": "cohesity-ansible/v1.0.9",
         }
         response = open_url(
             url=uri,
@@ -508,6 +511,15 @@ def main():
             id="",
         )
         if module.params.get("state") == "present":
+            job_details = dict(
+                token=get__cohesity_auth__token(module),
+                name=module.params.get("name"),
+                environment=module.params.get("environment"),
+                sourceIds=module.params.get("endpoint"),
+                policyId=module.params.get("protection_policy"),
+                viewBoxId=module.params.get("storage_domain"),
+                timezone=module.params.get("time_zone"),
+            )
             if group_exists:
                 check_mode_results[
                     "msg"
@@ -517,6 +529,19 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Group is not currently registered.  This action would register the Cohesity Protection Group."
                 check_mode_results["id"] = group_exists
+                # Check the endpoint reachability.
+                status = check_source_reachability(module.params.get("endpoint"))
+                if not status:
+                    if status is None:
+                        check_mode_results[
+                            "msg"
+                        ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % module.params.get("endpoint")
+                    else:
+                        check_mode_results["msg"] += "Source '%s' is not reachable." % module.params.get("endpoint")
+                if not get__prot_policy_id__by_name(module, job_details):
+                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % module.params.get("policy")
+                if not get__storage_domain_id__by_name(module, job_details):
+                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % module.params.get("storage_domain")
         else:
             if group_exists:
                 check_mode_results[
@@ -546,6 +571,7 @@ def main():
             environment="k" + module.params.get("environment"),
             policyId=get__prot_policy_id__by__name(module),
             timezone=module.params.get("time_zone").strip(),
+            timeZone=module.params.get("time_zone").strip(),
             description=module.params.get("description"),
         )
         objects = [{"name": name for name in module.params.get("objects")}]

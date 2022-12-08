@@ -14,7 +14,7 @@
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
         state: "{{ state | default('present') }}"
-        name: "AnsibleView"
+        name: "s3-view"
         description: "View is created using Ansible"
         storage_domain: "DefaultStorageDomain"
         qos_policy: "Backup Target Low"
