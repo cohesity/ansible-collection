@@ -1014,7 +1014,49 @@ def unregister_job(module, self):
         raise__cohesity_exception__handler(error, module)
 
 
+def check_default_fields(module, job_meta_data, job_details):
+    """
+    Function to check if any default backup job is updated.
+    returns the status.
+    """
+    status = False
+    # Check the start time of the backup job.
+    if module.params.get("start_time"):
+        start_time = module.params.get("start_time").replace(":", "")
+        if not len(start_time) == 4:
+            # => There are only so many options here but if we get more characters
+            # => than four then we need to escape quickly.
+            module.fail_json(
+                msg="Invalid start_time selected ("
+                + module.params.get("start_time")
+                + ").  Please review and submit the correct Protection Job Starting time."
+            )
+        start_time = dict(
+            hour=int(start_time[0] + start_time[1]),
+            minute=int(start_time[2] + start_time[3]),
+        )
+        existing_start_time = dict(
+            hour=job_meta_data["startTime"]["hour"],
+            minute=job_meta_data["startTime"]["minute"],
+        )
+        if start_time != existing_start_time:
+            status = True
+            job_meta_data["startTime"] = start_time
+    if job_meta_data["timezone"] != module.params.get("time_zone"):
+        status = True
+        job_meta_data["timezone"] = module.params.get("time_zone")
+    policy_id = get__prot_policy_id__by_name(module, job_details)
+    if policy_id != job_meta_data["policyId"]:
+        status = True
+        job_meta_data["policyId"] = policy_id
+    return status
+
+
 def update_vmware_job(module, job_meta_data, job_details):
+    avl_source_ids = job_meta_data["sourceIds"]
+    avl_exclude_source_ids = job_meta_data["excludeSourceIds"]
+    # Check for start time, timezone, policy and storage domain.
+    status = check_default_fields(module, job_meta_data, job_details)
     if len(module.params.get("exclude")) != 0 or len(module.params.get("include")) != 0:
         if len(module.params.get("exclude")) != 0:
             vms = module.params.get("exclude")
@@ -1038,6 +1080,21 @@ def update_vmware_job(module, job_meta_data, job_details):
                 )
             job_meta_data["sourceIds"] = include_vm_ids
         job_meta_data["token"] = job_details["token"]
+        if (
+            not status
+            and (set(job_meta_data["sourceIds"]) == set(avl_source_ids))
+            and (set(avl_exclude_source_ids) == set(job_meta_data["excludeSourceIds"]))
+        ):
+            module.exit_json(
+                msg="Job '%s' is already updated, skipping."
+                % module.params.get("name"),
+                changed=False,
+            )
+        if not job_meta_data["sourceIds"]:
+            module.exit_json(
+                msg="Please specify one or more sources to backup. Provided VMs are not available",
+                changed=False,
+            )
         if len(module.params.get("include_tags")) != 0:
             tag_list = list()
             for tags in module.params.get("include_tags"):
@@ -1144,12 +1201,33 @@ def update_job_util(module, job_details, job_exists):
     is_indexing_updated = False
     indexing_policy = existing_job_details["indexingPolicy"]
     indexing = module.params.get("indexing", {})
+    allow_prefixes = ["/"]
+    deny_prefixes = [
+        "/$Recycle.Bin",
+        "/Windows",
+        "/Program Files",
+        "/Program Files (x86)",
+        "/ProgramData",
+        "/System Volume Information",
+        "/Users/*/AppData",
+        "/Recovery",
+        "/var",
+        "/usr",
+        "/sys",
+        "/proc",
+        "/lib",
+        "/grub",
+        "/grub2",
+        "/opt",
+        "/splunk",
+    ]
+
     if module.params.get("disable_indexing") is False:
         if (
-            set(indexing.get("allowed_prefix", []))
+            set(indexing.get("allowed_prefix", allow_prefixes))
             != set(indexing_policy.get("allowPrefixes", []))
         ) or (
-            set(indexing.get("denied_prefix", []))
+            set(indexing.get("denied_prefix", deny_prefixes))
             != set(indexing_policy.get("denyPrefixes", []))
         ):
             update_indexing(module, existing_job_details)
@@ -1192,8 +1270,15 @@ def update_job_util(module, job_details, job_exists):
                     break
     if update_sources:
         already_exist_in_job = False
+
+    # Check default fields are updated.
+    update_default_fields = check_default_fields(
+        module, existing_job_details, job_details
+    )
+
     if (
-        not is_indexing_updated
+        not update_default_fields
+        and not is_indexing_updated
         and already_exist_in_job
         and len(job_details["sourceIds"]) != 0
     ):
@@ -1203,8 +1288,11 @@ def update_job_util(module, job_details, job_exists):
             id=job_exists,
             name=module.params.get("name"),
         )
-    elif is_indexing_updated or (
-        not already_exist_in_job and len(job_details["sourceIds"]) != 0
+        module.exit_json(**results)
+    elif (
+        is_indexing_updated
+        or update_default_fields
+        or (not already_exist_in_job and len(job_details["sourceIds"]) != 0)
     ):
         indexing_msg = ""
         new_sources = list(
@@ -1263,7 +1351,9 @@ def main():
                 default="PhysicalFiles",
             ),
             view_name=dict(type="str", required=False),
-            protection_sources=dict(type="list", aliases=["sources"], default=[], elements="dict"),
+            protection_sources=dict(
+                type="list", aliases=["sources"], default=[], elements="dict"
+            ),
             protection_policy=dict(type="str", aliases=["policy"], default="Bronze"),
             storage_domain=dict(type="str", default="DefaultStorageDomain"),
             delete_sources=dict(type="bool", default=False),
@@ -1327,15 +1417,24 @@ def main():
                     status = check_source_reachability(source["endpoint"])
                     if not status:
                         if status is None:
-                            check_mode_results[
-                                "msg"
-                            ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open."
+                                % source["endpoint"]
+                            )
                         else:
-                            check_mode_results["msg"] += "Source '%s' is not reachable." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Source '%s' is not reachable." % source["endpoint"]
+                            )
                 if not get__prot_policy_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % job_details["policyId"]
+                    check_mode_results["msg"] += (
+                        "Protection policy '%s' is not available in the cluster"
+                        % job_details["policyId"]
+                    )
                 if not get__storage_domain_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % job_details["viewBoxId"]
+                    check_mode_results["msg"] += (
+                        "Storage domain '%s' is not available in the cluster"
+                        % job_details["viewBoxId"]
+                    )
 
         else:
             if job_exists:
