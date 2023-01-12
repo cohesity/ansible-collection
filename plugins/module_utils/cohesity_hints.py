@@ -580,6 +580,31 @@ def get__restore_job__by_type(module, self):
         raise HTTPException(error.read())
 
 
+def get__restore_task_status__by_id(module, self):
+
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/v2/data-protect/recoveries?ids="
+            + self["id"]
+        )
+        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        objects = open_url(
+            url=uri, headers=headers, validate_certs=validate_certs, timeout=120
+        )
+        objects = json.loads(objects.read())
+        # => Returns an array of snapshots that contain that file.
+        if not objects or not objects["recoveries"]:
+            return None
+        return objects["recoveries"][0]["status"]
+    except urllib_error.URLError as error:
+        raise HTTPException(error.read())
+
+
 # => Unregister an existing Cohesity Protection Source.
 def unregister_source(module, self):
     server = module.params.get("cluster")
