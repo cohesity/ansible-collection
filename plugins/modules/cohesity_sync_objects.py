@@ -11,21 +11,23 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Naveena (@naveena-maplelabs)"
+author: Naveena (@naveena-maplelabs)
 description:
-  - "Ansible Module used to finalize a Cohesity Migration Job on a Cohesity Cluster."
-  - "When executed in a playbook, the objects in Cohesity migration Job will be synced."
+  - Ansible Module used to finalize a Cohesity Migration Job on a Cohesity
+    Cluster.
+  - When executed in a playbook, the objects in Cohesity migration Job will be
+    synced.
 module: cohesity_sync_objects
 options:
   task_id:
     description:
-      - "Recovery task Id. pattern: ^\d+:\d+:\d+$". Yet to implement.
+      - Task Id of the migrate job.
     type: str
   cluster:
     aliases:
       - cohesity_server
     description:
-      - "IP or FQDN for the Cohesity Cluster"
+      - IP or FQDN for the Cohesity Cluster
     type: str
   cohesity_admin:
     aliases:
@@ -33,7 +35,8 @@ options:
       - cohesity_user
       - username
     description:
-      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain
+        Specific credentails can be configured in following formats
       - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
@@ -43,7 +46,8 @@ options:
       - password
       - admin_pass
     description:
-      - "Password belonging to the selected Username.  This parameter will not be logged."
+      - Password belonging to the selected Username.  This parameter will not be
+        logged.
     type: str
   state:
     choices:
@@ -51,17 +55,17 @@ options:
       - absent
     default: present
     description:
-      - "Determines the state of the Recovery Job."
-      - "(C)present a recovery job will be created and started."
-      - "(C)absent is currently not implemented"
+      - Determines the state of the Recovery Job.
+      - (C)present a recovery job will be created and started.
+      - (C)absent is currently not implemented
     type: str
   task_name:
     description:
-      - "Name of the recovery task name."
+      - Name of the recovery task name.
     type: str
 extends_documentation_fragment:
-- cohesity.dataprotect.cohesity
-short_description: "Sync objects available in the VM migration task"
+  - cohesity.dataprotect.cohesity
+short_description: Sync objects available in the VM migration task
 version_added: 1.0.9
 """
 
@@ -201,8 +205,7 @@ def main():
     )
 
     task_details = dict(
-        token=get__cohesity_auth__token(module),
-        name=module.params.get("task_name")
+        token=get__cohesity_auth__token(module), name=module.params.get("task_name")
     )
 
     task_status, task_id = check__protection_restore__exists(module, task_details)
@@ -239,9 +242,7 @@ def main():
             )
         else:
             task_details["task_id"] = task_id
-            response  = sync_objects(
-                module, task_details
-            )
+            response = sync_objects(module, task_details)
 
             results = dict(
                 changed=True,

@@ -226,6 +226,7 @@ RETURN = """"""
 
 
 import json
+
 try:
     from urllib import quote
 except ImportError:
@@ -260,53 +261,63 @@ class ParameterViolation(Exception):
 
 def check__protection_restore__exists(module, self):
     payload = self.copy()
-    payload['restore_type'] = "kRecoverVMs"
-    payload['count'] = 1
+    payload["restore_type"] = "kRecoverVMs"
+    payload["count"] = 1
 
     restore_tasks = get__restore_job__by_type(module, payload)
 
     if restore_tasks:
-        task_list = [
-            task for task in restore_tasks if task['name'] == self['name']]
+        task_list = [task for task in restore_tasks if task["name"] == self["name"]]
         for task in task_list:
-            if task['status'] != 'kFinished':
+            if task["status"] != "kFinished":
                 return True
     return False
 
 
 def get_source_details(module, restore_to_source):
-    '''
+    """
     Get VMware protection source details
     :param module: object that holds parameters passed to the module
     :param restore_to_source: boolean flag to get target source details or
     vm's parent source details
     :return:
-    '''
-    server = module.params.get('cluster')
-    validate_certs = module.params.get('validate_certs')
+    """
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
     token = get__cohesity_auth__token(module)
     try:
-        uri = "https://" + server + \
-              "/irisservices/api/v1/public/protectionSources/rootNodes?environments=kVMware"
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + token,
-                   "user-agent": "cohesity-ansible/v2.3.4"}
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources/rootNodes?environments=kVMware"
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v2.3.4",
+        }
         response = open_url(
             url=uri,
             headers=headers,
             validate_certs=validate_certs,
-            method="GET", timeout=REQUEST_TIMEOUT)
+            method="GET",
+            timeout=REQUEST_TIMEOUT,
+        )
         response = json.loads(response.read())
         source_details = dict()
         for source in response:
-            if not restore_to_source and source['protectionSource']['name'] == module.params.get('endpoint'):
-                source_details['id'] = source['protectionSource']['id']
-            elif restore_to_source and source['protectionSource']['name'] == module.params.get('restore_to_source'):
-                source_details['id'] = source['protectionSource']['id']
+            if not restore_to_source and source["protectionSource"][
+                "name"
+            ] == module.params.get("endpoint"):
+                source_details["id"] = source["protectionSource"]["id"]
+            elif restore_to_source and source["protectionSource"][
+                "name"
+            ] == module.params.get("restore_to_source"):
+                source_details["id"] = source["protectionSource"]["id"]
         if not source_details:
             module.fail_json(
-                changed=False,
-                msg="Can't find the endpoint on the cluster")
+                changed=False, msg="Can't find the endpoint on the cluster"
+            )
         return source_details
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
@@ -316,27 +327,38 @@ def get_source_details(module, restore_to_source):
 
 
 def get_vmware_source_objects(module, source_id):
-    '''
+    """
     :param module: object that holds parameters passed to the module
     :param source_id: protection source id
     :return:
-    '''
-    server = module.params.get('cluster')
-    validate_certs = module.params.get('validate_certs')
+    """
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
     token = get__cohesity_auth__token(module)
     try:
-        uri = "https://" + server + "/irisservices/api/v1/public/protectionSources?id=" + str(
-            source_id) + "&excludeTypes=kVirtualMachine" + "&includeDatastores=true" + \
-            "&includeNetworks=true" + "&includeVMFolders=true"
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + token,
-                   "user-agent": "cohesity-ansible/v2.3.4"}
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources?id="
+            + str(source_id)
+            + "&excludeTypes=kVirtualMachine"
+            + "&includeDatastores=true"
+            + "&includeNetworks=true"
+            + "&includeVMFolders=true"
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v2.3.4",
+        }
 
         response = open_url(
             url=uri,
-            method='GET',
+            method="GET",
             headers=headers,
-            validate_certs=validate_certs, timeout=REQUEST_TIMEOUT)
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
         response = json.loads(response.read())
         return response
     except urllib_error.URLError as e:
@@ -347,53 +369,72 @@ def get_vmware_source_objects(module, source_id):
 
 
 def get_vmware_object_id(source_objects, object_name, object_type):
-    '''
+    """
     :param source_objects: protection source object tree
     :param object_name: resource pool name or datastore name
     :param object_type: type of the object like kResourcePool, kDatastore
     :return:
-    '''
+    """
     nodes = []
     for node in source_objects:
-        if 'nodes' in node:
-            nodes.append(node['nodes'])
-        if ('protectionSource' in node) and (node['protectionSource']['name'] == object_name) and\
-                node['protectionSource']['vmWareProtectionSource']['type'] == object_type:
-            return node['protectionSource']['id']
+        if "nodes" in node:
+            nodes.append(node["nodes"])
+        if (
+            ("protectionSource" in node)
+            and (node["protectionSource"]["name"] == object_name)
+            and node["protectionSource"]["vmWareProtectionSource"]["type"]
+            == object_type
+        ):
+            return node["protectionSource"]["id"]
 
     while len(nodes) != 0:
         objects = nodes.pop()
         for node in objects:
-            if 'nodes' in node:
-                nodes.append(node['nodes'])
-            if ('protectionSource' in node) and (node['protectionSource']['name'] == object_name) and \
-                    node['protectionSource']['vmWareProtectionSource']['type'] == object_type:
-                return node['protectionSource']['id']
+            if "nodes" in node:
+                nodes.append(node["nodes"])
+            if (
+                ("protectionSource" in node)
+                and (node["protectionSource"]["name"] == object_name)
+                and node["protectionSource"]["vmWareProtectionSource"]["type"]
+                == object_type
+            ):
+                return node["protectionSource"]["id"]
     return None
 
 
 def get__vmware_snapshot_information__by_source(module, self, source_details):
-    '''
+    """
     Get the snapshot information using environment, VMname and source id filters
     :param module: object that holds parameters passed to the module
     :param self: restore task details
     :param source_details: parent protection source details
     :return:
-    '''
-    server = module.params.get('cluster')
-    validate_certs = module.params.get('validate_certs')
-    token = self['token']
+    """
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
     try:
-        uri = "https://" + server + \
-            "/irisservices/api/v1/public/restore/objects" + \
-            "?environments=kVMware&search=" + quote(self['restore_obj']['vmname']) +\
-              "&registeredSourceIds=" + str(source_details['id'])
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/restore/objects"
+            + "?environments=kVMware&search="
+            + quote(self["restore_obj"]["vmname"])
+            + "&registeredSourceIds="
+            + str(source_details["id"])
+        )
 
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + token,
-                   "user-agent": "cohesity-ansible/v2.3.4"}
-        objects = open_url(url=uri, headers=headers,
-                           validate_certs=validate_certs, timeout=REQUEST_TIMEOUT)
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v2.3.4",
+        }
+        objects = open_url(
+            url=uri,
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
         objects = json.loads(objects.read())
         return objects
     except urllib_error.URLError as e:
@@ -412,14 +453,14 @@ def get__job_information__for_restore(module, self):
 
     # => There will be a lot of potential jobs.  Return only the
     # => one that matches our job_name
-    job_data = [job for job in job_output if job['name'] == self['job_name']]
+    job_data = [job for job in job_output if job["name"] == self["job_name"]]
 
     if not job_data:
         failure = dict(
             changed=False,
-            job_name=self['job_name'],
-            environment=self['environment'],
-            msg="Failed to find chosen Job name for the selected Environment Type."
+            job_name=self["job_name"],
+            environment=self["environment"],
+            msg="Failed to find chosen Job name for the selected Environment Type.",
         )
         module.fail_json(**failure)
     else:
@@ -432,42 +473,40 @@ def get__job_information__for_restore(module, self):
 def get_snapshot_information_for_vmname(module, self):
     restore_objects = []
     job_data = dict()
-    job_data['uid'] = dict(
-        clusterId='',
-        clusterIncarnationId='',
-        id=''
-    )
-    if self['job_name']:
+    job_data["uid"] = dict(clusterId="", clusterIncarnationId="", id="")
+    if self["job_name"]:
         # => Return the Protection Job information based on the Environment and Job Name
         job_data = get__job_information__for_restore(module, self)
     else:
         source_details = get_source_details(module, False)
     # => Create a restore object for each Virtual Machine
-    for vmname in self['vm_names']:
+    for vmname in self["vm_names"]:
         # => Build the Restore Dictionary Object
         restore_details = dict(
             jobRunId="",
             jobUid=dict(
-                clusterId=job_data['uid']['clusterId'],
-                clusterIncarnationId=job_data['uid']['clusterIncarnationId'],
-                id=job_data['uid']['id']
+                clusterId=job_data["uid"]["clusterId"],
+                clusterIncarnationId=job_data["uid"]["clusterIncarnationId"],
+                id=job_data["uid"]["id"],
             ),
-            startedTimeUsecs=""
+            startedTimeUsecs="",
         )
-        self['restore_obj'] = restore_details.copy()
-        self['restore_obj']['vmname'] = vmname
-        if self['job_name']:
+        self["restore_obj"] = restore_details.copy()
+        self["restore_obj"]["vmname"] = vmname
+        if self["job_name"]:
             output = get__vmware_snapshot_information__by_vmname(module, self)
         else:
-            output = get__vmware_snapshot_information__by_source(module, self, source_details)
+            output = get__vmware_snapshot_information__by_source(
+                module, self, source_details
+            )
 
-        if not output or output['totalCount'] == 0:
+        if not output or output["totalCount"] == 0:
             failure = dict(
                 changed=False,
-                job_name=self['job_name'],
+                job_name=self["job_name"],
                 vmname=vmname,
-                environment=self['environment'],
-                msg="Failed to find a snapshot on the cluster"
+                environment=self["environment"],
+                msg="Failed to find a snapshot on the cluster",
             )
             module.fail_json(**failure)
 
@@ -475,28 +514,44 @@ def get_snapshot_information_for_vmname(module, self):
         # => For now, let's just grab the most recent snapshot.
         success = False
         # when job name is given, select the most recent snapshot from the job
-        if self['job_name']:
-            for snapshot_info in output.get('objectSnapshotInfo', []):
-                if snapshot_info['objectName'] == vmname:
-                    snapshot_detail = snapshot_info['versions'][0]
-                    if 'jobRunId' in self:
-                        snapshot_detail = [jobRun for jobRun in snapshot_info['versions']
-                                           if jobRun['jobRunId'] == int(self['jobRunId'])][0]
+        if self["job_name"]:
+            for snapshot_info in output.get("objectSnapshotInfo", []):
+                if snapshot_info["objectName"] == vmname:
+                    snapshot_detail = snapshot_info["versions"][0]
+                    if "jobRunId" in self:
+                        snapshot_detail = [
+                            jobRun
+                            for jobRun in snapshot_info["versions"]
+                            if jobRun["jobRunId"] == int(self["jobRunId"])
+                        ][0]
 
-                    restore_details['protectionSourceId'] = snapshot_info['snapshottedSource']['id']
-                    restore_details['jobRunId'] = snapshot_detail['jobRunId']
-                    restore_details['startedTimeUsecs'] = snapshot_detail['startedTimeUsecs']
+                    restore_details["protectionSourceId"] = snapshot_info[
+                        "snapshottedSource"
+                    ]["id"]
+                    restore_details["jobRunId"] = snapshot_detail["jobRunId"]
+                    restore_details["startedTimeUsecs"] = snapshot_detail[
+                        "startedTimeUsecs"
+                    ]
                     success = True
         else:
             # when job name is not given, select the most recent snapshot across all the jobs
             timestamp = 0
-            for snapshot_info in output['objectSnapshotInfo']:
-                if snapshot_info['objectName'] == vmname and snapshot_info['versions'][0]['startedTimeUsecs'] >= timestamp:
-                    timestamp = snapshot_info['versions'][0]['startedTimeUsecs']
-                    restore_details['protectionSourceId'] = snapshot_info['snapshottedSource']['id']
-                    restore_details['jobRunId'] = snapshot_info['versions'][0]['jobRunId']
-                    restore_details['jobUid'] = snapshot_info['jobUid']
-                    restore_details['startedTimeUsecs'] = snapshot_info['versions'][0]['startedTimeUsecs']
+            for snapshot_info in output["objectSnapshotInfo"]:
+                if (
+                    snapshot_info["objectName"] == vmname
+                    and snapshot_info["versions"][0]["startedTimeUsecs"] >= timestamp
+                ):
+                    timestamp = snapshot_info["versions"][0]["startedTimeUsecs"]
+                    restore_details["protectionSourceId"] = snapshot_info[
+                        "snapshottedSource"
+                    ]["id"]
+                    restore_details["jobRunId"] = snapshot_info["versions"][0][
+                        "jobRunId"
+                    ]
+                    restore_details["jobUid"] = snapshot_info["jobUid"]
+                    restore_details["startedTimeUsecs"] = snapshot_info["versions"][0][
+                        "startedTimeUsecs"
+                    ]
                     success = True
         if not success:
             module.fail_json(msg="No Snapshot Found for the VM: " + vmname)
@@ -507,33 +562,40 @@ def get_snapshot_information_for_vmname(module, self):
 # => Perform the Restore of a Virtual Machine to the selected ProtectionSource Target
 def start_restore__vms(module, self):
     payload = self.copy()
-    payload.pop('vm_names', None)
+    payload.pop("vm_names", None)
     return start_restore(module, "/irisservices/api/v1/public/restore/recover", payload)
 
 
 def start_restore(module, uri, self):
-    server = module.params.get('cluster')
-    validate_certs = module.params.get('validate_certs')
-    token = self['token']
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
     try:
         uri = "https://" + server + uri
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + token,
-                   "user-agent": "cohesity-ansible/v2.3.4"}
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v2.3.4",
+        }
         payload = self.copy()
 
         # => Remove the Authorization Token from the Payload
-        payload.pop('token', None)
+        payload.pop("token", None)
 
         data = json.dumps(payload)
 
-        response = open_url(url=uri, data=data, headers=headers,
-                            validate_certs=validate_certs, timeout=REQUEST_TIMEOUT)
+        response = open_url(
+            url=uri,
+            data=data,
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
 
         response = json.loads(response.read())
 
         # => Remove the Job name as it will be duplicated back to our process.
-        response.pop('name')
+        response.pop("name")
 
         return response
     except urllib_error.URLError as e:
@@ -544,65 +606,73 @@ def start_restore(module, uri, self):
 
 
 def wait_restore_complete(module, self):
-    server = module.params.get('cluster')
-    validate_certs = module.params.get('validate_certs')
-    token = self['token']
-    wait_counter = int(module.params.get('wait_minutes')) * 2
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    wait_counter = int(module.params.get("wait_minutes")) * 2
 
-    wait_results = dict(
-        changed=False,
-        status="Failed",
-        attempts=list(),
-        error=list()
-    )
+    wait_results = dict(changed=False, status="Failed", attempts=list(), error=list())
     try:
         import time
 
-        uri = "https://" + server + \
-            "/irisservices/api/v1/public/restore/tasks/" + str(self['id'])
-        headers = {"Accept": "application/json",
-                   "Authorization": "Bearer " + token,
-                   "user-agent": "cohesity-ansible/v2.3.4"}
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/restore/tasks/"
+            + str(self["id"])
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v2.3.4",
+        }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
         while attempts < wait_counter:
 
-            response = open_url(url=uri, headers=headers,
-                                validate_certs=validate_certs, timeout=REQUEST_TIMEOUT)
+            response = open_url(
+                url=uri,
+                headers=headers,
+                validate_certs=validate_certs,
+                timeout=REQUEST_TIMEOUT,
+            )
             response = json.loads(response.read())
 
             # => If the status is Finished then break out and check for errors.
-            if response['status'] == "kFinished":
-                wait_results['changed'] = True
-                wait_results['status'] = "Finished"
+            if response["status"] == "kFinished":
+                wait_results["changed"] = True
+                wait_results["status"] = "Finished"
                 break
             # => Otherwise, pause and try again.
             else:
-                attempt_tracker = dict(
-                    attempt=attempts,
-                    status=response['status']
-                )
-                wait_results['attempts'].append(attempt_tracker)
+                attempt_tracker = dict(attempt=attempts, status=response["status"])
+                wait_results["attempts"].append(attempt_tracker)
                 attempts += 1
                 time.sleep(30)
 
                 if attempts >= wait_counter:
-                    wait_results['changed'] = False
-                    wait_results['status'] = response['status']
-                    wait_results['error'] = "Failed to wait for the restore to complete after " + \
-                        module.params.get('wait_minutes') + " minutes."
-                    if wait_results['status'] == "kInProgress":
-                        wait_results['error'] = wait_results['error'] + \
-                            " The restore is still in progress and the timeout might be too short."
+                    wait_results["changed"] = False
+                    wait_results["status"] = response["status"]
+                    wait_results["error"] = (
+                        "Failed to wait for the restore to complete after "
+                        + module.params.get("wait_minutes")
+                        + " minutes."
+                    )
+                    if wait_results["status"] == "kInProgress":
+                        wait_results["error"] = (
+                            wait_results["error"]
+                            + " The restore is still in progress and the timeout might be too short."
+                        )
         # => If the error key exists in the response, then something happened during the restore
-        if 'error' in response:
-            wait_results['status'] = "Failed"
-            wait_results['changed'] = False
-            if self['environment'] == "VMware":
-                wait_results['error'] = [elem['error']['message']
-                                         for elem in response['restoreObjectState']]
+        if "error" in response:
+            wait_results["status"] = "Failed"
+            wait_results["changed"] = False
+            if self["environment"] == "VMware":
+                wait_results["error"] = [
+                    elem["error"]["message"] for elem in response["restoreObjectState"]
+                ]
             else:
-                wait_results['error'] = response['error']['message']
+                wait_results["error"] = response["error"]["message"]
 
         output = self.copy()
         output.update(**wait_results)
@@ -620,68 +690,64 @@ def main():
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
-            name=dict(type='str', required=True),
-            state=dict(choices=['present', 'absent'], default='present'),
-            endpoint=dict(type='str', required=True),
-            job_name=dict(type='str', default=''),
-            backup_id=dict(type='int'),
-            backup_timestamp=dict(type='str'),
+            name=dict(type="str", required=True),
+            state=dict(choices=["present", "absent"], default="present"),
+            endpoint=dict(type="str", required=True),
+            job_name=dict(type="str", default=""),
+            backup_id=dict(type="int"),
+            backup_timestamp=dict(type="str"),
             # => Currently, the only supported environments types are list in the choices
             # => For future enhancements, the below list should be consulted.
             # => 'SQL', 'View', 'Puppeteer', 'Pure', 'Netapp', 'HyperV', 'Acropolis', 'Azure'
-            environment=dict(
-                choices=['VMware'],
-                default='VMware'
-            ),
-            vm_names=dict(type='list', elements='str'),
-            wait_for_job=dict(type='bool', default=True),
-            wait_minutes=dict(type='int', default=20),
-            datastore_id=dict(type='int'),
-            datastore_name=dict(type='str', default=''),
-            datastore_folder_id=dict(type='int'),
-            interface_group_name=dict(type='str'),
-            network_connected=dict(type='bool', default=True),
-            network_id=dict(type='int'),
-            network_name=dict(type='str'),
-            power_state=dict(type='bool', default=True),
-            prefix=dict(type='str'),
-            resource_pool_id=dict(type='int'),
-            restore_to_source=dict(type='bool'),
-            resource_pool_name=dict(type='str', default=''),
-            recovery_process_type=dict(type='str', default='InstantRecovery'),
-            suffix=dict(type='str'),
-            vm_folder_id=dict(type='int'),
-            vm_folder_name=dict(type='str')
-
+            environment=dict(choices=["VMware"], default="VMware"),
+            vm_names=dict(type="list", elements="str"),
+            wait_for_job=dict(type="bool", default=True),
+            wait_minutes=dict(type="int", default=20),
+            datastore_id=dict(type="int"),
+            datastore_name=dict(type="str", default=""),
+            datastore_folder_id=dict(type="int"),
+            interface_group_name=dict(type="str"),
+            network_connected=dict(type="bool", default=True),
+            network_id=dict(type="int"),
+            network_name=dict(type="str"),
+            power_state=dict(type="bool", default=True),
+            prefix=dict(type="str"),
+            resource_pool_id=dict(type="int"),
+            restore_to_source=dict(type="bool"),
+            resource_pool_name=dict(type="str", default=""),
+            recovery_process_type=dict(type="str", default="InstantRecovery"),
+            suffix=dict(type="str"),
+            vm_folder_id=dict(type="int"),
+            vm_folder_name=dict(type="str"),
         )
     )
 
     # => Create a new module object
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
-        state=module.params.get('state')
+        state=module.params.get("state"),
     )
 
     job_details = dict(
         token=get__cohesity_auth__token(module),
-        endpoint=module.params.get('endpoint'),
-        job_name=module.params.get('job_name'),
-        environment=module.params.get('environment'),
-
+        endpoint=module.params.get("endpoint"),
+        job_name=module.params.get("job_name"),
+        environment=module.params.get("environment"),
     )
-    if module.params.get('job_name'):
-        job_details['name'] = module.params.get('job_name') + ": " + module.params.get('name')
+    if module.params.get("job_name"):
+        job_details["name"] = (
+            module.params.get("job_name") + ": " + module.params.get("name")
+        )
     else:
-        job_details['name'] = module.params.get('name')
+        job_details["name"] = module.params.get("name")
 
-    if module.params.get('backup_id'):
-        job_details['jobRunId'] = module.params.get('backup_id')
+    if module.params.get("backup_id"):
+        job_details["jobRunId"] = module.params.get("backup_id")
 
-    if module.params.get('backup_timestamp'):
-        job_details['backup_timestamp'] = module.params.get('backup_timestamp')
+    if module.params.get("backup_timestamp"):
+        job_details["backup_timestamp"] = module.params.get("backup_timestamp")
 
     job_exists = check__protection_restore__exists(module, job_details)
 
@@ -689,210 +755,265 @@ def main():
         check_mode_results = dict(
             changed=False,
             msg="Check Mode: Cohesity Protection Restore Job is not currently registered",
-            id=""
+            id="",
         )
-        if module.params.get('state') == "present":
+        if module.params.get("state") == "present":
             if job_exists:
                 check_mode_results[
-                    'msg'] = "Check Mode: Cohesity Protection Restore Job is currently registered.  No changes"
+                    "msg"
+                ] = "Check Mode: Cohesity Protection Restore Job is currently registered.  No changes"
             else:
                 check_mode_results[
-                    'msg'] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
-                check_mode_results['id'] = job_exists
+                    "msg"
+                ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
+                check_mode_results["id"] = job_exists
                 restore_to_source_details = get_source_details(module, True)
-                restore_to_source_objects = get_vmware_source_objects(module, restore_to_source_details['id'])
-                if module.params.get('resource_pool_name'):
-                    resource_pool_id =\
-                        get_vmware_object_id(restore_to_source_objects,
-                                             module.params.get('resource_pool_name'), 'kResourcePool')
+                restore_to_source_objects = get_vmware_source_objects(
+                    module, restore_to_source_details["id"]
+                )
+                if module.params.get("resource_pool_name"):
+                    resource_pool_id = get_vmware_object_id(
+                        restore_to_source_objects,
+                        module.params.get("resource_pool_name"),
+                        "kResourcePool",
+                    )
                     if not resource_pool_id:
-                        check_mode_results["msg"] += "Resource Pool %s is not available in the source" % module.params.get('resource_pool_name')
-                if module.params.get('datastore_name'):
-                    datastore_id = get_vmware_object_id(restore_to_source_objects,
-                                                        module.params.get('datastore_name'), 'kDatastore')
+                        check_mode_results["msg"] += (
+                            "Resource Pool %s is not available in the source"
+                            % module.params.get("resource_pool_name")
+                        )
+                if module.params.get("datastore_name"):
+                    datastore_id = get_vmware_object_id(
+                        restore_to_source_objects,
+                        module.params.get("datastore_name"),
+                        "kDatastore",
+                    )
                     if not datastore_id:
-                        check_mode_results["msg"] += "Datastore %s is not available in the source" % module.params.get('datastore_name')
+                        check_mode_results["msg"] += (
+                            "Datastore %s is not available in the source"
+                            % module.params.get("datastore_name")
+                        )
 
         else:
             if job_exists:
                 check_mode_results[
-                    'msg'] = "Check Mode: Cohesity Protection Restore Job is currently registered.  This action would unregister the Cohesity Protection Job."
-                check_mode_results['id'] = job_exists
+                    "msg"
+                ] = "Check Mode: Cohesity Protection Restore Job is currently registered.  This action would unregister the Cohesity Protection Job."
+                check_mode_results["id"] = job_exists
             else:
                 check_mode_results[
-                    'msg'] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  No changes."
+                    "msg"
+                ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  No changes."
         module.exit_json(**check_mode_results)
 
-    elif module.params.get('state') == "present":
+    elif module.params.get("state") == "present":
 
         if job_exists:
             results = dict(
                 changed=False,
                 msg="The Restore Job for is already registered",
                 id=job_exists,
-                name=job_details['name']
+                name=job_details["name"],
             )
         else:
             # check__mandatory__params(module)
-            environment = module.params.get('environment')
+            environment = module.params.get("environment")
             response = []
 
             if environment == "VMware":
-                job_details['vm_names'] = module.params.get('vm_names')
+                job_details["vm_names"] = module.params.get("vm_names")
                 source_object_info = get_snapshot_information_for_vmname(
-                    module, job_details)
+                    module, job_details
+                )
 
                 restore_data = dict(
-                    name=job_details['name'],
-                    vm_names=module.params.get('vm_names'),
+                    name=job_details["name"],
+                    vm_names=module.params.get("vm_names"),
                     objects=source_object_info,
-                    token=job_details['token'],
+                    token=job_details["token"],
                     type="kRecoverVMs",
                     vmwareParameters=dict(
-                        poweredOn=module.params.get('power_state'),
-                        disableNetwork=module.params.get('network_connected'),
-                        recoveryProcessType='k' + module.params.get('recovery_process_type')
-                    )
+                        poweredOn=module.params.get("power_state"),
+                        disableNetwork=module.params.get("network_connected"),
+                        recoveryProcessType="k"
+                        + module.params.get("recovery_process_type"),
+                    ),
                 )
-                if module.params.get('prefix'):
-                    restore_data['vmwareParameters']['prefix'] = module.params.get(
-                        'prefix')
+                if module.params.get("prefix"):
+                    restore_data["vmwareParameters"]["prefix"] = module.params.get(
+                        "prefix"
+                    )
 
-                if module.params.get('suffix'):
-                    restore_data['vmwareParameters']['suffix'] = module.params.get(
-                        'suffix')
+                if module.params.get("suffix"):
+                    restore_data["vmwareParameters"]["suffix"] = module.params.get(
+                        "suffix"
+                    )
 
-                if module.params.get('interface_group_name'):
-                    iface_group = module.params.get('interface_group_name')
+                if module.params.get("interface_group_name"):
+                    iface_group = module.params.get("interface_group_name")
                     # Check the group exist in the cluster.
                     cohesity_client = get_cohesity_client(module)
                     vlans = cohesity_client.vlan.get_vlans()
                     for vlan in vlans:
                         if vlan.iface_group_name == iface_group:
-                            restore_data['vlanParameters'] = dict(
-                                interfaceName=iface_group,
-                                disableVlan=True)
+                            restore_data["vlanParameters"] = dict(
+                                interfaceName=iface_group, disableVlan=True
+                            )
                             break
-                    if not restore_data.get('vlanParameters', None):
+                    if not restore_data.get("vlanParameters", None):
                         module.fail_json(
-                            msg="Failed to find Inferface Group with name %s" % iface_group,
-                                changed=False)
+                            msg="Failed to find Inferface Group with name %s"
+                            % iface_group,
+                            changed=False,
+                        )
 
-                if module.params.get('restore_to_source'):
-                    datastore_id = module.params.get('datastore_id')
-                    resource_pool_id = module.params.get('resource_pool_id')
+                if module.params.get("restore_to_source"):
+                    datastore_id = module.params.get("datastore_id")
+                    resource_pool_id = module.params.get("resource_pool_id")
                     restore_to_source_details = get_source_details(module, True)
-                    restore_to_source_objects = get_vmware_source_objects(module, restore_to_source_details['id'])
-                    if (module.params.get('resource_pool_id') or module.params.get('resource_pool_name')) and\
-                            (module.params.get('datastore_id') or module.params.get('datastore_name')):
+                    restore_to_source_objects = get_vmware_source_objects(
+                        module, restore_to_source_details["id"]
+                    )
+                    if (
+                        module.params.get("resource_pool_id")
+                        or module.params.get("resource_pool_name")
+                    ) and (
+                        module.params.get("datastore_id")
+                        or module.params.get("datastore_name")
+                    ):
 
-                        if module.params.get('resource_pool_name'):
-                            resource_pool_id =\
-                                get_vmware_object_id(restore_to_source_objects,
-                                                     module.params.get('resource_pool_name'), 'kResourcePool')
-                        if module.params.get('datastore_name'):
-                            datastore_id = get_vmware_object_id(restore_to_source_objects,
-                                                                module.params.get('datastore_name'), 'kDatastore')
+                        if module.params.get("resource_pool_name"):
+                            resource_pool_id = get_vmware_object_id(
+                                restore_to_source_objects,
+                                module.params.get("resource_pool_name"),
+                                "kResourcePool",
+                            )
+                        if module.params.get("datastore_name"):
+                            datastore_id = get_vmware_object_id(
+                                restore_to_source_objects,
+                                module.params.get("datastore_name"),
+                                "kDatastore",
+                            )
 
                         if not datastore_id or not resource_pool_id:
-                            module.fail_json(msg="Failed to find the resource pool"
-                                                 " or datastore on the target source")
+                            module.fail_json(
+                                msg="Failed to find the resource pool"
+                                " or datastore on the target source"
+                            )
 
-                        restore_data['newParentId'] = restore_to_source_details['id']
-                        restore_data['vmwareParameters']['resourcePoolId'] = resource_pool_id
-                        restore_data['vmwareParameters']['datastoreId'] = datastore_id
+                        restore_data["newParentId"] = restore_to_source_details["id"]
+                        restore_data["vmwareParameters"][
+                            "resourcePoolId"
+                        ] = resource_pool_id
+                        restore_data["vmwareParameters"]["datastoreId"] = datastore_id
 
                         # => Optional VMware Parameters
-                        if module.params.get('datastore_folder_id'):
-                            restore_data['vmwareParameters']['datastoreFolderId'] = module.params.get(
-                                'datastore_folder_id')
-                        if module.params.get('network_id'):
-                            restore_data['vmwareParameters']['networkId'] = module.params.get(
-                                'network_id')
-                        if module.params.get('network_name'):
-                            network_name = module.params.get('network_name')
-                            network_id = get_vmware_object_id(restore_to_source_objects,
-                                                              network_name, 'kNetwork')
+                        if module.params.get("datastore_folder_id"):
+                            restore_data["vmwareParameters"][
+                                "datastoreFolderId"
+                            ] = module.params.get("datastore_folder_id")
+                        if module.params.get("network_id"):
+                            restore_data["vmwareParameters"][
+                                "networkId"
+                            ] = module.params.get("network_id")
+                        if module.params.get("network_name"):
+                            network_name = module.params.get("network_name")
+                            network_id = get_vmware_object_id(
+                                restore_to_source_objects, network_name, "kNetwork"
+                            )
                             if not network_id:
                                 module.fail_json(
-                                    msg="Failed to find network with name %s" % network_name,
-                                    changed=False)
-                            restore_data['vmwareParameters']['networkId'] = network_id
+                                    msg="Failed to find network with name %s"
+                                    % network_name,
+                                    changed=False,
+                                )
+                            restore_data["vmwareParameters"]["networkId"] = network_id
 
-                        if module.params.get('vm_folder_id'):
-                            restore_data['vmwareParameters']['vmFolderId'] = module.params.get(
-                                'vm_folder_id')
+                        if module.params.get("vm_folder_id"):
+                            restore_data["vmwareParameters"][
+                                "vmFolderId"
+                            ] = module.params.get("vm_folder_id")
 
-                        if module.params.get('vm_folder_name'):
-                            vm_folder_name = module.params.get('vm_folder_name')
-                            vm_folder_id = get_vmware_object_id(restore_to_source_objects,
-                                                                vm_folder_name, 'kFolder')
+                        if module.params.get("vm_folder_name"):
+                            vm_folder_name = module.params.get("vm_folder_name")
+                            vm_folder_id = get_vmware_object_id(
+                                restore_to_source_objects, vm_folder_name, "kFolder"
+                            )
                             if not vm_folder_id:
                                 module.fail_json(
-                                    msg="Failed to find folder with name %s" % vm_folder_name,
-                                        changed=False)
-                            restore_data['vmwareParameters']['vmFolderId'] = vm_folder_id
+                                    msg="Failed to find folder with name %s"
+                                    % vm_folder_name,
+                                    changed=False,
+                                )
+                            restore_data["vmwareParameters"][
+                                "vmFolderId"
+                            ] = vm_folder_id
                     else:
-                        module.fail_json(msg="The resource pool and datastore details are"
-                                             " required for restoring to a new location")
+                        module.fail_json(
+                            msg="The resource pool and datastore details are"
+                            " required for restoring to a new location"
+                        )
 
                 # => Start the Virtual Machine Restore operation
                 job_start = start_restore__vms(module, restore_data)
-                job_start['vm_names'] = job_details['vm_names']
+                job_start["vm_names"] = job_details["vm_names"]
                 response.append(job_start)
 
             else:
                 # => This error should never happen based on the set assigned to the parameter.
                 # => However, in case, we should raise an appropriate error.
-                module.fail_json(msg="Invalid Environment Type selected: {0}".format(
-                    module.params.get('environment')), changed=False)
+                module.fail_json(
+                    msg="Invalid Environment Type selected: {0}".format(
+                        module.params.get("environment")
+                    ),
+                    changed=False,
+                )
 
-            task = dict(
-                changed=False
-            )
+            task = dict(changed=False)
             for jobCheck in response:
-                restore_data['id'] = jobCheck['id']
-                restore_data['environment'] = environment
-                if module.params.get('wait_for_job'):
+                restore_data["id"] = jobCheck["id"]
+                restore_data["environment"] = environment
+                if module.params.get("wait_for_job"):
                     task = wait_restore_complete(module, restore_data)
-                    jobCheck['status'] = task['status']
+                    jobCheck["status"] = task["status"]
 
             results = dict(
                 changed=True,
                 msg="Registration of Cohesity Restore Job Complete",
-                name=module.params.get('job_name') + ": " +
-                module.params.get('name'),
-                restore_jobs=response
+                name=module.params.get("job_name") + ": " + module.params.get("name"),
+                restore_jobs=response,
             )
 
-            if not task['changed'] and module.params.get('wait_for_job'):
+            if not task["changed"] and module.params.get("wait_for_job"):
                 # => If the task failed to complete, then the key 'changed' will be False and
                 # => we need to fail the module.
-                results['changed'] = False
-                results.pop('msg')
+                results["changed"] = False
+                results.pop("msg")
                 errorCode = ""
                 # => Set the errorCode to match the task['error'] if the key exists
-                if 'error' in task:
-                    errorCode = task['error']
+                if "error" in task:
+                    errorCode = task["error"]
                 results["msg"] = "Cohesity Restore Job Failed to complete"
                 results["error"] = errorCode
                 module.fail_json(**results)
 
-    elif module.params.get('state') == "absent":
+    elif module.params.get("state") == "absent":
 
         results = dict(
             changed=False,
             msg="Cohesity Restore: This feature (absent) has not be implemented yet.",
-            name=module.params.get('job_name') + ": " + module.params.get('name')
+            name=module.params.get("job_name") + ": " + module.params.get("name"),
         )
     else:
         # => This error should never happen based on the set assigned to the parameter.
         # => However, in case, we should raise an appropriate error.
-        module.fail_json(msg="Invalid State selected: {0}".format(
-            module.params.get('state')), changed=False)
+        module.fail_json(
+            msg="Invalid State selected: {0}".format(module.params.get("state")),
+            changed=False,
+        )
 
     module.exit_json(**results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

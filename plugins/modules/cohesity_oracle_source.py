@@ -295,7 +295,9 @@ def main():
                         "msg"
                     ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
                 elif not status:
-                    check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")
+                    check_mode_results[
+                        "msg"
+                    ] += "Source '%s' is not reachable" % module.params.get("endpoint")
 
         else:
             if current_status:

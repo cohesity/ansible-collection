@@ -47,7 +47,7 @@ Parameters
 
 
   cohesity_password (optional, str, None)
-    Password belonging to the selected Username.  This parameter will not be logged.
+    Password belonging to the selected Username. This parameter will not be logged.
 
 
   endpoint (True, str, None)
@@ -136,6 +136,10 @@ Parameters
 
   state (optional, str, present)
     Determines the state of the Protection Source
+
+
+  timeout (optional, int, 120)
+    Wait time in seconds while registering/updating source.
 
 
   update_source (optional, bool, False)

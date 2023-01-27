@@ -168,9 +168,15 @@ from cohesity_management_sdk.models.protection_job_request_body import (
 from cohesity_management_sdk.models.run_protection_job_param import (
     RunProtectionJobParam,
 )
-from cohesity_management_sdk.models.source_special_parameter import SourceSpecialParameter
-from cohesity_management_sdk.models.oracle_special_parameters import OracleSpecialParameters
-from cohesity_management_sdk.models.oracle_database_node_channel import OracleDatabaseNodeChannel
+from cohesity_management_sdk.models.source_special_parameter import (
+    SourceSpecialParameter,
+)
+from cohesity_management_sdk.models.oracle_special_parameters import (
+    OracleSpecialParameters,
+)
+from cohesity_management_sdk.models.oracle_database_node_channel import (
+    OracleDatabaseNodeChannel,
+)
 from cohesity_management_sdk.models.oracle_app_params import OracleAppParams
 
 try:
@@ -202,6 +208,7 @@ def get_timezone():
     default_timezone = "America/Los_Angeles"
     try:
         import subprocess
+
         cmd = "timedatectl status"
         proc = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True
@@ -376,9 +383,7 @@ def start_job(module):
     try:
         body = RunProtectionJobParam()
         body.run_type = "k" + module.params.get("ondemand_run_type")
-        cohesity_client.protection_jobs.create_run_protection_job(
-            job_id, body
-        )
+        cohesity_client.protection_jobs.create_run_protection_job(job_id, body)
 
         # => This dictionary will allow us to return a standardized output
         # => for all Protection Job.
@@ -418,9 +423,7 @@ def stop_job(module, _id):
         )
         body = CancelProtectionJobRunParam()
         body.job_run_id = last_run.backup_run.job_run_id
-        cohesity_client.protection_runs.create_cancel_protection_job_run(
-            _id, body
-        )
+        cohesity_client.protection_runs.create_cancel_protection_job_run(_id, body)
 
         # => It can take a few moments for the job to actually stop.  In this case,
         # => We will introduce a delay and check every (5) seconds for up to a minute
@@ -468,7 +471,7 @@ def main():
             validate_certs=dict(type="bool", default=False),
             endpoint=dict(type="str", default=""),
             databases=dict(type="list", default=[], elements="str"),
-            archive_log_keep_days=dict(type="int", required=False)
+            archive_log_keep_days=dict(type="int", required=False),
         )
     )
 
@@ -554,7 +557,8 @@ def main():
                 for node in application_nodes:
                     if node["protectionSource"]["name"] == database.strip():
                         entity_ids[node["protectionSource"]["id"]] = node[
-                            "protectionSource"]["oracleProtectionSource"]["uuid"]
+                            "protectionSource"
+                        ]["oracleProtectionSource"]["uuid"]
                         copy_database.remove(database)
                 if len(databases) == len(list(entity_ids.keys())):
                     break
@@ -566,7 +570,9 @@ def main():
             spl_params = SourceSpecialParameter()
             spl_params.source_id = source_id
             spl_params.oracle_special_parameters = OracleSpecialParameters()
-            spl_params.oracle_special_parameters.application_entity_ids = list(entity_ids.keys())
+            spl_params.oracle_special_parameters.application_entity_ids = list(
+                entity_ids.keys()
+            )
             archive_log_keep_days = module.params.get("archive_log_keep_days", None)
             if archive_log_keep_days is not None:
                 spl_params.oracle_special_parameters.app_params_list = []
@@ -578,7 +584,9 @@ def main():
                     oracle_app_params.database_app_id = db_id
                     oracle_app_params.node_channel_list = list()
                     oracle_app_params.node_channel_list.append(node_channel)
-                    spl_params.oracle_special_parameters.app_params_list.append(oracle_app_params)
+                    spl_params.oracle_special_parameters.app_params_list.append(
+                        oracle_app_params
+                    )
             body.source_special_parameters.append(spl_params)
 
         if module.params.get("start_time"):
@@ -619,7 +627,9 @@ def main():
             if status:
                 stop_job(module, job_id)
                 while True:
-                    status, is_active, run = get_protection_run__status__by_id(module, job_id)
+                    status, is_active, run = get_protection_run__status__by_id(
+                        module, job_id
+                    )
                     if not status:
                         time.sleep(10)
                         break

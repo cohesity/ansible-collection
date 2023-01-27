@@ -423,7 +423,7 @@ def main():
             job_name=dict(type="str", required=True),
             endpoint=dict(type="str", required=True),
             backup_timestamp=dict(type="str", default=""),
-            file_names=dict(type="list", required=True, elements='str'),
+            file_names=dict(type="list", required=True, elements="str"),
             wait_for_job=dict(type="bool", default=True),
             overwrite=dict(type="bool", default=True),
             preserve_attributes=dict(type="bool", default=True),
@@ -615,11 +615,9 @@ def main():
                 # => Set the errorCode to match the task['error'] if the key exists
                 if "error" in task:
                     errorCode = task["error"]
-                results["msg"] = "Cohesity Restore Job Failed to complete",
+                results["msg"] = ("Cohesity Restore Job Failed to complete",)
                 results["error"] = errorCode
-                module.fail_json(
-                    **results
-                )
+                module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
 

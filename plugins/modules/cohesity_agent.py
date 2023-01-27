@@ -791,10 +791,10 @@ def main():
                         "msg"
                     ] = "Check Mode: Agent is currently installed.  No changes"
                 else:
-                    check_mode_results[
-                        "msg"
-                    ] = "Check Mode: Agent is currently not installed." + \
-                        " This action would install the Agent."
+                    check_mode_results["msg"] = (
+                        "Check Mode: Agent is currently not installed."
+                        + " This action would install the Agent."
+                    )
                     check_mode_results["version"] = results["version"]
             else:
                 if results["version"]:

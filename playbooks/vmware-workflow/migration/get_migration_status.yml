@@ -1,5 +1,4 @@
-# => restore vms from VMware Backup based on timestamp provided or recent
-# => job run is used for the operation.
+# => Poll for migration status of the task.
 ---
 - hosts: localhost
   gather_facts: no
@@ -7,11 +6,14 @@
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: Finalise migration of VMs
+    - name: Poll for migration status of VMs
       cohesity_migration_status:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
-        #task_name: "Migrate_VM_Jan_11_2023_06_31_PM"
-        task_id: 1755745655068243:1672666992780:6198
+        task_id: 1755745655068243:1672666992780:11012
+     register: job_result
+     until: job_result.status == "Succeeded" or job_result.status == "Canceled" or job_result.status == "Failed" or job_result.status == "OnHold"
+     ignore_errors: true
+     retries: 10

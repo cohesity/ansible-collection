@@ -52,6 +52,10 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
+  end_timestamp (False, str, None)
+    Option to identify backups based on a end timestamp
+
+
   environment (optional, str, VMware)
     Optional directory path to which the installer will be downloaded.  If not selected, then a temporary
 
@@ -84,6 +88,10 @@ Parameters
     Specifies the resource pool where the cloned or recovered objects are attached.
 
 
+  start_timestamp (False, str, None)
+    Option to identify backups based on a start timestamp.
+
+
   state (optional, str, present)
     Determines if the clone vm should be ``present`` or ``absent`` from the cluster
 
@@ -92,7 +100,7 @@ Parameters
     Specifies a suffix to appended to the original source object name to derive a new name      for the recovered or cloned object.
 
 
-  view_name (True, str, None)
+  view_name (optional, str, None)
     Name of the view
 
 

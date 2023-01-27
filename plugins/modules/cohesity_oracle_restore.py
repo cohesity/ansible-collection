@@ -323,8 +323,7 @@ def search_for_database(token, module):
         response = json.loads(response.read())
         if not response:
             if module.check_mode:
-                module.exit_json(
-                    msg="Source database %s not available." % sourcedb)
+                module.exit_json(msg="Source database %s not available." % sourcedb)
             raise Exception("Source database %s not available." % sourcedb)
         vms = response["vms"]
         snapshot_timesecs = 0
@@ -339,7 +338,9 @@ def search_for_database(token, module):
                 search_info = vm
         if not search_info:
             err_msg = "Source database %s not available in source %s." % (
-                sourcedb, source_server)
+                sourcedb,
+                source_server,
+            )
             if module.check_mode:
                 module.exit_json(msg="Check Mode: %s" % err_msg)
             raise Exception(err_msg)

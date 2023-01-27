@@ -294,7 +294,8 @@ def get_remote_cluster_id(module, cluster_name):
     """
     try:
         clusters = cohesity_client.remote_cluster.get_remote_clusters(
-            cluster_names=cluster_name)
+            cluster_names=cluster_name
+        )
         for cluster in clusters:
             if cluster.name == cluster_name:
                 return cluster.cluster_id
@@ -429,8 +430,8 @@ def create_policy(module):
             policy_request.extended_retention_policies = extended_retention(module)
 
         if module.params.get("replication_copy"):
-            policy_request.snapshot_replication_copy_policies = replication_copy_policies(
-                module
+            policy_request.snapshot_replication_copy_policies = (
+                replication_copy_policies(module)
             )
         if module.params.get("archival_copy"):
             policy_request.snapshot_archival_copy_policies = archival_copy_policies(
@@ -527,7 +528,9 @@ def main():
                     " This action would create a protection policy"
                 )
                 if module.params.get("extended_retention"):
-                    remote_clusters = cohesity_client.remote_cluster.get_remote_clusters()
+                    remote_clusters = (
+                        cohesity_client.remote_cluster.get_remote_clusters()
+                    )
 
                 if module.params.get("archival_copy"):
                     unavailable_targets = []
@@ -535,16 +538,21 @@ def main():
                         if not get_external_target_id(target["target_name"]):
                             unavailable_targets.append(target["target_name"])
                     if unavailable_targets:
-                        check_mode_results["msg"] += "Following list of external targets " \
+                        check_mode_results["msg"] += (
+                            "Following list of external targets "
                             "are not available, '%s'" % ", ".join(unavailable_targets)
+                        )
                 if module.params.get("replication_copy"):
                     unavailable_remote_clusters = []
                     for cluster in module.params.get("replication_copy"):
                         if not get_remote_cluster_id(target["cluster_name"]):
                             unavailable_remote_clusters.append(target["cluster_name"])
                     if unavailable_remote_clusters:
-                        check_mode_results["msg"] += "Following list of remote clusters " \
-                            "are not available, '%s'" % ", ".join(unavailable_remote_clusters)
+                        check_mode_results["msg"] += (
+                            "Following list of remote clusters "
+                            "are not available, '%s'"
+                            % ", ".join(unavailable_remote_clusters)
+                        )
                 check_mode_results["changed"] = True
         else:
             if policy_exists:

@@ -1263,7 +1263,9 @@ def main():
                 default="PhysicalFiles",
             ),
             view_name=dict(type="str", required=False),
-            protection_sources=dict(type="list", aliases=["sources"], default=[], elements="dict"),
+            protection_sources=dict(
+                type="list", aliases=["sources"], default=[], elements="dict"
+            ),
             protection_policy=dict(type="str", aliases=["policy"], default="Bronze"),
             storage_domain=dict(type="str", default="DefaultStorageDomain"),
             delete_sources=dict(type="bool", default=False),
@@ -1327,15 +1329,24 @@ def main():
                     status = check_source_reachability(source["endpoint"])
                     if not status:
                         if status is None:
-                            check_mode_results[
-                                "msg"
-                            ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open."
+                                % source["endpoint"]
+                            )
                         else:
-                            check_mode_results["msg"] += "Source '%s' is not reachable." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Source '%s' is not reachable." % source["endpoint"]
+                            )
                 if not get__prot_policy_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % job_details["policyId"]
+                    check_mode_results["msg"] += (
+                        "Protection policy '%s' is not available in the cluster"
+                        % job_details["policyId"]
+                    )
                 if not get__storage_domain_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % job_details["viewBoxId"]
+                    check_mode_results["msg"] += (
+                        "Storage domain '%s' is not available in the cluster"
+                        % job_details["viewBoxId"]
+                    )
 
         else:
             if job_exists:

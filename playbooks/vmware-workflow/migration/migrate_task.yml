@@ -1,0 +1,48 @@
+# => Create a task and poll for the status
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Restore VMs
+      cohesity_migrate_vm:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        name: "Testing"
+        job_vm_pair:
+          job_name_1:
+            - VM1
+          job_name_2:
+            - VM2
+            - VM3
+        wait_for_job: true
+        state: "present"
+        network_name: "VLAN"
+        vm_folder_name: "cohesity_folder"
+        resource_pool_name: resource_pool
+        datastore_name: datastore_name
+        network_connected: false
+        endpoint: vcenter.domain.com 
+        suffix: "_1"
+        prefix: "copy_"
+        disable_network: false
+        preserve_mac_address: true
+      register: task
+
+    - name: Poll for migration status of VMs
+      cohesity_migration_status:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: "{{ task.id }}"
+      register: job_result
+      until: job_result.status == "Succeeded" or job_result.status == "Canceled" or job_result.status == "Failed" or job_result.status == "OnHold"
+      ignore_errors: true
+      # This task will poll for 21(retries+1) times with 30 seconds sleep time.
+      retries: 20
+      delay: 30

@@ -257,7 +257,7 @@ def convert__windows_file_name(filename):
 def strip__prefix(prefix, file_path):
 
     if file_path.startswith(prefix):
-        return file_path[len(prefix):]
+        return file_path[len(prefix) :]
     return file_path
 
 
@@ -669,7 +669,7 @@ def main():
                 # => Set the errorCode to match the task['error'] if the key exists
                 if "error" in task:
                     errorCode = task["error"]
-                results["msg"] = "Cohesity Restore Job Failed to complete",
+                results["msg"] = ("Cohesity Restore Job Failed to complete",)
                 results["error"] = errorCode
                 module.fail_json(**results)
 

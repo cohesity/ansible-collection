@@ -11,21 +11,21 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: "Naveena (@naveena-maplelabs)"
+author: Naveena (@naveena-maplelabs)
 description:
-  - "Ansible Module used to Cancel a Cohesity Migration Job on a Cohesity Cluster."
-  - "When executed in a playbook, the Cohesity migration Job will be Canceld."
+  - Ansible Module used to Cancel a Cohesity Migration Job on a Cohesity Cluster.
+  - When executed in a playbook, the Cohesity migration Job will be Canceld.
 module: cohesity_cancel_migration
 options:
   task_id:
     description:
-      - "Recovery task Id. pattern: ^\d+:\d+:\d+$"
+      - Task Id of the migrate job.
     type: str
   cluster:
     aliases:
       - cohesity_server
     description:
-      - "IP or FQDN for the Cohesity Cluster"
+      - IP or FQDN for the Cohesity Cluster
     type: str
   cohesity_admin:
     aliases:
@@ -33,7 +33,8 @@ options:
       - cohesity_user
       - username
     description:
-      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain
+        Specific credentails can be configured in following formats
       - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
@@ -43,7 +44,8 @@ options:
       - password
       - admin_pass
     description:
-      - "Password belonging to the selected Username.  This parameter will not be logged."
+      - Password belonging to the selected Username.  This parameter will not be
+        logged.
     type: str
   state:
     choices:
@@ -51,17 +53,17 @@ options:
       - absent
     default: present
     description:
-      - "Determines the state of the Recovery Job."
-      - "(C)present a recovery job will be created and started."
-      - "(C)absent is currently not implemented"
+      - Determines the state of the Recovery Job.
+      - (C)present a recovery job will be created and started.
+      - (C)absent is currently not implemented
     type: str
   task_name:
     description:
-      - "Name of the recovery task name."
+      - Name of the recovery task name.
     type: str
 extends_documentation_fragment:
-- cohesity.dataprotect.cohesity
-short_description: "Cancel the VM migration"
+  - cohesity.dataprotect.cohesity
+short_description: Cancel the VM migration
 version_added: 1.0.9
 """
 
@@ -142,19 +144,19 @@ def check__protection_restore__exists(module, self):
         if module.params.get("task_name"):
             for task in restore_tasks:
                 if task["name"] == self["name"]:
-                    return task["status"], task["id"]
+                    return task["status"], task["id"], task["name"]
         if module.params.get("task_id"):
             for task in restore_tasks:
-                if task["id"] == int(module.params.get("task_id")):
-                    return task["status"], task["id"]
-        return False, False
+                if task["id"] == module.params.get("task_id"):
+                    return task["status"], task["id"], task["name"]
+        return False, False, False
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
-        return None, None
+        return None, None, None
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
-        return None, None
+        return None, None, None
 
 
 def cancel_migration(module, task_id):
@@ -183,7 +185,7 @@ def cancel_migration(module, task_id):
             data=json.dumps({}),
             timeout=REQUEST_TIMEOUT,
         )
-        return response.code==204
+        return response.code == 204
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -216,7 +218,7 @@ def main():
         id=module.params.get("task_id"),
     )
 
-    task_status, task_id = check__protection_restore__exists(module, task_details)
+    task_status, task_id, task_name = check__protection_restore__exists(module, task_details)
     if not task_details["id"]:
         task_details["id"] = task_id
 
@@ -248,14 +250,15 @@ def main():
             results = dict(
                 changed=False,
                 msg="Couldn't find the Restore Job '%s'"
-                % (task_details["name"] or task_details["id"]),
+                % (task_name),
             )
         else:
             if task_status not in ["Running", "Accepted"]:
                 results = dict(
-                msg="Cohesity Migration Job status is '%s', skipping cancelation" % task_status,
-                name=module.params.get("task_name"),
-            )
+                    msg="Cohesity Migration Job status is '%s', skipping cancelation"
+                    % task_status,
+                    name=task_name,
+                )
             else:
                 cancel_migration(module, task_id)
                 # Poll for cancellation status.
@@ -264,15 +267,17 @@ def main():
                     status = get__restore_task_status__by_id(module, task_details)
                     if status == "Canceled":
                         module.exit_json(
-                                changed=True,
-                            msg="Succesfully canceled the Cohesity Migration Job '%s'" % module.params.get("task_name"),
-                    )
+                            changed=True,
+                            msg="Succesfully canceled the Cohesity Migration Job '%s'"
+                            % task_name,
+                        )
                     time.sleep(60)
                     count += 1
                 results = dict(
-                msg="Cancelation of the Cohesity Migration Job is incomplete, task status is '%s'" % status,
-                name=module.params.get("task_name"),
-            )
+                    msg="Cancellation of the Cohesity Migration Job is incomplete, task status is '%s'"
+                    % status,
+                    name=task_name,
+                )
             module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
@@ -280,7 +285,7 @@ def main():
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",
-            name=module.params.get("task_name"),
+            name=task_name,
         )
     else:
         # => This error should never happen based on the set assigned to the parameter.

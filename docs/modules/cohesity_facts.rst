@@ -78,6 +78,10 @@ Parameters
     will filter the Protection Sources, Jobs, and Executions data and return only current information if *include_deleted=no*
 
 
+  validate_certs (optional, bool, False)
+    Switch determines if SSL Validation should be enabled.
+
+
 
 
 

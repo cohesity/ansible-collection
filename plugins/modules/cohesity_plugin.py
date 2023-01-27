@@ -237,7 +237,7 @@ def download_datastore_plugin(module):
 
 
 def update_global_allow_lists(module):
-    """"
+    """ "
     Function to update the cluster global allow lists.
     Required only for SapHana platform.
     : returns: None
@@ -315,8 +315,7 @@ def install_plugin(module, filename):
         rc, stdout, stderr = module.run_command(cmd)
         # => Any return code other than 0 is considered a failure.
         if rc:
-            module.fail_json(
-                msg="Error while installing connector plugin %s" % stderr)
+            module.fail_json(msg="Error while installing connector plugin %s" % stderr)
         return (True, "Successfully Installed the Cohesity plugin")
     except Exception as error:
         raise__cohesity_exception__handler(error, module)

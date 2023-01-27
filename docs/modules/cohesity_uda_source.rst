@@ -58,6 +58,12 @@ Parameters
     LOCAL/username@tenant
 
 
+  os_type (optional, str, None)
+    Type of the UDA source to be registered.
+
+    Field is applicable for few cluster versions.
+
+
   source_type (optional, str, Linux)
     Type of the UDA source to be registered.
 
@@ -124,7 +130,6 @@ Examples
         username: admin
         password: password
         endpoint: myvcenter.host.lab
-        environment: VMware
         state: absent
 
 

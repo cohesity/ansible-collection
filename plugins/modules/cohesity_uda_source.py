@@ -149,9 +149,12 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all, unregister_source
+        get__prot_source__all,
+        unregister_source,
     )
-    from ansible_collections.cohesity.dataprotect.plugins.modules.cohesity_source import unregister_source
+    from ansible_collections.cohesity.dataprotect.plugins.modules.cohesity_source import (
+        unregister_source,
+    )
 except Exception:
     pass
 
@@ -207,7 +210,7 @@ def register_source(module, self):
         payload = dict(
             environment="kUDA",
             udaParams=dict(
-                sourceType='k' + module.params.get("source_type"),
+                sourceType="k" + module.params.get("source_type"),
                 hosts=module.params.get("hosts"),
                 credentials=dict(
                     username=module.params.get("db_username"),
@@ -219,7 +222,7 @@ def register_source(module, self):
             ),
         )
         if module.params.get("os_type", None):
-            payload["osType"] = 'k' + module.params.get("os_type")
+            payload["osType"] = "k" + module.params.get("os_type")
         data = json.dumps(payload)
         request_method = "POST"
         if module.params.get("update_source"):
@@ -363,7 +366,8 @@ def main():
             if not response:
                 module.fail_json(
                     changed=False,
-                    msg="Error while registering UDA source to the cluster")
+                    msg="Error while registering UDA source to the cluster",
+                )
             msg = "Registration of Cohesity Protection Source Complete"
             if module.params.get("update_source"):
                 msg = "Updation of Cohesity Protection Source Complete"

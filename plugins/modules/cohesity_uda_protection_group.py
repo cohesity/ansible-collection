@@ -533,15 +533,26 @@ def main():
                 status = check_source_reachability(module.params.get("endpoint"))
                 if not status:
                     if status is None:
+                        check_mode_results["msg"] += (
+                            "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open."
+                            % module.params.get("endpoint")
+                        )
+                    else:
                         check_mode_results[
                             "msg"
-                        ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % module.params.get("endpoint")
-                    else:
-                        check_mode_results["msg"] += "Source '%s' is not reachable." % module.params.get("endpoint")
+                        ] += "Source '%s' is not reachable." % module.params.get(
+                            "endpoint"
+                        )
                 if not get__prot_policy_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % module.params.get("policy")
+                    check_mode_results["msg"] += (
+                        "Protection policy '%s' is not available in the cluster"
+                        % module.params.get("policy")
+                    )
                 if not get__storage_domain_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % module.params.get("storage_domain")
+                    check_mode_results["msg"] += (
+                        "Storage domain '%s' is not available in the cluster"
+                        % module.params.get("storage_domain")
+                    )
         else:
             if group_exists:
                 check_mode_results[

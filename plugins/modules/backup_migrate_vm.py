@@ -11,19 +11,27 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: Naveena (@naveena-maplelabs)
+author: "Naveena (@naveena-maplelabs)"
 description:
-  - Ansible Module used to start a Cohesity Migration Job on a Cohesity Cluster.
-  - When executed in a playbook, the Cohesity migration Job will be validated
-    and the appropriate state action
-  - will be applied.
+  - "Ansible Module used to start a Cohesity Migration Job on a Cohesity Cluster."
+  - "When executed in a playbook, the Cohesity migration Job will be validated and the appropriate state action"
+  - "will be applied."
 module: cohesity_migrate_vm
 options:
+  backup_id:
+    description:
+      - "Optional Cohesity ID to use as source for the Restore operation.  If not selected, the most recent RunId will be used"
+    type: int
+  backup_timestamp:
+    description:
+      - "Future option to identify backups based on a timestamp"
+      - "Currently not implemented."
+    type: str
   cluster:
     aliases:
       - cohesity_server
     description:
-      - IP or FQDN for the Cohesity Cluster
+      - "IP or FQDN for the Cohesity Cluster"
     type: str
   cohesity_admin:
     aliases:
@@ -31,8 +39,7 @@ options:
       - cohesity_user
       - username
     description:
-      - Username with which Ansible will connect to the Cohesity Cluster. Domain
-        Specific credentails can be configured in following formats
+      - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
       - AD.domain.com/username
       - AD.domain.com/username@tenant
       - LOCAL/username@tenant
@@ -42,23 +49,18 @@ options:
       - password
       - admin_pass
     description:
-      - Password belonging to the selected Username.  This parameter will not be
-        logged.
+      - "Password belonging to the selected Username.  This parameter will not be logged."
     type: str
   datastore_name:
     description:
-      - Specifies the datastore where the files should be recovered to. This
-        field is required to recover objects to
-      - a different resource pool or to a different parent source. If not
-        specified, objects are recovered to their original
-      - datastore locations in the parent source.
+      - "Specifies the datastore where the files should be recovered to. This field is required to recover objects to"
+      - "a different resource pool or to a different parent source. If not specified, objects are recovered to their original"
+      - "datastore locations in the parent source."
     type: str
   endpoint:
     description:
-      - Specifies the network endpoint of the Protection Source where it is
-        reachable. It could
-      - be an URL or hostname or an IP address of the Protection Source or a NAS
-        Share/Export Path.
+      - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
+      - "be an URL or hostname or an IP address of the Protection Source or a NAS Share/Export Path."
     required: true
     type: str
   environment:
@@ -66,50 +68,50 @@ options:
       - VMware
     default: VMware
     description:
-      - Specifies the environment type (such as VMware) of the Protection Source
-        this Job
-      - is protecting. Supported environment types include 'VMware'
+      - "Specifies the environment type (such as VMware) of the Protection Source this Job"
+      - "is protecting. Supported environment types include 'VMware'"
     required: false
     type: str
   interface_group_name:
     description:
-      - Specifies the interface name to connect after restoring the VM.
+      - "Specifies the interface name to connect after restoring the VM."
+    type: str
+  job_name:
+    description:
+      - "Name of the Protection Job"
+    required: false
     type: str
   name:
     description:
-      - Descriptor to assign to the Recovery Job.  The Recovery Job name will
-        consist of the name_date_time format.
+      - "Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the job_name:name format."
     required: true
     type: str
   network_connected:
     default: true
     description:
-      - Specifies whether the network should be left in disabled state. Attached
-        network is enabled by default. Set this flag to true to disable it.
+      - "Specifies whether the network should be left in disabled state. Attached network is enabled by default. Set this flag to true to disable it."
     type: bool
   network_name:
     description:
-      - Specifies a network name to be attached to the migrated object.
+      - "Specifies a network name to be attached to the cloned or recovered object."
     type: str
   power_state:
     default: true
     description:
-      - Specifies the power state of the recovered objects. By default, the
-        migrated objects are powered off.
+      - "Specifies the power state of the cloned or recovered objects. By default, the cloned or recovered objects are powered off."
     type: bool
   prefix:
     description:
-      - Specifies a prefix to prepended to the source object name to derive a
-        new name for the recovered object.
+      - "Specifies a prefix to prepended to the source object name to derive a new name for the recovered or cloned object."
     type: str
   recovery_process_type:
-    default: CopyRecovery
+    default: InstantRecovery
     description:
-      - Specifies the recovery type.
+      - "Specifies the recovery type."
     type: str
   resource_pool_name:
     description:
-      - Specifies the resource pool name where the migrated objects are attached.
+      - "Specifies the resource pool name where the cloned or recovered objects are attached."
     type: str
   state:
     choices:
@@ -117,66 +119,71 @@ options:
       - absent
     default: present
     description:
-      - Determines the state of the Recovery Job.
-      - (C)present a recovery job will be created and started.
-      - (C)absent is currently not implemented
+      - "Determines the state of the Recovery Job."
+      - "(C)present a recovery job will be created and started."
+      - "(C)absent is currently not implemented"
     type: str
   suffix:
     description:
-      - Specifies a suffix to appended to the original source object name to
-        derive a new name for the migrated object
+      - "Specifies a suffix to appended to the original source object name to derive a new name for the recovered or cloned object"
     type: str
   vm_folder_name:
     description:
-      - Specifies a folder name where the VMs should be restored.
+      - "Specifies a folder name where the VMs should be restored."
     type: str
-  job_vm_pair:
+  vm_names:
     description:
-      - Key value pair with job names as key and list of Virtual Machines to
-        migrate
-    elements: list
-    required: true
-    type: dict
+      - "Array of Virtual Machines to restore"
+    elements: str
+    required: false
+    type: list
+  wait_for_job:
+    default: true
+    description:
+      - "Should wait until the Restore Job completes"
+    type: bool
+  wait_minutes:
+    default: 20
+    description:
+      - "Number of minutes to wait until the job completes."
+    type: int
 extends_documentation_fragment:
-  - cohesity.dataprotect.cohesity
-short_description: Migrate one or more Virtual Machines from Cohesity Protection Jobs
+- cohesity.dataprotect.cohesity
+short_description: "Migrate one or more Virtual Machines from Cohesity Protection Jobs"
 version_added: 1.0.9
 """
 
 EXAMPLES = """
 
-# Migrate a single Virtual Machine
-- name: Migrate a Virtual Machine
+# Restore a single Virtual Machine
+- name: Restore a Virtual Machine
   cohesity_migrate_vm:
     cluster: cohesity.lab
     username: admin
     password: password
     state: present
-    name: "Ansible Test VM Migrate"
+    name: "Ansible Test VM Restore"
     endpoint: "myvcenter.cohesity.demo"
     environment: "VMware"
-    job_vm_pair:
-      "Backup_job":
-        - chs-win-01
-        - chs-win-02
+    job_name: "myvcenter.cohesity.demo"
+    vm_names:
+      - chs-win-01
 
-# Migrate multiple Virtual Machines from a specific snapshot with a new prefix and disable the network
-- name: Migrate a Virtual Machine
+# Restore multiple Virtual Machines from a specific snapshot with a new prefix and disable the network
+- name: Restore a Virtual Machine
   cohesity_migrate_vm:
     cluster: cohesity.lab
     username: admin
     password: password
     state: present
-    name: "Ansible Test VM Migrate"
+    name: "Ansible Test VM Restore"
     endpoint: "myvcenter.cohesity.demo"
     environment: "VMware"
-    job_vm_pair:
-      "Backup_job":
-        - chs-win-01
-        - chs-win-02
-      "Protect_VM":
-        - chs-ubun-01
-        - chs-ubun-02
+    job_name: "myvcenter.cohesity.demo"
+    backup_id: "48291"
+    vm_names:
+      - chs-win-01
+      - chs-win-02
     prefix: "rst-"
     network_connected: no
 
@@ -210,6 +217,8 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+        get__protection_jobs__by_environment,
+        get__vmware_snapshot_information__by_vmname,
         get__restore_job__by_type,
         get_cohesity_client,
     )
@@ -264,7 +273,7 @@ def get_source_details(module):
             timeout=REQUEST_TIMEOUT,
         )
         response = json.loads(response.read())
-        source_details = {}
+        source_details = dict()
         for source in response:
             if source["protectionSource"]["name"] == module.params.get("endpoint"):
                 source_details["id"] = source["protectionSource"]["id"]
@@ -310,50 +319,6 @@ def get_backup_job_run_id(module, job_id):
             timeout=REQUEST_TIMEOUT,
         )
         response = json.loads(response.read())
-        if response.get("runs", []):
-            return response["runs"][0]
-        else:
-            return None
-    except urllib_error.URLError as e:
-        # => Capture and report any error messages.
-        raise__cohesity_exception__handler(e.read(), module)
-    except Exception as error:
-        raise__cohesity_exception__handler(error, module)
-
-
-def get_backup_job_ids(module, job_names):
-    """
-    Get Backup job run Id.
-    :param module: object that holds parameters passed to the module
-    :param job_id: id of the backup job.
-    :return:
-    """
-    server = module.params.get("cluster")
-    validate_certs = module.params.get("validate_certs")
-    token = get__cohesity_auth__token(module)
-    try:
-        uri = (
-            "https://"
-            + server
-            + "/v2/data-protect/protection-groups?names=%s" % str(",".join(job_names))
-        )
-        headers = {
-            "Accept": "application/json",
-            "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
-        }
-        response = open_url(
-            url=uri,
-            headers=headers,
-            validate_certs=validate_certs,
-            method="GET",
-            timeout=REQUEST_TIMEOUT,
-        )
-        response = json.loads(response.read())
-        if response["protectionGroups"]:
-            return {job["name"]: job["id"] for job in response["protectionGroups"]}
-        else:
-            return {}
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -477,9 +442,7 @@ def start_restore(module, uri, self):
 
 
 def create_migration_task(module, body):
-    """
-    Function to trigger the API call to create a the migration task.
-    """
+    """ """
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = get__cohesity_auth__token(module)
@@ -509,10 +472,7 @@ def create_migration_task(module, body):
 
 
 def get_protection_groups(module):
-    """
-    Function to get list of protection backup groups.
-    :return response
-    """
+    """ """
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = get__cohesity_auth__token(module)
@@ -552,22 +512,24 @@ def main():
             name=dict(type="str", required=True),
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
+            job_name=dict(type="str", default=""),
+            backup_id=dict(type="int"),
+            backup_timestamp=dict(type="str"),
+            # => Currently, the only supported environments types are list in the choices
+            # => For future enhancements, the below list should be consulted.
+            # => 'SQL', 'View', 'Puppeteer', 'Pure', 'Netapp', 'HyperV', 'Acropolis', 'Azure'
             environment=dict(choices=["VMware"], default="VMware"),
-            job_vm_pair=dict(type="dict", required=True),
+            vm_names=dict(type="list", elements="str"),
+            wait_for_job=dict(type="bool", default=True),
+            wait_minutes=dict(type="int", default=20),
             datastore_name=dict(type="str", default=""),
             interface_group_name=dict(type="str"),
             network_connected=dict(type="bool", default=True),
             network_name=dict(type="str"),
             power_state=dict(type="bool", default=True),
-            preserve_mac_address=dict(type="bool", default=False),
-            disable_network=dict(type="bool", default=True),
             prefix=dict(type="str"),
             resource_pool_name=dict(type="str", default=""),
-            recovery_process_type=dict(
-                type="str",
-                choices=["CopyRecovery", "InstantRecovery"],
-                default="CopyRecovery",
-            ),
+            recovery_process_type=dict(type="str", default="InstantRecovery"),
             suffix=dict(type="str"),
             vm_folder_name=dict(type="str", required=False),
         )
@@ -584,27 +546,39 @@ def main():
     job_details = dict(
         token=get__cohesity_auth__token(module),
         endpoint=module.params.get("endpoint"),
+        job_name=module.params.get("job_name"),
         environment=module.params.get("environment"),
     )
-    job_details["name"] = module.params.get("name")
+    if module.params.get("job_name"):
+        job_details["name"] = (
+            module.params.get("job_name") + ": " + module.params.get("name")
+        )
+    else:
+        job_details["name"] = module.params.get("name")
+
+    if module.params.get("backup_id"):
+        job_details["jobRunId"] = module.params.get("backup_id")
+
+    if module.params.get("backup_timestamp"):
+        job_details["backup_timestamp"] = module.params.get("backup_timestamp")
 
     job_exists = check__protection_restore__exists(module, job_details)
 
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
-            msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
+            msg="Check Mode: Cohesity Protection Restore Job is not currently registered",
             id="",
         )
         if module.params.get("state") == "present":
             if job_exists:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is currently registered.  No changes"
+                ] = "Check Mode: Cohesity Protection Restore Job is currently registered.  No changes"
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not currently registered.  This action would register the Cohesity Protection Job."
+                ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
                 restore_to_source_details = get_source_details(module)
                 restore_to_source_objects = get_vmware_source_objects(
@@ -615,12 +589,12 @@ def main():
             if job_exists:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is currently registered.  This action would unregister the Cohesity Protection Job."
+                ] = "Check Mode: Cohesity Protection Restore Job is currently registered.  This action would unregister the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not currently registered.  No changes."
+                ] = "Check Mode: Cohesity Protection Restore Job is not currently registered.  No changes."
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
@@ -629,7 +603,7 @@ def main():
         if job_exists:
             results = dict(
                 changed=False,
-                msg="The Migrate Job for is already registered",
+                msg="The Restore Job for is already registered",
                 id=job_exists,
                 name=job_details["name"],
             )
@@ -640,7 +614,7 @@ def main():
                 "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
             )
 
-            run_params = []
+            run_params = list()
             if environment != "kVMware":
                 # => This error should never happen based on the set assigned to the parameter.
                 # => However, in case, we should raise an appropriate error.
@@ -651,39 +625,50 @@ def main():
                     changed=False,
                 )
 
+            job_details["vm_names"] = module.params.get("vm_names")
             # Get the job run id and object Id.
             source_details = get_source_details(module)
             source_id = source_details["id"]
+            protected_objects = (
+                cohesity_client.protection_sources.list_protected_objects(
+                    environment=environment, id=source_id
+                )
+            )
+            vm_names = module.params.get("vm_names")
             restore_to_source_objects = get_vmware_source_objects(module, source_id)
+            i = []
+            full_job_ids = get_protection_groups(module)
+            for obj in protected_objects:
+                i.append(obj.protection_source.name)
+                if obj.protection_source.name in vm_names:
+                    # Check if job name if provided or else select the first
+                    # job from the list.
+                    job_id = None
+                    for job in obj.protection_jobs:
+                        if (
+                            not job_details["job_name"]
+                            or job.name == job_details["job_name"]
+                        ):
+                            job_id = job.id
+                            vm_names.remove(obj.protection_source.name)
+                            break
+                    if not job_id:
+                        module.fail_json(msg="Backup Job is not available")
+                    response = get_backup_job_run_id(module, full_job_ids[str(job_id)])
+                    # Get the snapshot Id.
 
-            job_vm_pair = module.params.get("job_vm_pair")
-            # Get the list of job names and ids.
-            backup_job_ids = get_backup_job_ids(module, job_vm_pair.keys())
-            objects = []
-            for jobname, vms in job_vm_pair.items():
-                if not backup_job_ids.get(jobname, None):
-                    continue
-                # If VM list is empty, all the virtual machine objects
-                # protected in the job is selected.
-                response = get_backup_job_run_id(module, backup_job_ids[jobname])
-                if not vms:
-                    run_id, instance_id = (
-                        response["id"],
-                        response["protectionGroupInstanceId"],
-                    )
+                    if response["runs"]:
+                        run_id, instance_id = (
+                            response["runs"][0]["id"],
+                            response["runs"][0]["protectionGroupInstanceId"],
+                        )
+                    i.append([job_id, run_id, instance_id])
                     obj_dict = dict(
                         protectionGroupRunId=run_id,
                         protectionGroupInstanceId=instance_id,
                     )
                     run_params.append(obj_dict)
-                else:
-                    for obj in response["objects"]:
-                        if obj["object"]["name"] in vms:
-                            snapshot_id = obj["localSnapshotInfo"]["snapshotInfo"][
-                                "snapshotId"
-                            ]
-                            objects.append(dict(snapshotId=snapshot_id))
-                            continue
+                    del obj_dict
             if module.params.get("resource_pool_name"):
                 resource_pool_id = get_vmware_object_id(
                     restore_to_source_objects,
@@ -718,11 +703,7 @@ def main():
                         msg="Failed to find network with name %s" % network_name,
                         changed=False,
                     )
-                new_network_config["networkPortGroup"] = dict(
-                    id=network_id,
-                    disableNetwork=module.params.get("disable_network"),
-                    preserveMacAddress=module.params.get("preserve_mac_address"),
-                )
+                new_network_config["networkPortGroup"] = dict(id=network_id)
             v_center_params = dict(
                 source=dict(id=source_id),
                 networkConfig=dict(
@@ -750,13 +731,13 @@ def main():
             )
             vmware_target_params = dict(
                 recoveryTargetConfig=recovery_target_config,
-                recoveryProcessType=module.params.get("recovery_process_type"),
+                recoveryProcessType="CopyRecovery",
                 powerOnVms=True,
                 diskProvisionType="kBackedUpDiskType",
                 continueOnError=False,
                 isMultiStageRestore=True,
             )
-            rename_recovered_vms_params = {}
+            rename_recovered_vms_params = dict()
             if module.params.get("prefix"):
                 rename_recovered_vms_params["prefix"] = module.params.get("prefix")
             if module.params.get("suffix"):
@@ -782,9 +763,7 @@ def main():
                 name=task_name,
                 snapshotEnvironment=environment,
                 vmwareParams=dict(
-                    objects=objects,
-                    recoveryAction="RecoverVMs",
-                    recoverVmParams=recover_vm_params,
+                    recoveryAction="RecoverVMs", recoverVmParams=recover_vm_params
                 ),
             )
             response = create_migration_task(module, body)
@@ -800,7 +779,7 @@ def main():
 
         results = dict(
             changed=False,
-            msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",
+            msg="Cohesity Restore: This feature (absent) has not be implemented yet.",
             name=task_name,
         )
     else:
