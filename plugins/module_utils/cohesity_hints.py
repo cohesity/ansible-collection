@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.0.9
+version_added: 1.0.10
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -586,12 +586,7 @@ def get__restore_task_status__by_id(module, self):
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
     try:
-        uri = (
-            "https://"
-            + server
-            + "/v2/data-protect/recoveries?ids="
-            + self["id"]
-        )
+        uri = "https://" + server + "/v2/data-protect/recoveries?ids=" + self["id"]
         headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
@@ -620,7 +615,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
 
         response = open_url(
@@ -661,7 +656,9 @@ def get__storage_domain_id__by__name(module):
 
 def get_protection_run__status__by_id(module, group_id):
     try:
-        group_run = cohesity_client.protection_runs.get_protection_runs(group_id=group_id)
+        group_run = cohesity_client.protection_runs.get_protection_runs(
+            group_id=group_id
+        )
         if not group_run:
             return False, "", ""
         # Fetch the status of last group run.
@@ -682,11 +679,16 @@ def check__protection_group__exists(module, self):
         environment = "k" + module.params.get("environment")
         server = module.params.get("cluster")
         validate_certs = module.params.get("validate_certs")
-        uri = "https://" + server + "/v2/data-protect/protection-groups?environments=" + environment
+        uri = (
+            "https://"
+            + server
+            + "/v2/data-protect/protection-groups?environments="
+            + environment
+        )
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -698,7 +700,7 @@ def check__protection_group__exists(module, self):
         if not response.getcode() == 200:
             raise Exception(response.read())
         group_list = json.loads(response.read())
-        for group in (group_list.get("protectionGroups") or []):
+        for group in group_list.get("protectionGroups") or []:
             if group["name"] == name:
                 return group["id"], group
         return False, ""

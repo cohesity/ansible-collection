@@ -64,7 +64,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Cancel the VM migration
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -218,7 +218,9 @@ def main():
         id=module.params.get("task_id"),
     )
 
-    task_status, task_id, task_name = check__protection_restore__exists(module, task_details)
+    task_status, task_id, task_name = check__protection_restore__exists(
+        module, task_details
+    )
     if not task_details["id"]:
         task_details["id"] = task_id
 
@@ -249,8 +251,7 @@ def main():
         if not task_status:
             results = dict(
                 changed=False,
-                msg="Couldn't find the Restore Job '%s'"
-                % (task_name),
+                msg="Couldn't find the Restore Job '%s'" % (task_name),
             )
         else:
             if task_status not in ["Running", "Accepted"]:
@@ -262,23 +263,13 @@ def main():
             else:
                 cancel_migration(module, task_id)
                 # Poll for cancellation status.
-                count = 0
-                while count < 5:
-                    status = get__restore_task_status__by_id(module, task_details)
-                    if status == "Canceled":
-                        module.exit_json(
-                            changed=True,
-                            msg="Succesfully canceled the Cohesity Migration Job '%s'"
-                            % task_name,
-                        )
-                    time.sleep(60)
-                    count += 1
+                status = get__restore_task_status__by_id(module, task_details)
                 results = dict(
-                    msg="Cancellation of the Cohesity Migration Job is incomplete, task status is '%s'"
-                    % status,
+                    msg="Succesfully cancelling the cohesity migrate job",
+                    status=status,
                     name=task_name,
                 )
-            module.fail_json(**results)
+            module.exit_json(**results)
 
     elif module.params.get("state") == "absent":
 

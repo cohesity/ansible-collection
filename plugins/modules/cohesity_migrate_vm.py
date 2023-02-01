@@ -53,6 +53,19 @@ options:
         specified, objects are recovered to their original
       - datastore locations in the parent source.
     type: str
+  detach_network:
+    default: false
+    description:
+      - If this is set to true, then the network will be detached from the
+        recovered VMs. All the other networking parameters set will be
+        ignored if set to true
+    type: bool
+  enable_network:
+    default: true
+    description:
+      - Specifies whether the attached network should be left in enabled
+        state
+    type: bool
   endpoint:
     description:
       - Specifies the network endpoint of the Protection Source where it is
@@ -81,12 +94,6 @@ options:
         consist of the name_date_time format.
     required: true
     type: str
-  network_connected:
-    default: true
-    description:
-      - Specifies whether the network should be left in disabled state. Attached
-        network is enabled by default. Set this flag to true to disable it.
-    type: bool
   network_name:
     description:
       - Specifies a network name to be attached to the migrated object.
@@ -140,7 +147,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Protection Jobs
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -178,7 +185,6 @@ EXAMPLES = """
         - chs-ubun-01
         - chs-ubun-02
     prefix: "rst-"
-    network_connected: no
 
 """
 
@@ -556,11 +562,11 @@ def main():
             job_vm_pair=dict(type="dict", required=True),
             datastore_name=dict(type="str", default=""),
             interface_group_name=dict(type="str"),
-            network_connected=dict(type="bool", default=True),
             network_name=dict(type="str"),
             power_state=dict(type="bool", default=True),
             preserve_mac_address=dict(type="bool", default=False),
-            disable_network=dict(type="bool", default=True),
+            enable_network=dict(type="bool", default=True),
+            detach_network=dict(type="bool", default=False),
             prefix=dict(type="str"),
             resource_pool_name=dict(type="str", default=""),
             recovery_process_type=dict(
@@ -707,7 +713,10 @@ def main():
                         % module.params.get("datastore_name")
                     )
             datastores = [dict(id=datastore_id, parentId=source_id)]
-            new_network_config = dict(disableNetwork=False, preserveMacAddress=False)
+            new_network_config = dict(
+                disableNetwork=not module.params.get("enable_network"),
+                preserveMacAddress=module.params.get("preserve_mac_address"),
+            )
             if module.params.get("network_name"):
                 network_name = module.params.get("network_name")
                 network_id = get_vmware_object_id(
@@ -718,15 +727,12 @@ def main():
                         msg="Failed to find network with name %s" % network_name,
                         changed=False,
                     )
-                new_network_config["networkPortGroup"] = dict(
-                    id=network_id,
-                    disableNetwork=module.params.get("disable_network"),
-                    preserveMacAddress=module.params.get("preserve_mac_address"),
-                )
+                new_network_config["networkPortGroup"] = dict(id=network_id)
             v_center_params = dict(
                 source=dict(id=source_id),
                 networkConfig=dict(
-                    detachNetwork=True, newNetworkConfig=new_network_config
+                    detachNetwork=module.params.get("detach_network"),
+                    newNetworkConfig=new_network_config,
                 ),
                 datastores=datastores,
                 resourcePool=dict(id=resource_pool_id),
@@ -778,6 +784,10 @@ def main():
                 recoverProtectionGroupRunsParams=run_params,
                 vmwareTargetParams=vmware_target_params,
             )
+            if not run_params and not objects:
+                module.fail_json(
+                    msg="Couldn't find the VM(s) protected in the cluster."
+                )
             body = dict(
                 name=task_name,
                 snapshotEnvironment=environment,

@@ -22,15 +22,14 @@
         wait_for_job: true
         state: "present"
         network_name: "VLAN"
+        preserve_mac_address: true
+        enable_network: false
         vm_folder_name: "cohesity_folder"
         resource_pool_name: resource_pool
         datastore_name: datastore_name
-        network_connected: false
         endpoint: vcenter.domain.com 
         suffix: "_1"
         prefix: "copy_"
-        disable_network: false
-        preserve_mac_address: true
       register: task
 
     - name: Poll for migration status of VMs
@@ -46,3 +45,25 @@
       # This task will poll for 21(retries+1) times with 30 seconds sleep time.
       retries: 20
       delay: 30
+
+    # This task cancels the migration if the number of objects in-sync is less
+    # than the total number of vms migrated available in the task.
+    - name: Cancel Migration task when more than half of object migration is failed
+      cohesity_cancel_migration:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: "{{ task.id }}"
+      when: job_result.status.sync_vms < job_result.status.total_vms/2
+
+    # This task finalise the migration if the number of objects in-sync is greater
+    # than the total number of vms migrated available in the task.
+    - name: Finalise Migration task when all the objects are In-Sync.
+      cohesity_finalize_migration:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: "{{ task.id }}"
+      when: job_result.status.sync_vms >= job_result.status.total_vms/2

@@ -65,7 +65,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Finalize the VM migration
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -88,6 +88,7 @@ RETURN = """"""
 
 
 import json
+import time
 
 try:
     from urllib import quote
@@ -110,6 +111,7 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
+        get__restore_task_status__by_id,
     )
 except ImportError:
     pass
@@ -125,18 +127,17 @@ def check__protection_restore__exists(module, self):
 
     restore_tasks = get__restore_job__by_type(module, payload)
 
-    if not restore_tasks:
-        return False, False
-    if module.params.get("task_name"):
-        for task in restore_tasks:
-            if task["name"] == self["name"]:
-                return task["status"], task["id"]
-    if module.params.get("task_id"):
-        task_id = module.params.get("task_id").split(":")[-1]
-        for task in restore_tasks:
-            if task["id"] == int(task_id):
-                return task["status"], task["id"]
-    return False, False
+    if restore_tasks:
+        if module.params.get("task_name"):
+            for task in restore_tasks:
+                if task["name"] == self["name"]:
+                    return task["status"], task["id"], task["name"]
+        if module.params.get("task_id"):
+            task_id = module.params.get("task_id").split(":")[-1]
+            for task in restore_tasks:
+                if task["id"] == int(task_id):
+                    return task["status"], task["id"], task["name"]
+    return False, False, False
 
 
 def finalize_migration(module, self):
@@ -196,10 +197,12 @@ def main():
     )
 
     task_details = dict(
-        token=get__cohesity_auth__token(module), name=module.params.get("task_name")
+        token=get__cohesity_auth__token(module),
     )
 
-    task_status, task_id = check__protection_restore__exists(module, task_details)
+    task_status, task_id, task_name = check__protection_restore__exists(
+        module, task_details
+    )
 
     if module.check_mode:
         check_mode_results = dict(
@@ -228,19 +231,17 @@ def main():
         if task_status != "kInProgress":
             results = dict(
                 changed=False,
-                msg="The Restore Job for is already finalized",
+                msg="The Migrate Job for is already finalized",
                 id=task_status,
                 name=task_details["name"],
             )
         else:
             task_details["task_id"] = task_id
             response = finalize_migration(module, task_details)
-
             results = dict(
-                changed=True,
-                msg="Cohesity Migrate Job is finalised",
-                name=module.params.get("task_name"),
-                restore_jobs=response,
+                changed=False,
+                msg="Succesfully triggered API to finalise Cohesity Migrate Job.",
+                name=task_name,
             )
 
     elif module.params.get("state") == "absent":
@@ -248,7 +249,7 @@ def main():
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",
-            name=module.params.get("task_name"),
+            name=task_name,
         )
     else:
         # => This error should never happen based on the set assigned to the parameter.

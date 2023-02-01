@@ -58,6 +58,14 @@ Parameters
     datastore locations in the parent source.
 
 
+  detach_network (optional, bool, False)
+    If this is set to true, then the network will be detached from the recovered VMs. All the other networking parameters set will be ignored if set to true
+
+
+  enable_network (optional, bool, True)
+    Specifies whether the attached network should be left in enabled state
+
+
   endpoint (True, str, None)
     Specifies the network endpoint of the Protection Source where it is reachable. It could
 
@@ -76,10 +84,6 @@ Parameters
 
   name (True, str, None)
     Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the name_date_time format.
-
-
-  network_connected (optional, bool, True)
-    Specifies whether the network should be left in disabled state. Attached network is enabled by default. Set this flag to true to disable it.
 
 
   network_name (optional, str, None)
@@ -178,7 +182,6 @@ Examples
             - chs-ubun-01
             - chs-ubun-02
         prefix: "rst-"
-        network_connected: no
 
 
 

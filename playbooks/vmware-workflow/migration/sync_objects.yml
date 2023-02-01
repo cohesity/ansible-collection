@@ -1,0 +1,15 @@
+# Finalise VM migration.
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Cohesity Migration Task: Sync VMs"
+      cohesity_sync_objects:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: 2520974734107749:1675035602065:420

@@ -65,7 +65,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Check Sync status of objects available in the VM migration task
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -126,7 +126,7 @@ def check__protection_restore__exists(module, self):
     restore_tasks = get__restore_job__by_type(module, payload)
 
     if not restore_tasks:
-        return False, False
+        return False, False, False
     if module.params.get("task_name"):
         for task in restore_tasks:
             if task["name"] == self["name"]:
@@ -271,37 +271,80 @@ def main():
             task_details["task_id"] = task_id
             response = get_migration_status(module, task_details)
             status = get_task_status(module, module.params.get("task_id"))["status"]
-            results = defaultdict(int)
+            results = defaultdict(list)
             if response:
-                objects = response[0]["restoreTask"].get("restoreSubTaskWrapperProtoVec", [])
+                objects = response[0]["restoreTask"].get(
+                    "restoreSubTaskWrapperProtoVec", []
+                )
+                total_objects = len(objects)
+                sync_vms = 0
+                error_list = []
                 task_status = response[0]["restoreTask"]["performRestoreTaskState"][
                     "base"
                 ]["publicStatus"].lstrip("k")
-                for obj in objects:
-                    status = obj["performRestoreTaskState"]["base"][
-                        "publicStatus"
-                    ].lstrip("k")
-                    results[status] += 1
+                if task_status == "Running":
+                    for obj in objects:
+                        status = obj["performRestoreTaskState"]["base"][
+                            "publicStatus"
+                        ].lstrip("k")
+                        # Get the object name.
+                        vm_name = obj["performRestoreTaskState"]["objects"][0][
+                            "entity"
+                        ]["displayName"]
+                        if status == "OnHold":
+                            multi_stage_restore = obj["performRestoreTaskState"].get(
+                                "multiStageRestoreTaskState", ""
+                            )
+                            if multi_stage_restore and multi_stage_restore.get(
+                                "syncTimeUsecs", ""
+                            ):
+                                sync_vms += 1
+                            results[status].append(vm_name)
+                            if obj["performRestoreTaskState"]["base"].get("error", ""):
+                                error_list.append(
+                                    obj["performRestoreTaskState"]["base"]["error"][
+                                        "errorMsg"
+                                    ]
+                                )
+
                 if len(results.keys()) > 1:
                     msg = "Migration is in-progress, one or more VM is still %s." % (
                         "/".join(results.keys())
                     )
                     module.exit_json(
-                        msg=msg, changed=False, results=results, status=task_status
+                        msg=msg,
+                        changed=False,
+                        results=results,
+                        status=task_status,
+                        errors=error_list,
                     )
                 elif results:
+                    if sync_vms == total_objects:
+                        # Task status will be running/migrating, update it once the
+                        # VMs are in-sync.
+                        task_status = list(results.keys())[0]
+                        msg = "All VM(s) available in the migration task are 'InSync'"
+                    else:
+                        msg = (
+                            "Status of all VM(s) available in the migration task is '%s'"
+                            % list(results.keys())[0]
+                        )
                     module.exit_json(
                         results=results,
                         status=task_status,
-                        msg="Status of all VM(s) available in the migration task is '%s'"
-                        % list(results.keys())[0],
+                        msg=msg,
+                        sync_vms=sync_vms,
+                        total_vms=total_objects,
                     )
                 else:
                     module.exit_json(
                         msg="Status of the migration task is '%s'" % status,
-                        status=status)
+                        status=status,
+                    )
             else:
-                module.fail_json(msg="Couldn't find the task details.", status="Invalid")
+                module.fail_json(
+                    msg="Couldn't find the task details.", status="Invalid"
+                )
 
     elif module.params.get("state") == "absent":
 
@@ -316,7 +359,7 @@ def main():
         module.fail_json(
             msg="Invalid State selected: {0}".format(module.params.get("state")),
             changed=False,
-            status="Invalid"
+            status="Invalid",
         )
 
     module.exit_json(**results)

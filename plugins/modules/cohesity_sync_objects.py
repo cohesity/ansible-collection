@@ -66,7 +66,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Sync objects available in the VM migration task
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -130,19 +130,12 @@ def check__protection_restore__exists(module, self):
 
     restore_tasks = get__restore_job__by_type(module, payload)
 
-    if not restore_tasks:
-        return False, False
-    if module.params.get("task_name"):
-        for task in restore_tasks:
-            if task["name"] == self["name"]:
-                return task["status"], task["id"]
-    """
-    if module.params.get("task_id"):
+    if restore_tasks and module.params.get("task_id"):
         task_id = module.params.get("task_id").split(":")[-1]
         for task in restore_tasks:
-            if task["id"] == int(task_id):                return task["status"], task["id"]
-    """
-    return False, False
+            if task["id"] == int(task_id):
+                return task["status"], task["id"], task["name"]
+    return False, False, False
 
 
 def sync_objects(module, self):
@@ -173,7 +166,7 @@ def sync_objects(module, self):
             headers=headers,
             validate_certs=validate_certs,
             method="PUT",
-            data=json.dump(body),
+            data=json.dumps(body),
             timeout=REQUEST_TIMEOUT,
         )
         response = json.loads(response.read())
@@ -208,7 +201,9 @@ def main():
         token=get__cohesity_auth__token(module), name=module.params.get("task_name")
     )
 
-    task_status, task_id = check__protection_restore__exists(module, task_details)
+    task_status, task_id, task_name = check__protection_restore__exists(
+        module, task_details
+    )
 
     if module.check_mode:
         check_mode_results = dict(
@@ -234,10 +229,14 @@ def main():
 
     elif module.params.get("state") == "present":
         check_mode_results = dict(msg="")
-        if task_status != "kInProgress":
+        if not task_name:
+            results = dict(
+                changed=False, msg="Couldn't find migration task in the cluster"
+            )
+        elif task_status != "kInProgress":
             results = dict(
                 changed=False,
-                msg="The Restore Job for is %s, skipping." % task_status,
+                msg="The Restore Job status is %s, skipping." % task_status,
                 id=task_status,
             )
         else:

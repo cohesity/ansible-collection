@@ -15,7 +15,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.0.9
+version_added: 1.0.10
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -257,7 +257,7 @@ def convert__windows_file_name(filename):
 def strip__prefix(prefix, file_path):
 
     if file_path.startswith(prefix):
-        return file_path[len(prefix) :]
+        return file_path[len(prefix):]
     return file_path
 
 
@@ -380,7 +380,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = self.copy()
 
@@ -429,7 +429,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
