@@ -198,7 +198,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.0.9
+version_added: 1.0.10
 """
 EXAMPLES = """
 # Create a new Physical Server Protection Job
@@ -517,7 +517,7 @@ def get_vmware_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -555,7 +555,7 @@ def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -600,7 +600,7 @@ def get_view_storage_domain_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -665,7 +665,7 @@ def register_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = self.copy()
 
@@ -753,7 +753,7 @@ def start_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         source_ids = payload.get("sourceIds", [])
         payload = dict()
@@ -812,7 +812,7 @@ def update_job(module, job_details, update_source_ids=None):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = job_details.copy()
         del payload["token"]
@@ -874,7 +874,7 @@ def get_prot_job_details(self, module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -928,7 +928,7 @@ def stop_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = self.copy()
 
@@ -991,7 +991,7 @@ def unregister_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
 
         payload = dict(deleteSnapshots=self["deleteSnapshots"])
@@ -1263,7 +1263,9 @@ def main():
                 default="PhysicalFiles",
             ),
             view_name=dict(type="str", required=False),
-            protection_sources=dict(type="list", aliases=["sources"], default=[], elements="dict"),
+            protection_sources=dict(
+                type="list", aliases=["sources"], default=[], elements="dict"
+            ),
             protection_policy=dict(type="str", aliases=["policy"], default="Bronze"),
             storage_domain=dict(type="str", default="DefaultStorageDomain"),
             delete_sources=dict(type="bool", default=False),
@@ -1327,15 +1329,24 @@ def main():
                     status = check_source_reachability(source["endpoint"])
                     if not status:
                         if status is None:
-                            check_mode_results[
-                                "msg"
-                            ] += "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open."
+                                % source["endpoint"]
+                            )
                         else:
-                            check_mode_results["msg"] += "Source '%s' is not reachable." % source["endpoint"]
+                            check_mode_results["msg"] += (
+                                "Source '%s' is not reachable." % source["endpoint"]
+                            )
                 if not get__prot_policy_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Protection policy '%s' is not available in the cluster" % job_details["policyId"]
+                    check_mode_results["msg"] += (
+                        "Protection policy '%s' is not available in the cluster"
+                        % job_details["policyId"]
+                    )
                 if not get__storage_domain_id__by_name(module, job_details):
-                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % job_details["viewBoxId"]
+                    check_mode_results["msg"] += (
+                        "Storage domain '%s' is not available in the cluster"
+                        % job_details["viewBoxId"]
+                    )
 
         else:
             if job_exists:

@@ -14,7 +14,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.0.9
+version_added: 1.0.10
 author: "Naveena (@naveena-maplelabs)"
 
 options:
@@ -265,7 +265,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = self.copy()
 
@@ -353,7 +353,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -423,7 +423,7 @@ def main():
             job_name=dict(type="str", required=True),
             endpoint=dict(type="str", required=True),
             backup_timestamp=dict(type="str", default=""),
-            file_names=dict(type="list", required=True, elements='str'),
+            file_names=dict(type="list", required=True, elements="str"),
             wait_for_job=dict(type="bool", default=True),
             overwrite=dict(type="bool", default=True),
             preserve_attributes=dict(type="bool", default=True),
@@ -615,11 +615,9 @@ def main():
                 # => Set the errorCode to match the task['error'] if the key exists
                 if "error" in task:
                     errorCode = task["error"]
-                results["msg"] = "Cohesity Restore Job Failed to complete",
+                results["msg"] = ("Cohesity Restore Job Failed to complete",)
                 results["error"] = errorCode
-                module.fail_json(
-                    **results
-                )
+                module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
 

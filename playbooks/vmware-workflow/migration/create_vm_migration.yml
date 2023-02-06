@@ -1,0 +1,32 @@
+# => Migrate vms from VMware Backup based.
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Migrate VMs
+      cohesity_migrate_vm:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        # Task name will be appended with timestamp while creation.
+        name: "Migrate_job"
+        job_vm_pair:
+          job_name_1:
+            - VM1
+          job_name_2:
+            - VM2
+            - VM3
+        network_name: "VLAN"
+        vm_folder_name: "cohesity_folder"
+        wait_for_job: true
+        state: "present"
+        resource_pool_name: resource_pool
+        datastore_name: datastore
+        network_connected: false
+        endpoint: vcenter.domain.com 
+        suffix: "_1"
+        prefix: "copy_"

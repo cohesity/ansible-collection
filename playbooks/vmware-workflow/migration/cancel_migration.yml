@@ -1,0 +1,15 @@
+# => Cancel VM migration
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Cancel migration of VMs
+      cohesity_cancel_migration:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: 1755745655068243:1672666992780:11166

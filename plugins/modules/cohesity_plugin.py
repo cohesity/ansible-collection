@@ -92,7 +92,7 @@ options:
       - "Determines whether to upgrade the connector plugin if already installed."
     type: bool
 short_description: "Management of Cohesity Datastore Plugin"
-version_added: "1.0.9"
+version_added: "1.0.10"
 """
 
 EXAMPLES = """
@@ -202,7 +202,7 @@ def download_datastore_plugin(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.9",
+            "user-plugin": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -237,7 +237,7 @@ def download_datastore_plugin(module):
 
 
 def update_global_allow_lists(module):
-    """"
+    """ "
     Function to update the cluster global allow lists.
     Required only for SapHana platform.
     : returns: None
@@ -249,7 +249,7 @@ def update_global_allow_lists(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.9",
+            "user-plugin": "cohesity-ansible/v1.0.10",
         }
         response = open_url(
             url=uri,
@@ -315,8 +315,7 @@ def install_plugin(module, filename):
         rc, stdout, stderr = module.run_command(cmd)
         # => Any return code other than 0 is considered a failure.
         if rc:
-            module.fail_json(
-                msg="Error while installing connector plugin %s" % stderr)
+            module.fail_json(msg="Error while installing connector plugin %s" % stderr)
         return (True, "Successfully Installed the Cohesity plugin")
     except Exception as error:
         raise__cohesity_exception__handler(error, module)

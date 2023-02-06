@@ -14,7 +14,7 @@ module: cohesity_view
 short_description: Management of Cohesity View
 description:
     - Ansible Module to create View.
-version_added: 1.0.9
+version_added: 1.0.10
 author: "Naveena (@naveena-maplelabs)"
 options:
   case_insensitive:
@@ -186,9 +186,7 @@ def get_storage_domain_id(module):
     """
     try:
         name = module.params.get("storage_domain")
-        view_boxes = cohesity_client.view_boxes.get_view_boxes(
-            names=name
-        )
+        view_boxes = cohesity_client.view_boxes.get_view_boxes(names=name)
         for view_box in view_boxes:
             if view_box.name == module.params.get("storage_domain"):
                 if module.check_mode:
@@ -463,7 +461,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.10"
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 
@@ -484,7 +482,9 @@ def main():
                 name = module.params.get("storage_domain")
                 storage_domains = cohesity_client.view_boxes.get_view_boxes(names=name)
                 if not storage_domains or storage_domains[0].name == name:
-                    check_mode_results["msg"] += "Storage domain '%s' is not available in the cluster" % name
+                    check_mode_results["msg"] += (
+                        "Storage domain '%s' is not available in the cluster" % name
+                    )
                 check_mode_results["changed"] = True
         else:
             if view_exists:

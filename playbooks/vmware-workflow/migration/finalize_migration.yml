@@ -1,0 +1,16 @@
+# Finalise VM migration.
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Finalise migration of VMs
+      cohesity_finalize_migration:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        #task_name: "Migrate_VM_Jan_17_2023_04_06_PM"
+        task_id: 1755745655068243:1672666992780:10217

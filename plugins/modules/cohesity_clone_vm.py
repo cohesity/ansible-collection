@@ -127,7 +127,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 
@@ -275,7 +275,7 @@ def get_snapshot_details(module, timestamp, vm_name, job_id):
                 search=vm_name,
                 job_ids=[job_id],
                 start_time_usecs=module.params.get("start_timestamp"),
-                end_time_usecs=module.params.get("end_timestamp")
+                end_time_usecs=module.params.get("end_timestamp"),
             )
         if object_details.total_count == 0:
             raise__cohesity_exception__handler(
@@ -506,7 +506,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.9"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.0.10"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 
@@ -527,14 +527,22 @@ def main():
                 ] = "Check Mode: Cohesity clone task doesn't exist. This action would clone VMs"
                 job_details = get_protection_job_details(module)
                 if not job_details:
-                    check_mode_results["msg"] += "Job '%s' doesn't exist in the cluster" \
-                        % module.params.get("job_name")
+                    check_mode_results[
+                        "msg"
+                    ] += "Job '%s' doesn't exist in the cluster" % module.params.get(
+                        "job_name"
+                    )
                     check_mode_results["changed"] = False
                 resource_pool_id = get_resource_pool_id(
-                    module, module.params.get("resource_pool"), job_details.parent_source_id)
+                    module,
+                    module.params.get("resource_pool"),
+                    job_details.parent_source_id,
+                )
                 if not resource_pool_id:
-                    check_mode_results["msg"] += "Resource pool '%s' is not available in " \
+                    check_mode_results["msg"] += (
+                        "Resource pool '%s' is not available in "
                         "the server" % module.params.get("resource_pool_name")
+                    )
                     check_mode_results["changed"] = False
 
         else:

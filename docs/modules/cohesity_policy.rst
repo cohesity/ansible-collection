@@ -90,6 +90,10 @@ Parameters
     Specifies the name of the protection policy.
 
 
+  replication_copy (optional, list, None)
+    Specifies the list of replication cluster to be added while creating policy.
+
+
   retries (optional, int, 3)
     Specifies the retry count while policy creation.
 

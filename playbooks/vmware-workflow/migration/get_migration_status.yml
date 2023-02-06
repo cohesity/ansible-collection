@@ -1,0 +1,19 @@
+# => Poll for migration status of the task.
+---
+- hosts: localhost
+  gather_facts: no
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Poll for migration status of VMs
+      cohesity_migration_status:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        task_id: 1755745655068243:1672666992780:11012
+      register: job_result
+      until: job_result.status == "Succeeded" or job_result.status == "Canceled" or job_result.status == "Failed" or job_result.status == "OnHold"
+      ignore_errors: true
+      retries: 10

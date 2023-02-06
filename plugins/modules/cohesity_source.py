@@ -139,6 +139,11 @@ options:
     description:
       - "Determines the state of the Protection Source"
     type: str
+  timeout:
+    default: 120
+    description:
+      - "Wait time in seconds while registering/updating source."
+    type: int
   update_source:
     default: false
     description:
@@ -176,7 +181,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.9
+version_added: 1.0.10
 """
 
 EXAMPLES = """
@@ -262,7 +267,9 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__prot_source__all, check_source_reachability, unregister_source
+        get__prot_source__all,
+        check_source_reachability,
+        unregister_source,
     )
 except Exception:
     pass
@@ -366,11 +373,13 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
-        sql_payload = dict(applications=["kSQL"],
-                           hasPersistentAgent=True,
-                           protectionSourceId=self["physicalSourceId"])
+        sql_payload = dict(
+            applications=["kSQL"],
+            hasPersistentAgent=True,
+            protectionSourceId=self["physicalSourceId"],
+        )
         data = json.dumps(sql_payload)
         if self.get("refresh", False):
             uri = (
@@ -385,7 +394,7 @@ def register_sql_source(module, self):
             data=data,
             headers=headers,
             validate_certs=validate_certs,
-            timeout=REQUEST_TIMEOUT,
+            timeout=module.params.get("timeout"),
         )
         if self.get("refresh", False):
             return
@@ -412,7 +421,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.9",
+            "user-agent": "cohesity-ansible/v1.0.10",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -425,21 +434,21 @@ def register_source(module, self):
         request_method = "POST"
         if module.params.get("update_source"):
             if not self.get("sourceId", None):
-                module.fail_json(
-                    msg="Could find the source, skipping source updation!")
+                module.fail_json(msg="Could find the source, skipping source updation!")
             request_method = "PATCH"
             uri = (
                 "https://"
                 + server
                 + "/irisservices/api/v1/public/protectionSources/"
-                + str(self["sourceId"]))
+                + str(self["sourceId"])
+            )
         response = open_url(
             url=uri,
             method=request_method,
             data=data,
             headers=headers,
             validate_certs=validate_certs,
-            timeout=REQUEST_TIMEOUT,
+            timeout=module.params.get("timeout"),
         )
 
         response = json.loads(response.read())
@@ -506,7 +515,8 @@ def main():
             nas_password=dict(type="str", no_log=True, default=""),
             nas_type=dict(type="str", default="Host"),
             skip_validation=dict(type="bool", default=False),
-            update_source=dict(type="bool", default=False)
+            timeout=dict(type="int", default=120),
+            update_source=dict(type="bool", default=False),
         )
     )
 
@@ -534,7 +544,9 @@ def main():
         prot_sources["physicalSourceId"] = current_status
         is_physical_source = True
         prot_sources["environment"] = "SQL"
-        current_status = get__protection_source_registration__status(module, prot_sources)
+        current_status = get__protection_source_registration__status(
+            module, prot_sources
+        )
 
     if module.check_mode:
         check_mode_results = dict(
@@ -558,7 +570,11 @@ def main():
                             "msg"
                         ] += "Please ensure cohesity agent is installed in the source and port 50051 is open"
                     else:
-                        check_mode_results["msg"] += "Source '%s' is not reachable" % module.params.get("endpoint")
+                        check_mode_results[
+                            "msg"
+                        ] += "Source '%s' is not reachable" % module.params.get(
+                            "endpoint"
+                        )
                 check_mode_results["id"] = current_status
         else:
             if current_status:
@@ -579,7 +595,9 @@ def main():
         check__mandatory__params(module)
         # Incase of SQL source, register the source as physical source primarily and
         # register the Mssql using physical sourceId.
-        if (prot_sources["environment"] == "Physical") or (is_sql and not is_physical_source):
+        if (prot_sources["environment"] == "Physical") or (
+            is_sql and not is_physical_source
+        ):
             prot_sources["hostType"] = module.params.get("host_type")
             prot_sources["physicalType"] = module.params.get("physical_type")
         if prot_sources["environment"] == "VMware":
@@ -622,20 +640,26 @@ def main():
             )
         else:
             prot_sources["sourceId"] = current_status
-            if (not is_sql or not is_physical_source):
+            if not is_sql or not is_physical_source:
                 response = register_source(module, prot_sources)
                 time.sleep(SLEEP_TIME)
-                current_status = get__protection_source_registration__status(module, prot_sources)
+                current_status = get__protection_source_registration__status(
+                    module, prot_sources
+                )
                 if not current_status:
                     module.fail_json(
-                        msg="Failed to register %s source" % prot_sources["environment"])
+                        msg="Failed to register %s source" % prot_sources["environment"]
+                    )
                 prot_sources["physicalSourceId"] = current_status
                 prot_sources["sourceId"] = current_status
 
             # Register the physical source as SQL source.
             if is_sql and prot_sources.get("physicalSourceId", None):
-                if is_physical_source and current_status and module.params.get(
-                        "update_source"):
+                if (
+                    is_physical_source
+                    and current_status
+                    and module.params.get("update_source")
+                ):
                     prot_sources["refresh"] = True
                 response = register_sql_source(module, prot_sources)
             msg = "Registration of Cohesity Protection Source Complete"
@@ -649,7 +673,7 @@ def main():
     elif module.params.get("state") == "absent":
         if current_status:
             prot_sources["id"] = current_status
-            prot_sources["timeout"] = REQUEST_TIMEOUT
+            prot_sources["timeout"] = module.params.get("timeout")
             response = unregister_source(module, prot_sources)
 
             results = dict(
