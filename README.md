@@ -5,7 +5,7 @@
   -->
 # Ansible Collection - cohesity.dataprotect
 
-![](docs/assets/images/cohesity_ansible.png)
+![](https://github.com/cohesity/ansible-collection/blob/main/docs/assets/images/cohesity_ansible.png)
 
 ## Overview
 [![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
