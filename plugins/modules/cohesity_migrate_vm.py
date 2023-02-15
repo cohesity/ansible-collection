@@ -279,8 +279,8 @@ def get_source_details(module):
         if not source_details:
             module.fail_json(
                 changed=False,
-                msg="Protection Source '%s' is not currently registered" % \
-                    module.params.get("endpoint")
+                msg="Protection Source '%s' is not currently registered"
+                % module.params.get("endpoint"),
             )
         return source_details
     except urllib_error.URLError as e:
@@ -292,8 +292,12 @@ def get_source_details(module):
 
 def get_resource_pool_id(module, source_id):
     """
-    Check resource pool name exists in the source. If Cluster Compute Resource
-    is provided, resource pool name under cluster will be returned.
+    Check resource pool name exists in the source.
+    1) If Cluster Compute Resource is provided, resource pool name under
+    cluster will be returned.
+    2) If multiple datastore exists, datacenter and cluster resource details
+    are used to uniquely identify the resourcepool.
+
     :param module: Source Id of the Vcenter source.
     :return reosurce pool id.
     """
@@ -318,14 +322,29 @@ def get_resource_pool_id(module, source_id):
             method="GET",
             timeout=REQUEST_TIMEOUT,
         )
+        pool_id = None
         response = json.loads(response.read())
         name = module.params.get("resource_pool_name")
         cluster = module.params.get("cluster_compute_resource")
+        datacenter = module.params.get("datacenter")
+        res_pool_count = 0
         for obj in response:
-            if cluster and obj.get("cluster", {}).get("displayName") != cluster:
+            if (cluster and obj.get("cluster", {}).get("displayName") != cluster) or (
+                datacenter
+                and obj.get("dataCenter", {}).get("displayName") != datacenter
+            ):
                 continue
             if obj["resourcePool"]["displayName"] == name:
-                return obj["resourcePool"]["id"]
+                pool_id = obj["resourcePool"]["id"]
+                res_pool_count += 1
+        if res_pool_count > 1:
+            module.fail_json(
+                changed=False,
+                msg="Multiple resource pools are available in the name '%s', "
+                "Please provide cluster_compute_resource and datacenter field "
+                "to uniquely identify a resource pool." % name,
+            )
+        return pool_id
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -561,6 +580,57 @@ def create_migration_task(module, body):
         raise__cohesity_exception__handler(error, module)
 
 
+def get_objects(module, backup_job_ids):
+    """
+    Function to get the list of virtual machine run id and snapshot id of
+    the protected jobs.
+    : return
+    """
+    try:
+        error_list = ""
+        objects = []
+        run_params = []
+        for jobname, vms in module.params.get("job_vm_pair").items():
+            if not backup_job_ids.get(jobname, None):
+                error_list += "Backup job '%s' is not available in the cluster." % jobname
+                continue
+            # If VM list is empty, all the virtual machine objects
+            # protected in the job is selected.
+            response = get_backup_job_run_id(module, backup_job_ids[jobname])
+            if not vms:
+                # If only job name is provided without any virtual machines,
+                # job run id will be used.
+                run_id, instance_id = (
+                    response["id"],
+                    response["protectionGroupInstanceId"],
+                )
+                obj_dict = dict(
+                    protectionGroupRunId=run_id,
+                    protectionGroupInstanceId=instance_id,
+                )
+                run_params.append(obj_dict)
+            else:
+                # If object list is provided, snapshot id of the object is
+                # fetched.
+                available_vms = []
+                for obj in response["objects"]:
+                    if obj["object"]["name"] in vms:
+                        snapshot_id = obj["localSnapshotInfo"]["snapshotInfo"][
+                            "snapshotId"
+                        ]
+                        objects.append(dict(snapshotId=snapshot_id))
+                        available_vms.append(obj["object"]["name"])
+                        continue
+                if len(vms) != len(available_vms):
+                    missing_vms = set(vms) - set(available_vms)
+                    error_list += "Couldn't find snapshot Id for following VM(s) %s" % ",".join(missing_vms)
+        return objects, run_params, error_list
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
 def get_protection_groups(module):
     """
     Function to get list of protection backup groups.
@@ -611,6 +681,7 @@ def main():
             interface_group_name=dict(type="str"),
             network_name=dict(type="str"),
             cluster_compute_resource=dict(type="str", default=None),
+            datacenter=dict(type="str", default=None),
             power_state=dict(type="bool", default=True),
             preserve_mac_address=dict(type="bool", default=False),
             enable_network=dict(type="bool", default=True),
@@ -645,13 +716,15 @@ def main():
     job_exists = check__protection_restore__exists(module, job_details)
     source_details = get_source_details(module)
     source_id = source_details["id"] if source_details else None
-    if not source_id:        
+    cohesity_client = get_cohesity_client(module)
+    if not source_id:
         msg = "Check Mode: " if module.check_mode else ""
         module.fail_json(
             changed=False,
-            msg=msg + "Protection Source '%s' is not currently registered" % \
-                job_details["endpoint"],
-            )
+            msg=msg
+            + "Protection Source '%s' is not currently registered"
+            % job_details["endpoint"],
+        )
 
     if module.check_mode:
         check_mode_results = dict(
@@ -670,14 +743,12 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Migrate Job is not currently registered.  This action would register the Cohesity Protection Job."
                 check_mode_results["id"] = job_exists
-                restore_to_source_objects = get_vmware_source_objects(
-                    module, source_id
-                )
+                restore_to_source_objects = get_vmware_source_objects(module, source_id)
                 if module.params.get("resource_pool_name"):
                     resource_pool_id = get_resource_pool_id(module, source_id)
                     if not resource_pool_id:
                         error_list += (
-                            "Resource Pool '%s' is not available in the source"
+                            "Resource Pool '%s' is not available in the source."
                             % module.params.get("resource_pool_name")
                         )
                 if module.params.get("datastore_name"):
@@ -688,7 +759,7 @@ def main():
                     )
                     if not datastore_id:
                         error_list += (
-                            "Datastore '%s' is not available in the source"
+                            "Datastore '%s' is not available in the source."
                             % module.params.get("datastore_name")
                         )
                 if module.params.get("network_name"):
@@ -698,7 +769,7 @@ def main():
                     )
                     if not network_id:
                         error_list += (
-                            "Failed to find network with name '%s'" % network_name
+                            "Failed to find network with name '%s'." % network_name
                         )
                 if module.params.get("vm_folder_name"):
                     vm_folder_name = module.params.get("vm_folder_name")
@@ -707,9 +778,24 @@ def main():
                     )
                     if not vm_folder_id:
                         error_list += (
-                            "Failed to find folder with name '%s'" % vm_folder_name,
+                            "Failed to find folder with name '%s'." % vm_folder_name
                         )
-
+                if module.params.get("interface_group_name"):
+                    vlan_id = None
+                    iface_group = module.params.get("interface_group_name")
+                    vlans = cohesity_client.vlan.get_vlans()
+                    for vlan in vlans:
+                        if vlan.iface_group_name == iface_group:
+                            vlan_id = vlan.id
+                            break
+                    if not vlan_id:
+                        error_list += (
+                            "Failed to find interface group '%s'" % iface_group
+                        )
+                backup_job_ids = get_backup_job_ids(
+                    module, module.params.get("job_vm_pair").keys())
+                objects, run_params, errors = get_objects(module, backup_job_ids)
+                error_list += errors
         else:
             if job_exists:
                 check_mode_results[
@@ -726,7 +812,6 @@ def main():
 
     elif module.params.get("state") == "present":
         check_mode_results = dict(msg="")
-        cohesity_client = get_cohesity_client(module)
         if job_exists:
             results = dict(
                 changed=False,
@@ -741,7 +826,6 @@ def main():
                 "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
             )
 
-            run_params = []
             if environment != "kVMware":
                 # => This error should never happen based on the set assigned to the parameter.
                 # => However, in case, we should raise an appropriate error.
@@ -752,37 +836,15 @@ def main():
                     changed=False,
                 )
 
-            # Get the job run id and object Id.            
+            # Get the job run id and object Id.
             restore_to_source_objects = get_vmware_source_objects(module, source_id)
 
             job_vm_pair = module.params.get("job_vm_pair")
             # Get the list of job names and ids.
             backup_job_ids = get_backup_job_ids(module, job_vm_pair.keys())
-            objects = []
-            for jobname, vms in job_vm_pair.items():
-                if not backup_job_ids.get(jobname, None):
-                    continue
-                # If VM list is empty, all the virtual machine objects
-                # protected in the job is selected.
-                response = get_backup_job_run_id(module, backup_job_ids[jobname])
-                if not vms:
-                    run_id, instance_id = (
-                        response["id"],
-                        response["protectionGroupInstanceId"],
-                    )
-                    obj_dict = dict(
-                        protectionGroupRunId=run_id,
-                        protectionGroupInstanceId=instance_id,
-                    )
-                    run_params.append(obj_dict)
-                else:
-                    for obj in response["objects"]:
-                        if obj["object"]["name"] in vms:
-                            snapshot_id = obj["localSnapshotInfo"]["snapshotInfo"][
-                                "snapshotId"
-                            ]
-                            objects.append(dict(snapshotId=snapshot_id))
-                            continue
+            objects, run_params, errors = get_objects(module, backup_job_ids)
+            if errors:
+                module.fail_json(errors)
             if module.params.get("resource_pool_name"):
                 resource_pool_id = get_resource_pool_id(module, source_id)
                 if not resource_pool_id:
@@ -881,7 +943,7 @@ def main():
             )
             if not run_params and not objects:
                 module.fail_json(
-                    msg="Couldn't find the VM(s) protected in the cluster."
+                    msg="Failed to find the VM(s) protected in the cluster."
                 )
             body = dict(
                 name=task_name,
