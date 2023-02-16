@@ -243,6 +243,7 @@ def main():
             changed=False,
             msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
             id="",
+            status=""
         )
         if module.params.get("state") == "present":
             if task_status == "kInProgress":

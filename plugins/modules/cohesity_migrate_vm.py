@@ -592,7 +592,9 @@ def get_objects(module, backup_job_ids):
         run_params = []
         for jobname, vms in module.params.get("job_vm_pair").items():
             if not backup_job_ids.get(jobname, None):
-                error_list += "Backup job '%s' is not available in the cluster." % jobname
+                error_list += (
+                    "Backup job '%s' is not available in the cluster." % jobname
+                )
                 continue
             # If VM list is empty, all the virtual machine objects
             # protected in the job is selected.
@@ -623,13 +625,17 @@ def get_objects(module, backup_job_ids):
                         continue
                 if len(vms) != len(available_vms):
                     missing_vms = set(vms) - set(available_vms)
-                    error_list += "Couldn't find snapshot Id for following VM(s) %s" % ",".join(missing_vms)
+                    error_list += (
+                        "Couldn't find snapshot Id for following VM(s) %s"
+                        % ",".join(missing_vms)
+                    )
         return objects, run_params, error_list
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
+
 
 def get_protection_groups(module):
     """
@@ -748,9 +754,21 @@ def main():
                     resource_pool_id = get_resource_pool_id(module, source_id)
                     if not resource_pool_id:
                         error_list += (
-                            "Resource Pool '%s' is not available in the source."
+                            "Failed to find Resource Pool '%s'"
                             % module.params.get("resource_pool_name")
                         )
+                        datacenter = module.params.get("datacenter")
+                        cluster_resource = module.params.get("cluster_compute_resource")
+                        if datacenter or cluster_resource:
+                            error_list += " associated with "
+                            error_list += (
+                                "datacenter '%s', " % datacenter if datacenter else ""
+                            )
+                            error_list += (
+                                "cluster_compute_resource '%s'." % cluster_resource
+                                if cluster_resource
+                                else ""
+                            )
                 if module.params.get("datastore_name"):
                     datastore_id = get_vmware_object_id(
                         restore_to_source_objects,
@@ -793,7 +811,8 @@ def main():
                             "Failed to find interface group '%s'" % iface_group
                         )
                 backup_job_ids = get_backup_job_ids(
-                    module, module.params.get("job_vm_pair").keys())
+                    module, module.params.get("job_vm_pair").keys()
+                )
                 objects, run_params, errors = get_objects(module, backup_job_ids)
                 error_list += errors
         else:
@@ -848,10 +867,23 @@ def main():
             if module.params.get("resource_pool_name"):
                 resource_pool_id = get_resource_pool_id(module, source_id)
                 if not resource_pool_id:
-                    module.fail_json(
-                        "Resource Pool '%s' is not available in the source"
+                    error_list = (
+                        "Failed to find Resource Pool '%s'"
                         % module.params.get("resource_pool_name")
                     )
+                    datacenter = module.params.get("datacenter")
+                    cluster_resource = module.params.get("cluster_compute_resource")
+                    if datacenter or cluster_resource:
+                        error_list += " associated with "
+                        error_list += (
+                            "datacenter '%s', " % datacenter if datacenter else ""
+                        )
+                        error_list += (
+                            "cluster_compute_resource '%s'." % cluster_resource
+                            if cluster_resource
+                            else ""
+                        )
+                    module.fail_json(error_list)
             if module.params.get("datastore_name"):
                 datastore_id = get_vmware_object_id(
                     restore_to_source_objects,
