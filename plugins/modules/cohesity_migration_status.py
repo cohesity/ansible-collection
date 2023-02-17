@@ -58,14 +58,10 @@ options:
       - (C)present a recovery job will be created and started.
       - (C)absent is currently not implemented
     type: str
-  task_name:
-    description:
-      - Name of the recovery task name. Yet to be implemented
-    type: str
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Check Sync status of objects available in the VM migration task
-version_added: 1.0.10
+version_added: 1.0.11
 """
 
 EXAMPLES = """
@@ -77,7 +73,7 @@ EXAMPLES = """
     username: admin
     password: password
     state: present
-    task_name: "Ansible Migrate VM- Get status"
+    task_id: "2520974734107749:1675035602065:2559"
 
 """
 
@@ -125,13 +121,7 @@ def check__protection_restore__exists(module, self):
 
     restore_tasks = get__restore_job__by_type(module, payload)
 
-    if not restore_tasks:
-        return False, False, False
-    if module.params.get("task_name"):
-        for task in restore_tasks:
-            if task["name"] == self["name"]:
-                return task["status"], task["id"], task["name"]
-    if module.params.get("task_id"):
+    if restore_tasks and module.params.get("task_id"):
         task_id = module.params.get("task_id").split(":")[-1]
         for task in restore_tasks:
             if task["id"] == int(task_id):
@@ -208,11 +198,10 @@ def get_task_status(module, task_id):
 
 
 def main():
-    # => Load the default arguments including those specific to the Cohesity Protection Jobs.
+    # => Load the default arguments including those specific to the Cohesity Migrate tasks
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
-            task_name=dict(type="str"),
             state=dict(choices=["present", "absent"], default="present"),
             task_id=dict(type="str"),
         )
@@ -224,11 +213,11 @@ def main():
         changed=False,
         msg="Attempting to fetch VM migration status",
         state=module.params.get("state"),
+        status="",
     )
 
     task_details = dict(
         token=get__cohesity_auth__token(module),
-        name=module.params.get("task_name"),
         id=module.params.get("task_id"),
     )
 
@@ -241,19 +230,19 @@ def main():
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
-            msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
+            msg="Check Mode: Cohesity Migrate Job is not currently registered",
             id="",
-            status=""
+            status="",
         )
         if module.params.get("state") == "present":
             if task_status == "kInProgress":
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job status check."
+                ] = "Check Mode: Cohesity Migrate Job status check."
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not registered or Finished."
+                ] = "Check Mode: Cohesity Migrate Job is not registered or Finished."
 
         else:
             check_mode_results[
@@ -266,13 +255,15 @@ def main():
         if not task_status:
             results = dict(
                 changed=False,
-                msg="Couldn't find the migrate job '%s'" % (task_name or task_id),
+                msg="Couldn't find the migrate job '%s'"
+                % (module.params.get("task_id")),
+                status="",
             )
         else:
             task_details["task_id"] = task_id
             response = get_migration_status(module, task_details)
-            status = get_task_status(module, module.params.get("task_id"))["status"]
             results = defaultdict(list)
+            status = get_task_status(module, module.params.get("task_id"))["status"]
             if response:
                 objects = response[0]["restoreTask"].get(
                     "restoreSubTaskWrapperProtoVec", []
@@ -335,12 +326,14 @@ def main():
                         status=task_status,
                         msg=msg,
                         sync_vms=sync_vms,
+                        errors=error_list,
                         total_vms=total_objects,
                     )
                 else:
                     module.exit_json(
                         msg="Status of the migration task is '%s'" % status,
                         status=status,
+                        errors=error_list,
                     )
             else:
                 module.fail_json(
@@ -352,7 +345,6 @@ def main():
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",
-            name=module.params.get("task_name"),
         )
     else:
         # => This error should never happen based on the set assigned to the parameter.

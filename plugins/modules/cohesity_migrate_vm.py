@@ -58,14 +58,13 @@ options:
     default: false
     description:
       - If this is set to true, then the network will be detached from the
-        recovered VMs. All the other networking parameters set will be
-        ignored if set to true
+        recovered VMs. All the other networking parameters set will be ignored
+        if set to true
     type: bool
   enable_network:
     default: true
     description:
-      - Specifies whether the attached network should be left in enabled
-        state
+      - Specifies whether the attached network should be left in enabled state
     type: bool
   endpoint:
     description:
@@ -148,8 +147,8 @@ options:
     type: dict
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
-short_description: Migrate one or more Virtual Machines from Cohesity Protection Jobs
-version_added: 1.0.10
+short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
+version_added: 1.0.11
 """
 
 EXAMPLES = """
@@ -674,7 +673,7 @@ def get_protection_groups(module):
 
 
 def main():
-    # => Load the default arguments including those specific to the Cohesity Protection Jobs.
+    # => Load the default arguments including those specific to the Cohesity migrate tasks.
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
@@ -735,7 +734,7 @@ def main():
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
-            msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
+            msg="Check Mode: Cohesity Migrate Job is not currently registered",
             id="",
         )
         error_list = ""
@@ -743,11 +742,11 @@ def main():
             if job_exists:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is currently registered.  No changes"
+                ] = "Check Mode: Cohesity Migrate Job is currently registered.  No changes"
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not currently registered.  This action would register the Cohesity Protection Job."
+                ] = "Check Mode: Cohesity Migrate Job is not currently registered.  This action would register the Cohesity Migrate Job."
                 check_mode_results["id"] = job_exists
                 restore_to_source_objects = get_vmware_source_objects(module, source_id)
                 if module.params.get("resource_pool_name"):
@@ -819,12 +818,12 @@ def main():
             if job_exists:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is currently registered.  This action would unregister the Cohesity Protection Job."
+                ] = "Check Mode: Cohesity Migrate Job is currently registered.  This action would unregister the Cohesity Migrate Job."
                 check_mode_results["id"] = job_exists
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not currently registered.  No changes."
+                ] = "Check Mode: Cohesity Migrate Job is not currently registered.  No changes."
         if error_list:
             check_mode_results["msg"] = error_list
         module.exit_json(**check_mode_results)

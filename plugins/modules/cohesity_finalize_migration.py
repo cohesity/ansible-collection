@@ -65,7 +65,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Finalize the VM migration
-version_added: 1.0.10
+version_added: 1.0.11
 """
 
 EXAMPLES = """
@@ -111,7 +111,6 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
-        get__restore_task_status__by_id,
     )
 except ImportError:
     pass
@@ -178,7 +177,7 @@ def finalize_migration(module, self):
 
 
 def main():
-    # => Load the default arguments including those specific to the Cohesity Protection Jobs.
+    # => Load the default arguments including those specific to the Cohesity migrate tasks.
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
@@ -197,7 +196,7 @@ def main():
     )
 
     task_details = dict(
-        token=get__cohesity_auth__token(module),
+        token=get__cohesity_auth__token(module), name=module.params.get("task_name")
     )
 
     task_status, task_id, task_name = check__protection_restore__exists(
@@ -207,18 +206,18 @@ def main():
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
-            msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
+            msg="Check Mode: Cohesity Migrate Job is not currently registered",
             id="",
         )
         if module.params.get("state") == "present":
             if task_status == "kInProgress":
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job currently registered will be finalised."
+                ] = "Check Mode: Cohesity Migrate Job currently registered will be finalised."
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not registered or Finished."
+                ] = "Check Mode: Cohesity Migrate Job is not registered or Finished."
 
         else:
             check_mode_results[
@@ -228,10 +227,16 @@ def main():
 
     elif module.params.get("state") == "present":
         check_mode_results = dict(msg="")
+        if not task_id:
+            module.fail_json(
+                "Couldn't find the Restore Job '%s'"
+                % (module.params.get("task_name") or module.params.get("task_id"))
+            )
         if task_status != "kInProgress":
             results = dict(
                 changed=False,
-                msg="The Migrate Job for is already finalized",
+                msg="The Migrate Job status is '%s', skipping finalise migration."
+                % task_status,
                 id=task_status,
                 name=task_details["name"],
             )

@@ -60,10 +60,6 @@ Parameters
     (C)absent is currently not implemented
 
 
-  task_name (optional, str, None)
-    Name of the recovery task name. Yet to be implemented
-
-
   validate_certs (optional, bool, True)
     Switch determines if SSL Validation should be enabled.
 
@@ -94,7 +90,7 @@ Examples
         username: admin
         password: password
         state: present
-        task_name: "Ansible Migrate VM- Get status"
+        task_id: "2520974734107749:1675035602065:2559"
 
 
 

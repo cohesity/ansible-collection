@@ -1,8 +1,8 @@
 .. _cohesity_migrate_vm_module:
 
 
-cohesity_migrate_vm -- Migrate one or more Virtual Machines from Cohesity Protection Jobs
-=========================================================================================
+cohesity_migrate_vm -- Migrate one or more Virtual Machines from Cohesity Migrate Jobs
+======================================================================================
 
 .. contents::
    :local:
