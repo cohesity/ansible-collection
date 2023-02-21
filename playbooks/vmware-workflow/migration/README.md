@@ -23,8 +23,8 @@ Refer the Cohesity Ansible playbook Documentation here. The documentation covers
 2) In the response list of total_vms, sync_vms and in case of errors list of 'errors' will be returned.
 
 * [Refer sample playbook to Poll for a migration task status.](https://github.com/cohesity/ansible-collection/blob/main/playbooks/vmware-workflow/migration/get_migration_status.yml#poll-migration)
-* ![](https://github.com/cohesity/ansible-collection/blob/main/docs/assets/images/get_migration.jpeg)
-* ![Sample Response](../../../../docs/assets/images/get_migration.jpeg)
+* Sample Response
+  ![image](https://user-images.githubusercontent.com/62049303/220300735-5b3f1881-6c84-48ea-a888-ff46bf6d263e.png)
 
 ## <a name="cancel-migration"></a> Cancel Migration
 
