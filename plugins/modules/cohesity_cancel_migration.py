@@ -64,7 +64,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Cancel the VM migration
-version_added: 1.0.10
+version_added: 1.0.11
 """
 
 EXAMPLES = """
@@ -227,18 +227,18 @@ def main():
     if module.check_mode:
         check_mode_results = dict(
             changed=False,
-            msg="Check Mode: Cohesity Protection Migrate Job is not currently registered",
+            msg="Check Mode: Cohesity Migrate Job is not currently registered",
             id="",
         )
         if module.params.get("state") == "present":
             if task_status == "Running":
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job currently registered will be cancelled."
+                ] = "Check Mode: Cohesity Migrate Job currently registered will be cancelled."
             else:
                 check_mode_results[
                     "msg"
-                ] = "Check Mode: Cohesity Protection Migrate Job is not registered or Finished."
+                ] = "Check Mode: Cohesity Migrate Job is not registered or Finished."
 
         else:
             check_mode_results[
@@ -251,7 +251,8 @@ def main():
         if not task_status:
             results = dict(
                 changed=False,
-                msg="Couldn't find the Restore Job '%s'" % (task_name),
+                msg="Couldn't find the Restore Job '%s'"
+                % (module.params.get("task_name") or module.params.get("task_id")),
             )
         else:
             if task_status not in ["Running", "Accepted"]:

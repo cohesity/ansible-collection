@@ -21,12 +21,15 @@
             - VM2
             - VM3
         network_name: "VLAN"
+        datacenter: Datacenter
+        cluster_compute_resource: Cluster1
         vm_folder_name: "cohesity_folder"
-        wait_for_job: true
         state: "present"
         resource_pool_name: resource_pool
         datastore_name: datastore
-        network_connected: false
+        enable_network: false
         endpoint: vcenter.domain.com 
         suffix: "_1"
         prefix: "copy_"
+        preserve_mac_address: true
+        detach_network: false

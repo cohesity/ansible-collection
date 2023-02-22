@@ -1,8 +1,8 @@
 .. _cohesity_migrate_vm_module:
 
 
-cohesity_migrate_vm -- Migrate one or more Virtual Machines from Cohesity Protection Jobs
-=========================================================================================
+cohesity_migrate_vm -- Migrate one or more Virtual Machines from Cohesity Migrate Jobs
+======================================================================================
 
 .. contents::
    :local:
@@ -50,7 +50,7 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
-  datastore_name (optional, str, None)
+  datastore_name (True, str, None)
     Specifies the datastore where the files should be recovered to. This field is required to recover objects to
 
     a different resource pool or to a different parent source. If not specified, objects are recovered to their original
@@ -102,7 +102,7 @@ Parameters
     Specifies the recovery type.
 
 
-  resource_pool_name (optional, str, None)
+  resource_pool_name (True, str, None)
     Specifies the resource pool name where the migrated objects are attached.
 
 

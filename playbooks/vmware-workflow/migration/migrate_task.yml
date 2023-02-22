@@ -19,8 +19,9 @@
           job_name_2:
             - VM2
             - VM3
-        wait_for_job: true
         state: "present"
+        datacenter: Datacenter
+        cluster_compute_resource: Cluster1
         network_name: "VLAN"
         preserve_mac_address: true
         enable_network: false
@@ -28,6 +29,7 @@
         resource_pool_name: resource_pool
         datastore_name: datastore_name
         endpoint: vcenter.domain.com 
+        detach_network: false
         suffix: "_1"
         prefix: "copy_"
       register: task
