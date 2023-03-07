@@ -181,7 +181,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.11
+version_added: 1.1.0
 """
 
 EXAMPLES = """
@@ -373,7 +373,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.0",
         }
         sql_payload = dict(
             applications=["kSQL"],
@@ -421,7 +421,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.0",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]

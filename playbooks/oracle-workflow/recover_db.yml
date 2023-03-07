@@ -14,8 +14,8 @@
         state: present
         source_db: cdb1
         task_name: recover_tasks_1
-        source_server: 10.14.55.190
-        target_server: 10.14.55.191
+        source_server: 192.168.1.1
+        target_server: 192.168.1.1
         target_db: cdb2
         oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
         oracle_base: /u01/app/oracle

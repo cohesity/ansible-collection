@@ -14,7 +14,7 @@
         protection_group_name: protect_udaa
         storage_domain: "DefaultStorageDomain"
         policy: "Silver"
-        endpoint: "x.x.x.x"
+        endpoint: "192.168.1.1"
         cancel_active: true
         objects:
           - DB2-199-RR-db2inst1

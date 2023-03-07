@@ -117,7 +117,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
-version_added: 1.0.11
+version_added: 1.1.0
 """
 
 EXAMPLES = """
@@ -205,7 +205,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.0",
         }
         payload = dict(
             environment="kUDA",

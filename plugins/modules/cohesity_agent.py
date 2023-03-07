@@ -192,7 +192,7 @@ EXAMPLES = """
     state: present
     service_user: cagent
     native_package: True
-    download_uri: 'http://10.2.145.47/files/bin/installers/el-cohesity-agent-6.3-1.x86_64.rpm'
+    download_uri: 'http://192.168.1.1/files/bin/installers/el-cohesity-agent-6.3-1.x86_64.rpm'
 
 """
 
@@ -334,13 +334,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.11",
+                "user-agent": "cohesity-ansible/v1.1.0",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.0.11",
+                "user-agent": "cohesity-ansible/v1.1.0",
             }
 
         agent = open_url(
@@ -615,7 +615,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.0",
         }
         response = open_url(
             url=uri,
@@ -667,7 +667,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.0.11",
+                "user-agent": "cohesity-ansible/v1.1.0",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(

@@ -183,7 +183,7 @@ Examples
         state: present
         service_user: cagent
         native_package: True
-        download_uri: 'http://10.2.145.47/files/bin/installers/el-cohesity-agent-6.3-1.x86_64.rpm'
+        download_uri: 'http://192.168.1.1/files/bin/installers/el-cohesity-agent-6.3-1.x86_64.rpm'
 
 
 

@@ -61,7 +61,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Check Sync status of objects available in the VM migration task
-version_added: 1.0.11
+version_added: 1.1.0
 """
 
 EXAMPLES = """
