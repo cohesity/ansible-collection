@@ -1,0 +1,22 @@
+# Playbook to register Oracle source to the cluster.
+---
+- hosts: localhost
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: "Cohesity Oracle Restore Task: Set Source to state of present"
+      cohesity_oracle_restore:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: present
+        source_db: cdb1
+        task_name: recover_tasks_1
+        source_server: 192.168.1.1
+        target_server: 192.168.1.1
+        target_db: cdb2
+        oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
+        oracle_base: /u01/app/oracle
+        oracle_data: /u01/app/oracle/product/12.1.0.2/db_1

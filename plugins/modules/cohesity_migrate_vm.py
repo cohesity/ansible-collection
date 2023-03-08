@@ -92,7 +92,7 @@ options:
     description:
       - Descriptor to assign to the Recovery Job.  The Recovery Job name will
         consist of the name_date_time format.
-    required: true
+    required: false
     type: str
   network_name:
     description:
@@ -148,7 +148,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
-version_added: 1.0.11
+version_added: 1.1.0
 """
 
 EXAMPLES = """
@@ -677,7 +677,7 @@ def main():
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
-            name=dict(type="str", required=True),
+            name=dict(type="str", required=False),
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             environment=dict(choices=["VMware"], default="VMware"),
@@ -840,9 +840,8 @@ def main():
         else:
             environment = "k" + module.params.get("environment")
             response = []
-            task_name = (
-                "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
-            )
+            t_name = "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
+            task_name = job_details["name"] or t_name
 
             if environment != "kVMware":
                 # => This error should never happen based on the set assigned to the parameter.

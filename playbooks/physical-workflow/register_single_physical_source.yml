@@ -12,6 +12,6 @@
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         state: present
-        endpoint: 10.2.102.17
+        endpoint: 192.168.1.1
         environment: "Physical"
         force_register: true

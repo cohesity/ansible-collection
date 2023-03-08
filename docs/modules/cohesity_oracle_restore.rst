@@ -162,12 +162,11 @@ Examples
     
     # Restore Oracle database.
     - name: Restore Oracle database.
-      cohesity_oracle:
+      cohesity_oracle_restore:
         source_db: cdb1
         task_name: recover_tasks
-        view_name: xyz
-        source_server: "10.2.103.113"
-        target_server: "10.2.103.113"
+        source_server: "192.168.1.1"
+        target_server: "192.168.1.1"
         target_db: cdb2
         oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
         oracle_base: /u01/app/oracle

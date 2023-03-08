@@ -64,7 +64,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Cancel the VM migration
-version_added: 1.0.11
+version_added: 1.1.0
 """
 
 EXAMPLES = """

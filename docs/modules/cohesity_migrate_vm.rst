@@ -82,7 +82,7 @@ Parameters
     Specifies the interface name to connect after restoring the VM.
 
 
-  name (True, str, None)
+  name (False, str, None)
     Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the name_date_time format.
 
 
