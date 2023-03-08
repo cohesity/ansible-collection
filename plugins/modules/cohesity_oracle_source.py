@@ -57,12 +57,12 @@ options:
     description:
       - "Specifies the password to access the target source database."
       - "This parameter will not be logged."
-      - "Required when I(state=present)"
+      - "Applicable only when state is set to present."
     type: str
   db_username:
     description:
       - "Specifies username to access the target source database."
-      - "Required when I(state=present)"
+      - "Applicable only when state is set to present."
     type: str
   state:
     choices:

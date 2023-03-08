@@ -65,13 +65,13 @@ Parameters
 
     This parameter will not be logged.
 
-    Required when *state=present*
+    Applicable only when state is set to present.
 
 
   db_username (optional, str, None)
     Specifies username to access the target source database.
 
-    Required when *state=present*
+    Applicable only when state is set to present.
 
 
   state (optional, str, present)
