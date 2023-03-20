@@ -63,17 +63,22 @@ options:
       - Type of the UDA source to be registered.
     default: Linux
     choices:
-      - Linux
-      - Windows
       - Aix
-      - Solaris
-      - SapHana
-      - SapOracle
       - CockroachDB
+      - DB2
+      - Linux
       - MySQL
-      - VMWareCDPFilter
-      - PostgreSQL
       - Other
+      - PostgreSQL
+      - SapASE
+      - SapHana
+      - SapMaxDB
+      - SapOracle
+      - SapSybase
+      - SapSybaseIQ
+      - Solaris
+      - VMWareCDPFilter
+      - Windows
   cohesity_password:
     aliases:
       - password
@@ -280,17 +285,23 @@ def main():
             source_type=dict(
                 type="str",
                 choices=[
-                    "Linux",
-                    "Windows",
                     "Aix",
-                    "Solaris",
-                    "SapHana",
-                    "SapOracle",
                     "CockroachDB",
+                    "DB2",
+                    "Linux",
                     "MySQL",
-                    "VMWareCDPFilter",
-                    "PostgreSQL",
                     "Other",
+                    "PostgreSQL",
+                    "SapASE",
+                    "SapHana",
+                    "SapMaxDB",
+                    "SapOracle",
+                    "SapOracle",
+                    "SapSybase",
+                    "SapSybaseIQ",
+                    "Solaris",
+                    "VMWareCDPFilter",
+                    "Windows",
                 ],
                 default="Linux",
             ),
