@@ -88,6 +88,26 @@ def get_cohesity_client(module):
         raise__cohesity_exception__handler(error, module)
 
 
+def refresh_protection_source(module, source_id):
+    """
+    Function to refresh the cohesity protection source by Id.
+    :return: None.
+    """
+    try:
+        protection_source = cohesity_client.protection_sources
+        # Refresh the existing source.
+        protection_source.create_refresh_protection_source_by_id(source_id)
+    except urllib_error.HTTPError as e:
+        try:
+            json.loads(e.read())["message"]
+        except Exception:
+            # => For HTTPErrors that return no JSON with a message (bad errors), we
+            # => will need to handle this by setting the msg variable to some default.
+            module.fail_json("Failed to refresh source with id '%s'" % source_id)
+        else:
+            raise HTTPException(e.read())
+
+
 def get__cluster(self):
 
     try:

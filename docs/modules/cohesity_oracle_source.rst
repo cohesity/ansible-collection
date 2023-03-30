@@ -60,6 +60,12 @@ Parameters
     Enabling this option will force the registration of the Cohesity Protection Source.
 
 
+  refresh (optional, bool, False)
+    Switch determines whether to refresh the existing source.
+
+    Applicable only when source is already registered.
+
+
   db_password (optional, str, None)
     Specifies the password to access the target source database.
 

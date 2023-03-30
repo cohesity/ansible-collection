@@ -53,6 +53,12 @@ options:
     description:
       - "Enabling this option will force the registration of the Cohesity Protection Source."
     type: bool
+  refresh:
+    default: false
+    description:
+      - "Switch determines whether to refresh the existing source."
+      - "Applicable only when source is already registered."
+    type: bool
   db_password:
     description:
       - "Specifies the password to access the target source database."
@@ -122,6 +128,7 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
+        refresh_protection_source,
         check_source_reachability,
     )
 except Exception:
@@ -245,6 +252,7 @@ def main():
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             force_register=dict(default=False, type="bool"),
+            refresh=dict(default=False, type="bool"),
             db_username=dict(default="", type="str"),
             db_password=dict(default="", type="str", no_log=True),
         )
@@ -336,9 +344,16 @@ def main():
                     )
 
             else:
+                msg = "The Protection Source for this host is already registered"
+                if module.params.get("refresh"):
+                    refresh_protection_source(module, current_status)
+                    msg = "Successfully refreshed the Oracle Source '%s'." % (
+                        module.params.get("endpoint")
+                    )
+
                 results = dict(
                     changed=False,
-                    msg="The Protection Source for this host is already registered",
+                    msg=msg,
                     id=current_status,
                     endpoint=module.params.get("endpoint"),
                 )
