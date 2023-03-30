@@ -62,6 +62,14 @@ Parameters
     If this is set to true, then the network will be detached from the recovered VMs. All the other networking parameters set will be ignored if set to true
 
 
+  cluster_compute_resource (optional, str, None)
+    Specifies the cluster compute resource to uniquely identify the resource pool name.
+
+
+  datacenter (optional, str, None)
+    Specifies the datacenter resource name to uniquely identify the resource pool name.
+
+
   enable_network (optional, bool, True)
     Specifies whether the attached network should be left in enabled state
 
@@ -96,6 +104,10 @@ Parameters
 
   prefix (optional, str, None)
     Specifies a prefix to prepended to the source object name to derive a new name for the recovered object.
+
+
+  preserve_mac_address (optional, bool, False)
+    Specifies whether to preserve the MAC address of the migrated VM.
 
 
   recovery_process_type (optional, str, CopyRecovery)

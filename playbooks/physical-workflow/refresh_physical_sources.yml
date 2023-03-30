@@ -1,4 +1,8 @@
 # Playbook to refresh list of Physical source to the cluster.
+# If the list of sources to be registered is available in the inventory
+# as groups we can access them as follows.
+# with_items: "{{ groups['linux'] }}"
+
 ---
 - hosts: localhost
   become: false
@@ -20,7 +24,3 @@
         environment: "Physical"
         refresh: true
       with_items: "{{ linux_servers }}"
-
-      # If the list of sources to be registered is available in the inventory
-      # as groups we can access them as follows.
-      # with_items: "{{ groups['linux'] }}"

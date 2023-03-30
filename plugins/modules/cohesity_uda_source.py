@@ -304,7 +304,6 @@ def main():
                     "SapHana",
                     "SapMaxDB",
                     "SapOracle",
-                    "SapOracle",
                     "SapSybase",
                     "SapSybaseIQ",
                     "Solaris",
@@ -381,7 +380,7 @@ def main():
                 msg="The Protection Source for this host is already registered",
                 id=current_status,
                 endpoint=module.params.get("endpoint"),
-                )
+            )
             if module.params.get("update_source"):
                 results["changed"] = False,
             elif module.params.get("refresh"):

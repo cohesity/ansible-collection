@@ -363,7 +363,6 @@ def get__protection_source_registration__status(module, self):
         raise__cohesity_exception__handler(error, module)
 
 
-
 def refresh_source(module, self):
     """
     Function to register Sql Source.
