@@ -1,4 +1,8 @@
-# Playbook to register list of Physical source to the cluster.
+# Playbook to refresh list of Physical source to the cluster.
+# If the list of sources to be registered is available in the inventory
+# as groups we can access them as follows.
+# with_items: "{{ groups['linux'] }}"
+
 ---
 - hosts: localhost
   become: false
@@ -9,7 +13,7 @@
       - ServerA
       - ServerB
   tasks:
-    - name: "Cohesity Protection Source: Set Source to state of present"
+    - name: "Cohesity Protection Source: Refresh list of Sources"
       cohesity_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
@@ -18,9 +22,5 @@
         state: present
         endpoint: "{{ item }}"
         environment: "Physical"
-        force_register: true
+        refresh: true
       with_items: "{{ linux_servers }}"
-
-      # If the list of sources to be registered is available in the inventory
-      # as groups we can access them as follows.
-      # with_items: "{{ groups['linux'] }}"

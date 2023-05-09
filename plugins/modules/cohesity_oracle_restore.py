@@ -397,6 +397,7 @@ def main():
     token = get__cohesity_auth__token(module)
     database_info = search_for_database(token, module)
     resp = create_recover_job(module, token, database_info)
+
     # Check for restore task status.
     task_id = resp["restoreTask"]["performRestoreTaskState"]["base"]["taskId"]
     status = check_for_status(module, task_id)

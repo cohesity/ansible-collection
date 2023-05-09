@@ -61,6 +61,18 @@ options:
         recovered VMs. All the other networking parameters set will be ignored
         if set to true
     type: bool
+  cluster_compute_resource:
+    description:
+      - Specifies the cluster compute resource to uniquely identify the
+        resource pool name.
+    type: str
+    default: null
+  datacenter:
+    description:
+      - Specifies the datacenter resource name to uniquely identify the
+        resource pool name.
+    type: str
+    default: null
   enable_network:
     default: true
     description:
@@ -109,11 +121,19 @@ options:
       - Specifies a prefix to prepended to the source object name to derive a
         new name for the recovered object.
     type: str
+  preserve_mac_address:
+    default: false
+    description:
+      - Specifies whether to preserve the MAC address of the migrated VM.
+    type: bool
   recovery_process_type:
     default: CopyRecovery
     description:
       - Specifies the recovery type.
     type: str
+    choices:
+      - "CopyRecovery"
+      - "InstantRecovery"
   resource_pool_name:
     description:
       - Specifies the resource pool name where the migrated objects are attached.
@@ -681,7 +701,7 @@ def main():
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             environment=dict(choices=["VMware"], default="VMware"),
-            job_vm_pair=dict(type="dict", required=True),
+            job_vm_pair=dict(type="dict", required=True, elements="list"),
             datastore_name=dict(type="str", required=True),
             interface_group_name=dict(type="str"),
             network_name=dict(type="str"),

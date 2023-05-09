@@ -98,6 +98,12 @@ Parameters
     be an URL or hostname or an IP address of the Protection Source
 
 
+  refresh (optional, bool, False)
+    Switch determines whether to refresh the existing source.
+
+    Applicable only when source is already registered.
+
+
   update_source (optional, bool, False)
     Specifies whether to update the source, if the source is already registered.
 

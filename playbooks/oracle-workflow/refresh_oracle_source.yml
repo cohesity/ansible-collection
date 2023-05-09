@@ -1,17 +1,16 @@
-# Playbook to register Physical source to the cluster.
+# Playbook to refresh Oracle source available in the cluster.
 ---
 - hosts: localhost
   become: false
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: "Cohesity Protection Source: Set Source to state of present"
-      cohesity_source:
+    - name: "Cohesity Protection Source: Refresh Source"
+      cohesity_oracle_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         state: present
-        endpoint: 192.168.1.1
-        environment: "Physical"
-        force_register: true
+        refresh: true
+        endpoint: "orcl-serv2-eng-db.com"
