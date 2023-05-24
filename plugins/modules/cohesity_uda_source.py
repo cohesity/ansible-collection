@@ -128,12 +128,12 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
-version_added: 1.1.0
+version_added: 1.1.2
 """
 
 EXAMPLES = """
 # Unegister an existing Cohesity Protection Source on a selected endpoint
-- cohesity_source:
+- cohesity_uda_source:
     server: cohesity.lab
     username: admin
     password: password
@@ -218,7 +218,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.0",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         payload = dict(
             environment="kUDA",
@@ -382,12 +382,12 @@ def main():
                 endpoint=module.params.get("endpoint"),
             )
             if module.params.get("update_source"):
-                results["changed"] = False,
+                results["changed"] = False
             elif module.params.get("refresh"):
                 refresh_protection_source(module, current_status)
-                results["msg"] = \
-                    "Successfully refreshed the UDA Source '%s'." % (
-                    module.params.get("endpoint"))
+                results["msg"] = "Successfully refreshed the UDA Source '%s'." % (
+                    module.params.get("endpoint")
+                )
         else:
             prot_sources["sourceId"] = current_status
             response = register_source(module, prot_sources)

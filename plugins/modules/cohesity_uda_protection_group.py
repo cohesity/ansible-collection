@@ -199,7 +199,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Management of Cohesity UDA Protection Groups
-version_added: 1.1.0
+version_added: 1.1.2
 """
 
 EXAMPLES = """

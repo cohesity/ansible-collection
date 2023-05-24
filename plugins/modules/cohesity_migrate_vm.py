@@ -45,6 +45,16 @@ options:
       - Password belonging to the selected Username.  This parameter will not be
         logged.
     type: str
+  cluster_compute_resource:
+    description:
+      - If the cluster compute resource is specified, VM will be recovered to resource pool
+        under the specified compute resource.
+    type: str
+  datacenter:
+    description:
+      - If multiple datastore exists, datacenter and cluster resource details
+        are used to uniquely identify the resourcepool.
+    type: str
   datastore_name:
     description:
       - Specifies the datastore where the files should be recovered to. This
@@ -61,18 +71,6 @@ options:
         recovered VMs. All the other networking parameters set will be ignored
         if set to true
     type: bool
-  cluster_compute_resource:
-    description:
-      - Specifies the cluster compute resource to uniquely identify the
-        resource pool name.
-    type: str
-    default: null
-  datacenter:
-    description:
-      - Specifies the datacenter resource name to uniquely identify the
-        resource pool name.
-    type: str
-    default: null
   enable_network:
     default: true
     description:
@@ -168,7 +166,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
-version_added: 1.1.0
+version_added: 1.1.2
 """
 
 EXAMPLES = """
@@ -239,6 +237,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
         get_cohesity_client,
+        get_resource_pool_id,
     )
 except ImportError:
     pass
@@ -281,7 +280,7 @@ def get_source_details(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -309,68 +308,6 @@ def get_source_details(module):
         raise__cohesity_exception__handler(error, module)
 
 
-def get_resource_pool_id(module, source_id):
-    """
-    Check resource pool name exists in the source.
-    1) If Cluster Compute Resource is provided, resource pool name under
-    cluster will be returned.
-    2) If multiple datastore exists, datacenter and cluster resource details
-    are used to uniquely identify the resourcepool.
-
-    :param module: Source Id of the Vcenter source.
-    :return reosurce pool id.
-    """
-    server = module.params.get("cluster")
-    validate_certs = module.params.get("validate_certs")
-    token = get__cohesity_auth__token(module)
-    try:
-        uri = (
-            "https://"
-            + server
-            + "/irisservices/api/v1/resourcePools?vCenterId=%s" % source_id
-        )
-        headers = {
-            "Accept": "application/json",
-            "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
-        }
-        response = open_url(
-            url=uri,
-            headers=headers,
-            validate_certs=validate_certs,
-            method="GET",
-            timeout=REQUEST_TIMEOUT,
-        )
-        pool_id = None
-        response = json.loads(response.read())
-        name = module.params.get("resource_pool_name")
-        cluster = module.params.get("cluster_compute_resource")
-        datacenter = module.params.get("datacenter")
-        res_pool_count = 0
-        for obj in response:
-            if (cluster and obj.get("cluster", {}).get("displayName") != cluster) or (
-                datacenter
-                and obj.get("dataCenter", {}).get("displayName") != datacenter
-            ):
-                continue
-            if obj["resourcePool"]["displayName"] == name:
-                pool_id = obj["resourcePool"]["id"]
-                res_pool_count += 1
-        if res_pool_count > 1:
-            module.fail_json(
-                changed=False,
-                msg="Multiple resource pools are available in the name '%s', "
-                "Please provide cluster_compute_resource and datacenter field "
-                "to uniquely identify a resource pool." % name,
-            )
-        return pool_id
-    except urllib_error.URLError as e:
-        # => Capture and report any error messages.
-        raise__cohesity_exception__handler(e.read(), module)
-    except Exception as error:
-        raise__cohesity_exception__handler(error, module)
-
-
 def get_backup_job_run_id(module, job_id):
     """
     Get Backup job run Id.
@@ -391,7 +328,7 @@ def get_backup_job_run_id(module, job_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -431,7 +368,7 @@ def get_backup_job_ids(module, job_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -475,7 +412,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
 
         response = open_url(
@@ -537,7 +474,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         payload = self.copy()
 
@@ -579,7 +516,7 @@ def create_migration_task(module, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         # module.fail_json(msg=body)
         response = open_url(
@@ -669,7 +606,7 @@ def get_protection_groups(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -705,8 +642,8 @@ def main():
             datastore_name=dict(type="str", required=True),
             interface_group_name=dict(type="str"),
             network_name=dict(type="str"),
-            cluster_compute_resource=dict(type="str", default=None),
-            datacenter=dict(type="str", default=None),
+            cluster_compute_resource=dict(type="str"),
+            datacenter=dict(type="str"),
             power_state=dict(type="bool", default=True),
             preserve_mac_address=dict(type="bool", default=False),
             enable_network=dict(type="bool", default=True),
@@ -770,7 +707,8 @@ def main():
                 check_mode_results["id"] = job_exists
                 restore_to_source_objects = get_vmware_source_objects(module, source_id)
                 if module.params.get("resource_pool_name"):
-                    resource_pool_id = get_resource_pool_id(module, source_id)
+                    job_details["sourceId"] = source_id
+                    resource_pool_id = get_resource_pool_id(module, job_details)
                     if not resource_pool_id:
                         error_list += (
                             "Failed to find Resource Pool '%s'"
@@ -781,7 +719,10 @@ def main():
                         if datacenter or cluster_resource:
                             error_list += " associated with "
                             error_list += (
-                                "datacenter '%s', " % datacenter if datacenter else ""
+                                "datacenter '%s'" % datacenter if datacenter else ""
+                            )
+                            error_list += (
+                                ", " if datacenter and cluster_resource else ""
                             )
                             error_list += (
                                 "cluster_compute_resource '%s'." % cluster_resource

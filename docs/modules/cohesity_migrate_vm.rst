@@ -50,6 +50,14 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
+  cluster_compute_resource (optional, str, None)
+    If the cluster compute resource is specified, VM will be recovered to resource pool under the specified compute resource.
+
+
+  datacenter (optional, str, None)
+    If multiple datastore exists, datacenter and cluster resource details are used to uniquely identify the resourcepool.
+
+
   datastore_name (True, str, None)
     Specifies the datastore where the files should be recovered to. This field is required to recover objects to
 
@@ -60,14 +68,6 @@ Parameters
 
   detach_network (optional, bool, False)
     If this is set to true, then the network will be detached from the recovered VMs. All the other networking parameters set will be ignored if set to true
-
-
-  cluster_compute_resource (optional, str, None)
-    Specifies the cluster compute resource to uniquely identify the resource pool name.
-
-
-  datacenter (optional, str, None)
-    Specifies the datacenter resource name to uniquely identify the resource pool name.
 
 
   enable_network (optional, bool, True)

@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.1.0
+version_added: 1.1.2
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -635,7 +635,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.0",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
 
         response = open_url(
@@ -708,7 +708,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.1.0",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -741,3 +741,68 @@ def check_source_reachability(source, timeout=3, port=50051):
         return None
     else:
         return True
+
+
+
+def get_resource_pool_id(module, self):
+    """
+    Check resource pool name exists in the source.
+    1) If Cluster Compute Resource is provided, resource pool name under
+    cluster will be returned.
+    2) If multiple datastore exists, datacenter and cluster resource details
+    are used to uniquely identify the resourcepool.
+
+    :param module: Source Id of the Vcenter source.
+    :return reosurce pool id.
+    """
+    server = module.params.get("cluster")
+    source_id = self["sourceId"]
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/resourcePools?vCenterId=%s" % source_id
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.1.2",
+        }
+        response = open_url(
+            url=uri,
+            headers=headers,
+            validate_certs=validate_certs,
+            method="GET",
+            timeout=REQUEST_TIMEOUT,
+        )
+        pool_id = None
+        response = json.loads(response.read())
+        name = module.params.get("resource_pool_name")
+        cluster = module.params.get("cluster_compute_resource")
+        datacenter = module.params.get("datacenter")
+        res_pool_count = 0
+        for obj in response:
+            if (cluster and obj.get("cluster", {}).get("displayName") != cluster) or (
+                datacenter
+                and obj.get("dataCenter", {}).get("displayName") != datacenter
+            ):
+                continue
+            if obj["resourcePool"]["displayName"] == name:
+                pool_id = obj["resourcePool"]["id"]
+                res_pool_count += 1
+        if res_pool_count > 1:
+            module.fail_json(
+                changed=False,
+                msg="Multiple resource pools are available in the name '%s', "
+                "Please provide cluster_compute_resource and datacenter field "
+                "to uniquely identify a resource pool." % name,
+            )
+        return pool_id
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
