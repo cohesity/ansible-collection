@@ -61,6 +61,16 @@ options:
       - "a different resource pool or to a different parent source. If not specified, objects are recovered to their original"
       - "datastore locations in the parent source."
     type: int
+  cluster_compute_resource:
+    description:
+      - If the cluster compute resource is specified, VM will be recovered to resource pool
+        under the specified compute resource.
+    type: str
+  datacenter:
+    description:
+      - If multiple datastore exists, datacenter and cluster resource details
+        are used to uniquely identify the resourcepool.
+    type: str
   datastore_name:
     description:
       - "Specifies the datastore where the files should be recovered to. This field is required to recover objects to"
@@ -70,7 +80,7 @@ options:
   endpoint:
     description:
       - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
-      - "be an URL or hostname or an IP address of the Protection Source or a NAS Share/Export Path."
+      - "be an URL or hostname or an IP address of the VMware Protection Source."
     required: true
     type: str
   environment:
@@ -180,7 +190,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: 1.1.0
+version_added: 1.1.2
 """
 
 EXAMPLES = """
@@ -249,6 +259,7 @@ try:
         get__protection_jobs__by_environment,
         get__vmware_snapshot_information__by_vmname,
         get__restore_job__by_type,
+        get_resource_pool_id,
         get_cohesity_client,
     )
 except ImportError:
@@ -294,7 +305,7 @@ def get_source_details(module, restore_to_source):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         response = open_url(
             url=uri,
@@ -306,13 +317,7 @@ def get_source_details(module, restore_to_source):
         response = json.loads(response.read())
         source_details = dict()
         for source in response:
-            if not restore_to_source and source["protectionSource"][
-                "name"
-            ] == module.params.get("endpoint"):
-                source_details["id"] = source["protectionSource"]["id"]
-            elif restore_to_source and source["protectionSource"][
-                "name"
-            ] == module.params.get("restore_to_source"):
+            if source["protectionSource"]["name"] == module.params.get("endpoint"):
                 source_details["id"] = source["protectionSource"]["id"]
         if not source_details:
             module.fail_json(
@@ -349,7 +354,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
 
         response = open_url(
@@ -427,7 +432,7 @@ def get__vmware_snapshot_information__by_source(module, self, source_details):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         objects = open_url(
             url=uri,
@@ -575,7 +580,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         payload = self.copy()
 
@@ -624,7 +629,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.2",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -669,7 +674,8 @@ def wait_restore_complete(module, self):
             wait_results["changed"] = False
             if self["environment"] == "VMware":
                 wait_results["error"] = [
-                    elem["error"]["message"] for elem in response["restoreObjectState"]
+                    elem.get("error", {}).get("message")
+                    for elem in response["restoreObjectState"]
                 ]
             else:
                 wait_results["error"] = response["error"]["message"]
@@ -705,6 +711,8 @@ def main():
             wait_minutes=dict(type="int", default=20),
             datastore_id=dict(type="int"),
             datastore_name=dict(type="str", default=""),
+            cluster_compute_resource=dict(type="str"),
+            datacenter=dict(type="str"),
             datastore_folder_id=dict(type="int"),
             interface_group_name=dict(type="str"),
             network_connected=dict(type="bool", default=True),
@@ -772,16 +780,26 @@ def main():
                     module, restore_to_source_details["id"]
                 )
                 if module.params.get("resource_pool_name"):
-                    resource_pool_id = get_vmware_object_id(
-                        restore_to_source_objects,
-                        module.params.get("resource_pool_name"),
-                        "kResourcePool",
-                    )
+                    job_details["sourceId"] = restore_to_source_details["id"]
+                    resource_pool_id = get_resource_pool_id(module, job_details)
                     if not resource_pool_id:
-                        check_mode_results["msg"] += (
-                            "Resource Pool %s is not available in the source"
+                        datacenter = module.params.get("datacenter")
+                        cluster_resource = module.params.get("cluster_compute_resource")
+                        error_list = (
+                            "Failed to find Resource Pool '%s'"
                             % module.params.get("resource_pool_name")
                         )
+                        if datacenter or cluster_resource:
+                            error_list += " associated with "
+                            error_list += (
+                                "datacenter '%s', " % datacenter if datacenter else ""
+                            )
+                            error_list += (
+                                "cluster_compute_resource '%s'." % cluster_resource
+                                if cluster_resource
+                                else ""
+                            )
+                        check_mode_results["msg"] += error_list
                 if module.params.get("datastore_name"):
                     datastore_id = get_vmware_object_id(
                         restore_to_source_objects,
@@ -883,11 +901,35 @@ def main():
                     ):
 
                         if module.params.get("resource_pool_name"):
-                            resource_pool_id = get_vmware_object_id(
-                                restore_to_source_objects,
-                                module.params.get("resource_pool_name"),
-                                "kResourcePool",
-                            )
+                            job_details["sourceId"] = restore_to_source_details["id"]
+                            resource_pool_id = get_resource_pool_id(module, job_details)
+                            if not resource_pool_id:
+                                error_list = (
+                                    "Failed to find Resource Pool '%s'"
+                                    % module.params.get("resource_pool_name")
+                                )
+                                datacenter = module.params.get("datacenter")
+                                cluster_resource = module.params.get(
+                                    "cluster_compute_resource"
+                                )
+                                if datacenter or cluster_resource:
+                                    error_list += " associated with "
+                                    error_list += (
+                                        "datacenter '%s'" % datacenter
+                                        if datacenter
+                                        else ""
+                                    )
+                                    error_list += (
+                                        ", " if datacenter and cluster_resource else ""
+                                    )
+                                    error_list += (
+                                        "cluster_compute_resource '%s'."
+                                        % cluster_resource
+                                        if cluster_resource
+                                        else ""
+                                    )
+                                module.fail_json(error_list)
+
                         if module.params.get("datastore_name"):
                             datastore_id = get_vmware_object_id(
                                 restore_to_source_objects,

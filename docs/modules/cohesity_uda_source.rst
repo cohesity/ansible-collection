@@ -131,7 +131,7 @@ Examples
 
     
     # Unegister an existing Cohesity Protection Source on a selected endpoint
-    - cohesity_source:
+    - cohesity_uda_source:
         server: cohesity.lab
         username: admin
         password: password
