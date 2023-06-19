@@ -190,7 +190,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -305,7 +305,7 @@ def get_source_details(module, restore_to_source):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -354,7 +354,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
 
         response = open_url(
@@ -432,7 +432,7 @@ def get__vmware_snapshot_information__by_source(module, self, source_details):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         objects = open_url(
             url=uri,
@@ -580,7 +580,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         payload = self.copy()
 
@@ -629,12 +629,11 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
         while attempts < wait_counter:
-
             response = open_url(
                 url=uri,
                 headers=headers,
@@ -732,6 +731,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
@@ -825,7 +826,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if job_exists:
             results = dict(
                 changed=False,
@@ -899,7 +899,6 @@ def main():
                         module.params.get("datastore_id")
                         or module.params.get("datastore_name")
                     ):
-
                         if module.params.get("resource_pool_name"):
                             job_details["sourceId"] = restore_to_source_details["id"]
                             resource_pool_id = get_resource_pool_id(module, job_details)
@@ -1040,7 +1039,6 @@ def main():
                 module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Restore: This feature (absent) has not be implemented yet.",

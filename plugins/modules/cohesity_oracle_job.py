@@ -131,7 +131,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -417,7 +417,6 @@ def stop_job(module, _id):
             msg="The Protection Job for this host is active and cannot be stopped",
         )
     try:
-
         output = dict(
             id=_id, cancel_active=module.params.get("cancel_active"), jobRunIds=list()
         )

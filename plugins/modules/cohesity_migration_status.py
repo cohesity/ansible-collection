@@ -61,7 +61,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Check Sync status of objects available in the VM migration task
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -106,6 +106,7 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
+        get_cohesity_client,
     )
 except ImportError:
     pass
@@ -147,7 +148,7 @@ def get_migration_status(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -179,7 +180,7 @@ def get_task_status(module, task_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -209,6 +210,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to fetch VM migration status",
@@ -341,7 +344,6 @@ def main():
                 )
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",

@@ -103,7 +103,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Cohesity Protection Policy"
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -506,7 +506,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.2"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.3"
     cohesity_client = get_cohesity_client(module)
     policy_exists, policy_details = get_policy_details(module)
 
@@ -569,7 +569,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if policy_exists:
             results = dict(
                 changed=False,

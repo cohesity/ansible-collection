@@ -160,13 +160,12 @@ options:
     description:
       - Key value pair with job names as key and list of Virtual Machines to
         migrate
-    elements: list
     required: true
     type: dict
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -280,7 +279,7 @@ def get_source_details(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -328,7 +327,7 @@ def get_backup_job_run_id(module, job_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -368,7 +367,7 @@ def get_backup_job_ids(module, job_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -412,7 +411,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
 
         response = open_url(
@@ -474,7 +473,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         payload = self.copy()
 
@@ -516,7 +515,7 @@ def create_migration_task(module, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         # module.fail_json(msg=body)
         response = open_url(
@@ -606,7 +605,7 @@ def get_protection_groups(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -638,7 +637,7 @@ def main():
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             environment=dict(choices=["VMware"], default="VMware"),
-            job_vm_pair=dict(type="dict", required=True, elements="list"),
+            job_vm_pair=dict(type="dict", required=True),
             datastore_name=dict(type="str", required=True),
             interface_group_name=dict(type="str"),
             network_name=dict(type="str"),
@@ -662,6 +661,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
@@ -678,7 +679,6 @@ def main():
     job_exists = check__protection_restore__exists(module, job_details)
     source_details = get_source_details(module)
     source_id = source_details["id"] if source_details else None
-    cohesity_client = get_cohesity_client(module)
     if not source_id:
         msg = "Check Mode: " if module.check_mode else ""
         module.fail_json(
@@ -824,7 +824,8 @@ def main():
             if errors:
                 module.fail_json(errors)
             if module.params.get("resource_pool_name"):
-                resource_pool_id = get_resource_pool_id(module, source_id)
+                job_details["sourceId"] = source_id
+                resource_pool_id = get_resource_pool_id(module, job_details)
                 if not resource_pool_id:
                     error_list = (
                         "Failed to find Resource Pool '%s'"
@@ -955,7 +956,6 @@ def main():
             )
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",

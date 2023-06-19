@@ -37,6 +37,8 @@ Parameters
 
     If not specified new list of vms will replace the existing vms available in the Protection job.
 
+    In case of tag based jobs, if append_to_existing is set to true new list of tags will be added to already available tags.
+
     Optional and only valid when (environment=VMware)
 
 
@@ -76,6 +78,14 @@ Parameters
     Specifies job is already available, if source available in Protection Job needs to be removed.
 
     Optional and only valid when (environment=Physical, PhysicalFiles, GenericNas)
+
+
+  delete_vms (optional, list, None)
+    Applicable only when job is already available
+
+    List of virtual machines will be removed from the job.
+
+    Optional and only valid when (environment=VMware)
 
 
   description (optional, str, None)

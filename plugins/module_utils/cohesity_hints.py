@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.1.2
+version_added: 1.1.3
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -109,7 +109,6 @@ def refresh_protection_source(module, source_id):
 
 
 def get__cluster(self):
-
     try:
         uri = (
             "https://" + self["server"] + "/irisservices/api/v1/public/basicClusterInfo"
@@ -136,7 +135,6 @@ def get__cluster(self):
 
 
 def get__nodes(self):
-
     try:
         uri = "https://" + self["server"] + "/irisservices/api/v1/public/nodes"
         headers = {
@@ -314,7 +312,7 @@ def get__protection_run__all(self):
                     objects_item
                     for objects_item in objects
                     if objects_item["backupRun"].get("status")
-                    in ["kAccepted", "kRunning"]
+                    in ["kAccepted", "kCanceling", "kRunning"]
                 ]
         return objects
     except urllib_error.URLError as error:
@@ -465,7 +463,6 @@ def get__prot_source_id__by_endpoint(module, self):
 
 
 def get__protection_jobs__by_environment(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -486,7 +483,6 @@ def get__protection_jobs__by_environment(module, self):
 
 
 def get__protection_run__all__by_id(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -510,7 +506,6 @@ def get__protection_run__all__by_id(module, self):
 
 
 def get__file_snapshot_information__by_filename(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -545,7 +540,6 @@ def get__file_snapshot_information__by_filename(module, self):
 
 
 def get__vmware_snapshot_information__by_vmname(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -573,7 +567,6 @@ def get__vmware_snapshot_information__by_vmname(module, self):
 
 
 def get__restore_job__by_type(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -601,7 +594,6 @@ def get__restore_job__by_type(module, self):
 
 
 def get__restore_task_status__by_id(module, self):
-
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
@@ -635,7 +627,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
 
         response = open_url(
@@ -675,9 +667,10 @@ def get__storage_domain_id__by__name(module):
 
 
 def get_protection_run__status__by_id(module, group_id):
+    #global cohesity_client
     try:
         group_run = cohesity_client.protection_runs.get_protection_runs(
-            group_id=group_id
+            job_id=group_id
         )
         if not group_run:
             return False, "", ""
@@ -708,7 +701,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -743,7 +736,6 @@ def check_source_reachability(source, timeout=3, port=50051):
         return True
 
 
-
 def get_resource_pool_id(module, self):
     """
     Check resource pool name exists in the source.
@@ -768,7 +760,7 @@ def get_resource_pool_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -805,4 +797,3 @@ def get_resource_pool_id(module, self):
         raise__cohesity_exception__handler(e.read(), module)
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
-

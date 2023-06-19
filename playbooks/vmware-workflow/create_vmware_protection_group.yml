@@ -23,9 +23,5 @@
           - CentOS-Default
         exclude:
           - WindowsServer
-        # Enabling append_to_existing will add the new list of VMs to the
-        # existing vms available in the job.
-        # append_to_existing: true
-        cancel_active: true
         time_zone: "America/Los_Angeles"
         start_time: "00:00"

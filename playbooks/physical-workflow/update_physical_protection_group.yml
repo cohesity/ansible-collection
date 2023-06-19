@@ -1,0 +1,35 @@
+# => Update a Physical protection job for list of Sources.
+# => List of new source endpoints will be appended to existing sources.
+# => If available source is provided, for PhysicalFiles environment existing
+# => file paths will be replaced with new filepaths.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Update sources and file paths of a Physical Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "present"
+        name: "PhysicalJob"
+        environment: "PhysicalFiles"
+        sources:
+          - endpoint: "{{ Server1 }}"
+            paths:
+              - includeFilePath: "/path1/"
+                excludeFilePaths:
+                  - "/path1/exclude_path1"  # This path should be present under /path1
+                  - "/path1/exclude_path2"  # This path should be present under /path1
+                skipNestedVolumes: false
+          - endpoint: "{{ Server2 }}"
+            paths:
+              - includeFilePath: "/path2"
+                excludeFilePaths:
+                  - "/path2/exclude_path1"  # This path should be present under /path2
+                skipNestedVolumes: false
+        protection_policy: "Bronze"
+        storage_domain: "DefaultStorageDomain"
