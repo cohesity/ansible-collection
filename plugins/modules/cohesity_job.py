@@ -23,6 +23,7 @@ options:
     description:
       - "Specifies when job is already available and new list of virtual machines needs to be added to existing list."
       - "If not specified new list of vms will replace the existing vms available in the Protection job."
+      - "In case of tag based jobs, if append_to_existing is set to true new list of tags will be added to already available tags."
       - "Optional and only valid when (environment=VMware)"
     type: bool
   cancel_active:
@@ -68,6 +69,12 @@ options:
       - "Specifies job is already available, if source available in Protection Job needs to be removed."
       - "Optional and only valid when (environment=Physical, PhysicalFiles, GenericNas)"
     type: bool
+  delete_vms:
+    description:
+      - "Applicable only when job is already available".
+      - "List of virtual machines will be removed from the job."
+      - "Optional and only valid when (environment=VMware)"
+    type: list
   description:
     description:
       - "Optional Description to assign to the Protection Job"
@@ -111,8 +118,8 @@ options:
   include_tags:
     description:
       - "Specifies the list of VMware tags to be included."
+      - "List of objects with category name as key and user tags as list should be provided"
       - "Applicable only when environment is set to VMware."
-      - "Yet to be implemented."
     elements: str
     type: list
   indexing:
@@ -477,6 +484,28 @@ def parse_vmware_protection_sources_json(response, vm_names):
     return list(set(ids))
 
 
+def find_tag_id(module, nodes, tags):
+    """
+    Function to return list of tag ids filtered by category and tag name.
+    """
+    ids = []
+    for node in nodes:
+        if "protectionSource" in node:
+            vmware_source = node["protectionSource"]["vmWareProtectionSource"]
+            if vmware_source["type"] != "kTagCategory" and "nodes" in node:
+                nodes.extend(node["nodes"])
+                continue
+            if vmware_source["type"] == "kTagCategory" and vmware_source["name"] not in tags:
+                continue
+            category_name = vmware_source["name"]
+            for item in node.get("nodes", []):
+                vmware_source = item["protectionSource"]["vmWareProtectionSource"]
+                if vmware_source["type"] == "kTag" and vmware_source["name"] not in tags[category_name]:
+                    continue
+                ids.append(item["protectionSource"]["id"])
+    return list(ids)
+
+
 def _get_tag_ids(module, tags, parentSourceId):
     """
     Function to fetch VMware tag ids for list of tag names.
@@ -488,14 +517,15 @@ def _get_tag_ids(module, tags, parentSourceId):
                 msg="Error while creating cohesity client, err msg '%s'" % client,
                 changed=False,
             )
-        result = client.protection_sources.list_protection_sources(id=parentSourceId)
+        result = client.protection_sources.list_protection_sources(
+            id=parentSourceId, exclude_types=["kDatacenter","kComputeResource","kResourcePool","kDatastore","kHostSystem","kVirtualMachine"])
         if not result or not result[0].nodes:
             module.fail_json(
                 msg="Failed to fetch tags for source with id " + str(parentSourceId),
                 changed=False,
             )
         nodes = result[0].nodes
-        return parse_vmware_protection_sources_json(nodes, tags)
+        return find_tag_id(module, nodes, tags)
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -534,49 +564,6 @@ def get_vmware_ids(module, job_meta_data, job_details, vm_names):
         response = json.loads(response.read())
         ids = parse_vmware_protection_sources_json(response, vm_names)
         return ids
-    except urllib_error.URLError as e:
-        # => Capture and report any error messages.
-        raise__cohesity_exception__handler(e.read(), module)
-    except Exception as error:
-        raise__cohesity_exception__handler(error, module)
-
-
-def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
-    server = module.params.get("cluster")
-    validate_certs = module.params.get("validate_certs")
-    token = job_details["token"]
-    try:
-        uri = (
-            "https://"
-            + server
-            + "/irisservices/api/v1/public/protectionSources/virtualMachines?vCenterId="
-            + str(job_meta_data["parentSourceId"])
-        )
-        headers = {
-            "Accept": "application/json",
-            "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
-        }
-        response = open_url(
-            url=uri,
-            method="GET",
-            headers=headers,
-            validate_certs=validate_certs,
-            timeout=REQUEST_TIMEOUT,
-        )
-
-        if not response.getcode() == 200:
-            raise ProtectionException(
-                msg="Failed to get VMware protection source details"
-            )
-        response = json.loads(response.read())
-        vm_ids = []
-        vm_names_lowercase = [v.lower() for v in vm_names]
-        for vm in response:
-            if vm["name"].lower() in vm_names_lowercase:
-                vm_ids.append(vm["id"])
-        return vm_ids
-
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
         raise__cohesity_exception__handler(e.read(), module)
@@ -681,12 +668,20 @@ def register_job(module, self):
             )
         elif payload["environment"] == "kVMware":
             parent_source_id = {"parentSourceId": self["parentSourceId"]}
-            if len(module.params.get("include_tags")) != 0:
-                tag_list = list()
-                for tags in module.params.get("include_tags"):
-                    tag_ids = _get_tag_ids(module, tags, self["parentSourceId"])
-                    tag_list.append(tag_ids)
-                payload["vmTagIds"] = tag_list
+            if module.params.get("include_tags"):
+                tags = module.params.get("include_tags")
+                for include_tags in tags:
+                    tag_ids = _get_tag_ids(module, include_tags, self["parentSourceId"])
+                    if tag_ids:
+                        payload["vmTagIds"].append(tag_ids)
+                if payload.get("sourceIds"):
+                    del payload["sourceIds"]
+            if module.params.get("exclude_tags"):
+                tags = module.params.get("exclude_tags")
+                for exclude_tags in tags:
+                    tag_ids = _get_tag_ids(module, exclude_tags, self["parentSourceId"])
+                    if tag_ids:
+                        payload["excludeVmTagIds"].append(tag_ids)
             if len(module.params.get("include")) != 0:
                 vms = module.params.get("include")
                 payload["sourceIds"] = get_vmware_ids(
@@ -739,6 +734,13 @@ def start_job(module, self):
         results = dict(
             changed=False,
             msg="The Protection Job for this host is currently running",
+            name=module.params.get("name"),
+        )
+        module.exit_json(**results)
+    if module.check_mode:
+        results = dict(
+            changed=True,
+            msg="Check Mode: This action will start the Protection Job.",
             name=module.params.get("name"),
         )
         module.exit_json(**results)
@@ -918,6 +920,13 @@ def stop_job(module, self):
             changed=False,
             msg="The Protection Job for this host is active and cannot be stopped",
         )
+    if module.check_mode and module.params.get("cancel_active"):
+        results = dict(
+            changed=False,
+            msg="Check Mode: The Protection Job for this host is currently running and will be cancelled",
+            name=module.params.get("name"),
+        )
+        module.exit_json(**results)
     try:
         uri = (
             "https://"
@@ -1053,11 +1062,42 @@ def check_default_fields(module, job_meta_data, job_details):
 
 
 def update_vmware_job(module, job_meta_data, job_details):
-    avl_source_ids = job_meta_data["sourceIds"]
-    avl_exclude_source_ids = job_meta_data["excludeSourceIds"]
+    delete_vm_ids = []
+    avl_source_ids = job_meta_data.get("sourceIds",[])
+    avl_exclude_source_ids = job_meta_data.get("excludeSourceIds", [])
     # Check for start time, timezone, policy and storage domain.
     status = check_default_fields(module, job_meta_data, job_details)
-    if len(module.params.get("exclude")) != 0 or len(module.params.get("include")) != 0:
+    job_meta_data["token"] = job_details["token"]
+    
+    if len(module.params.get("exclude")) != 0 or len(
+        module.params.get("include")) != 0 or len(
+            module.params.get("include_tags")) != 0 or \
+            module.params.get("delete_vms"):
+        existing_include_tags = job_meta_data.get("vmTagIds", [])
+        existing_include_tags.sort()
+        existing_exclude_tags = job_meta_data.get("excludeVmTagIds", [])
+        existing_exclude_tags.sort()
+        tags = module.params.get("include_tags")
+        if module.params.get("include_tags"):
+            job_meta_data["vmTagIds"] = []
+            for include_tags in tags:
+                tag_ids = _get_tag_ids(
+                    module, include_tags, job_meta_data["parentSourceId"])
+                if tag_ids:
+                    job_meta_data["vmTagIds"].append(tag_ids)
+        if module.params.get("exclude_tags"):
+            job_meta_data["excludeVmTagIds"] = []
+            job_meta_data["excludeVmTagIds"] = []
+            for exclude_tags in module.params.get("exclude_tags"):
+                tag_ids = _get_tag_ids(
+                    module, exclude_tags, job_meta_data["parentSourceId"])
+                if tag_ids:
+                    job_meta_data["excludeVmTagIds"].append(tag_ids)
+        if module.params.get("append_to_existing"):
+            for list_item in existing_include_tags:
+                if list_item not in job_meta_data["vmTagIds"]:
+                    job_meta_data["vmTagIds"].append(list_item)
+        job_meta_data["vmTagIds"].sort()
         if len(module.params.get("exclude")) != 0:
             vms = module.params.get("exclude")
             exclude_vm_ids = get_vmware_ids(module, job_meta_data, job_details, vms)
@@ -1079,36 +1119,51 @@ def update_vmware_job(module, job_meta_data, job_details):
                     ]
                 )
             job_meta_data["sourceIds"] = include_vm_ids
-        job_meta_data["token"] = job_details["token"]
+        if module.params.get("delete_vms"):
+            delete_vm_ids = get_vmware_ids(
+                module, job_meta_data, job_details, module.params.get(
+                    "delete_vms"))
+            if delete_vm_ids:
+                # Remove the list of vm ids from the sourceId list.
+                job_meta_data["sourceIds"] = list(
+                    set(job_meta_data.get("sourceIds", [])) - set(delete_vm_ids))
         if (
             not status
-            and (set(job_meta_data["sourceIds"]) == set(avl_source_ids))
-            and (set(avl_exclude_source_ids) == set(job_meta_data["excludeSourceIds"]))
+            and (set(job_meta_data.get("sourceIds", [])) == set(avl_source_ids))
+            and (set(avl_exclude_source_ids) == set(job_meta_data.get("excludeSourceIds", [])))
+            and existing_include_tags == job_meta_data["vmTagIds"]
+            and existing_exclude_tags == job_meta_data["excludeVmTagIds"]
         ):
+            msg = "Job '%s' is already updated, skipping." % module.params.get("name")
+            if module.check_mode:
+                msg = "Check Mode: " + msg
             module.exit_json(
-                msg="Job '%s' is already updated, skipping."
-                % module.params.get("name"),
+                msg=msg,
                 changed=False,
             )
-        if not job_meta_data["sourceIds"]:
+        if not job_meta_data["sourceIds"] and not job_meta_data["vmTagIds"]:
+            msg = "Please specify one or more sources to backup. Provided VMs are not available"
+            if module.check_mode:
+                msg = "Check Mode: " + msg
             module.exit_json(
-                msg="Please specify one or more sources to backup. Provided VMs are not available",
+                msg=msg,
                 changed=False,
             )
-        if len(module.params.get("include_tags")) != 0:
-            tag_list = list()
-            for tags in module.params.get("include_tags"):
-                tag_ids = _get_tag_ids(module, tags, job_meta_data["parentSourceId"])
-                tag_list.append(tag_ids)
-            job_meta_data["vmTagIds"] = tag_list
-        response = update_job(module, job_meta_data, "")
-        results = dict(
-            changed=True, msg="Successfully updated the protection job", **response
+        if module.check_mode:
+            results = dict(
+            changed=True, msg="Check Mode: Successfully updated the protection job"
         )
+        else:
+            response = update_job(module, job_meta_data, "")
+            results = dict(
+                changed=True, msg="Successfully updated the protection job", **response
+            )
         module.exit_json(**results)
     else:
+        msg = "The protection job already exists"
+        msg = "Check Mode: " + msg
         module.exit_json(
-            msg="The protection job already exists",
+            msg=msg,
             id=job_meta_data["id"],
             name=module.params.get("name"),
             changed=False,
@@ -1132,8 +1187,11 @@ def delete_sources(module, job_meta_data, job_details):
                         index = job_meta_data["sourceSpecialParameters"].index(source)
                         del job_meta_data["sourceSpecialParameters"][index]
         if len(job_meta_data["sourceIds"]) == 0:
+            msg="Cannot remove all the sources from a protection job."
+            if module.check_mode:
+                msg = "Check Mode: " + msg
             module.fail_json(
-                msg="Cannot remove all the sources from a protection job.",
+                msg = msg,
                 id=job_meta_data["id"],
                 changed=False,
                 name=module.params.get("name"),
@@ -1148,6 +1206,10 @@ def delete_sources(module, job_meta_data, job_details):
                 name=module.params.get("name"),
             )
         job_meta_data["token"] = job_details["token"]
+        if module.check_mode:
+            module.exit_json(
+            changed=True,
+            msg="Check Mode: Successfully removed sources from the protection job")
         response = update_job(module, job_meta_data)
         module.exit_json(
             changed=True,
@@ -1282,9 +1344,12 @@ def update_job_util(module, job_details, job_exists):
         and already_exist_in_job
         and len(job_details["sourceIds"]) != 0
     ):
+        msg = "The protection sources are already being protected"
+        if module.check_mode:
+            msg = "Check Mode: " + msg
         results = dict(
             changed=False,
-            msg="The protection sources are already being protected",
+            msg=msg,
             id=job_exists,
             name=module.params.get("name"),
         )
@@ -1310,7 +1375,8 @@ def update_job_util(module, job_details, job_exists):
         existing_job_details["token"] = job_details["token"]
         if is_indexing_updated:
             indexing_msg = "indexing policies, "
-        response = update_job(module, existing_job_details, new_sources)
+        if not module.check_mode:
+            update_job(module, existing_job_details, new_sources)
         if job_details["environment"] == "PhysicalFiles":
             msg = (
                 "Successfully updated "
@@ -1323,7 +1389,10 @@ def update_job_util(module, job_details, job_exists):
                 + indexing_msg
                 + "sources to existing protection job"
             )
-        results = dict(changed=True, msg=msg, **response)
+        if check_mode:
+            results = dict(changed=True, msg="Check Mode: " + msg)
+        else:
+            results = dict(changed=True, msg=msg, **response)
     else:
         module.fail_json(
             msg="Sources don't exist on the cluster",
@@ -1357,6 +1426,7 @@ def main():
             protection_policy=dict(type="str", aliases=["policy"], default="Bronze"),
             storage_domain=dict(type="str", default="DefaultStorageDomain"),
             delete_sources=dict(type="bool", default=False),
+            delete_vms=dict(type="list", elements="str"),
             time_zone=dict(type="str", default="America/Los_Angeles"),
             start_time=dict(type="str", default=""),
             delete_backups=dict(type="bool", default=False),
@@ -1368,8 +1438,8 @@ def main():
             append_to_existing=dict(type="bool", default=False),
             exclude=dict(type="list", default=[], elements="str"),
             include=dict(type="list", default=[], elements="str"),
-            exclude_tags=dict(type="list", default=[], elements="str"),
-            include_tags=dict(type="list", default=[], elements="str"),
+            exclude_tags=dict(type="list", default=[]),
+            include_tags=dict(type="list", default=[]),
             disable_indexing=dict(type="bool", default=False),
             indexing=dict(type="dict", default={}),
         )
@@ -1395,46 +1465,62 @@ def main():
     )
 
     job_exists, job_meta_data = check__protection_job__exists(module, job_details)
+    prot_source = dict(
+        environment=job_details["environment"], token=job_details["token"]
+    )
 
-    if module.check_mode:
+    if module.check_mode and module.params.get("state") == "absent":
+        ERROR_LIST = []
         check_mode_results = dict(
             changed=False,
             msg="Check Mode: Cohesity Protection Job is not currently registered",
             id="",
         )
         if module.params.get("state") == "present":
-            if job_exists:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Cohesity Protection Job is currently registered.  No changes"
-            else:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Cohesity Protection Job is not currently registered.  This action would register the Cohesity Protection Job."
+            # if job_exists:
+            #     check_mode_results[
+            #         "msg"
+            #     ] = "Check Mode: Cohesity Protection Job is currently registered.  No changes"
+            if not job_exists:
                 check_mode_results["id"] = job_exists
-                # Check all the endpoints are reachable
                 for source in module.params.get("protection_sources"):
-                    status = check_source_reachability(source["endpoint"])
-                    if not status:
-                        if status is None:
-                            check_mode_results["msg"] += (
+                    # Check whether the source is already registered or not.
+                    prot_source["endpoint"] = source["endpoint"]
+                    if job_details["environment"] == "PhysicalFiles":
+                        prot_source["environment"] = "Physical"
+                    source_id = get__prot_source_id__by_endpoint(module, prot_source)
+                    if not source_id:
+                        ERROR_LIST.append(
+                        "Protection Source '%s' is not registered in the cluster."
+                        % source["endpoint"]
+                    )
+                    if job_details["environment"] in ["Physical", "PhysicalFiles"]:
+                        # Check all the endpoints are reachable.
+                        status = check_source_reachability(source["endpoint"])
+                        if not status:
+                            ERROR_LIST.append(
                                 "Please ensure cohesity agent is installed in the source '%s' and port 50051 is open."
                                 % source["endpoint"]
                             )
-                        else:
-                            check_mode_results["msg"] += (
-                                "Source '%s' is not reachable." % source["endpoint"]
-                            )
                 if not get__prot_policy_id__by_name(module, job_details):
-                    check_mode_results["msg"] += (
-                        "Protection policy '%s' is not available in the cluster"
+                    ERROR_LIST.append(
+                        "Protection policy '%s' is not available in the cluster."
                         % job_details["policyId"]
                     )
                 if not get__storage_domain_id__by_name(module, job_details):
-                    check_mode_results["msg"] += (
-                        "Storage domain '%s' is not available in the cluster"
+                    ERROR_LIST.append(
+                        "Storage domain '%s' is not available in the cluster."
                         % job_details["viewBoxId"]
                     )
+                if ERROR_LIST:
+                    check_mode_results["ERROR_LIST"] = ERROR_LIST
+                    check_mode_results[
+                        "msg"
+                    ] = "Check Mode: Cohesity Protection Job is not currently registered. Please fix the list of errors to register the Cohesity Protection Job."
+                else:
+                    check_mode_results[
+                        "msg"
+                    ] = "Check Mode: Cohesity Protection Job is not currently registered.  This action would register the Cohesity Protection Job."
 
         else:
             if job_exists:
@@ -1482,9 +1568,6 @@ def main():
                 job_details["sourceIds"] = list()
                 if job_details["environment"] == "PhysicalFiles":
                     job_details["environment"] = "Physical"
-                prot_source = dict(
-                    environment=job_details["environment"], token=job_details["token"]
-                )
                 i = 0
                 for source in module.params.get("protection_sources"):
                     prot_source["endpoint"] = source["endpoint"]
@@ -1555,9 +1638,6 @@ def main():
                 job_details["sourceIds"] = list()
                 if job_details["environment"] == "PhysicalFiles":
                     job_details["environment"] = "Physical"
-                prot_source = dict(
-                    environment=job_details["environment"], token=job_details["token"]
-                )
                 for source in module.params.get("protection_sources"):
                     prot_source["endpoint"] = source["endpoint"]
                     source_id = get__prot_source_id__by_endpoint(module, prot_source)
@@ -1580,6 +1660,10 @@ def main():
                         )
                     )
                     existing_job_details["token"] = job_details["token"]
+                    if module.check_mode:
+                        module.exit_json(
+                        changed=True,
+                        msg="Successfully removed the sources from existing protection job")
                     response = update_job(
                         module, existing_job_details, sources_exiting_in_job
                     )
@@ -1615,9 +1699,6 @@ def main():
             job_details["sourceIds"] = []
             job_details["runType"] = module.params.get("ondemand_run_type")
 
-            prot_source = dict(
-                environment=job_details["environment"], token=job_details["token"]
-            )
             if module.params.get("environment") == "VMware":
                 ids = []
                 job_meta_data = {"parentSourceId": job_meta_data["parentSourceId"]}
@@ -1675,7 +1756,9 @@ def main():
             msg="Invalid State selected: {0}".format(module.params.get("state")),
             changed=False,
         )
-
+    if module.check_mode:
+        if "Check Mode" not in results["msg"]:
+            results["msg"] = "Check Mode: " + results["msg"]
     module.exit_json(**results)
 
 

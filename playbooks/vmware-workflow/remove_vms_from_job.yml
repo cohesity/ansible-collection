@@ -1,0 +1,23 @@
+# => Remove virtual machines from a Vmware Protection job.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Remove virtual machines from a Vmware Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "present"
+        job_name: "protect_vm"
+        sources:
+          - endpoint: "vcenter.domain.com"
+        environment: "VMware"
+        # Following list of of virtual machines, will be deleted from the
+        # existing job.
+        delete_vms:
+          - VM1
+          - VM2

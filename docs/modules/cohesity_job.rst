@@ -115,9 +115,9 @@ Parameters
   include_tags (optional, list, None)
     Specifies the list of VMware tags to be included.
 
-    Applicable only when environment is set to VMware.
+    List of objects with category name as key and user tags as list should be provided
 
-    Yet to be implemented.
+    Applicable only when environment is set to VMware.
 
 
   indexing (optional, dict, None)
