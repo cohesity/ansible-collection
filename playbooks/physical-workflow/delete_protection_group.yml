@@ -1,0 +1,16 @@
+# => Delete a Physical protection job.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Delete a Physical Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "absent"
+        name: "PhysicalJob"
+        environment: "PhysicalFiles"

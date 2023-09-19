@@ -187,7 +187,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -276,6 +276,7 @@ try:
         get__prot_source__all,
         check_source_reachability,
         unregister_source,
+        get_cohesity_client,
     )
 except Exception:
     pass
@@ -374,7 +375,7 @@ def refresh_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         uri = (
             "https://"
@@ -419,7 +420,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         sql_payload = dict(
             applications=["kSQL"],
@@ -467,7 +468,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -569,6 +570,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",

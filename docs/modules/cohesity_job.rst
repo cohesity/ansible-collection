@@ -37,6 +37,8 @@ Parameters
 
     If not specified new list of vms will replace the existing vms available in the Protection job.
 
+    In case of tag based jobs, if append_to_existing is set to true new list of tags will be added to already available tags.
+
     Optional and only valid when (environment=VMware)
 
 
@@ -78,6 +80,14 @@ Parameters
     Optional and only valid when (environment=Physical, PhysicalFiles, GenericNas)
 
 
+  delete_vms (optional, list, None)
+    Applicable only when job is already available
+
+    List of virtual machines will be removed from the job.
+
+    Optional and only valid when (environment=VMware)
+
+
   description (optional, str, None)
     Optional Description to assign to the Protection Job
 
@@ -115,9 +125,9 @@ Parameters
   include_tags (optional, list, None)
     Specifies the list of VMware tags to be included.
 
-    Applicable only when environment is set to VMware.
+    List of objects with category name as key and user tags as list should be provided
 
-    Yet to be implemented.
+    Applicable only when environment is set to VMware.
 
 
   indexing (optional, dict, None)

@@ -199,7 +199,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Management of Cohesity UDA Protection Groups
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 EXAMPLES = """
@@ -425,7 +425,6 @@ def stop_group(module, _id):
             msg="The Protection Group for this host is active and cannot be stopped",
         )
     try:
-
         output = dict(
             id=_id, cancel_active=module.params.get("cancel_active"), groupRunIds=list()
         )

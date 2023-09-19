@@ -1,27 +1,23 @@
-# => Create/Update a new Vmware protection job for list of Sources.
+# => Remove virtual machines from a Vmware Protection job.
 ---
 - hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: Create Vmware Protection job.
+    - name: Remove virtual machines from a Vmware Protection job.
       cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         state: "present"
-        job_name: "protect_vm_5"
-        policy: Gold
-        storage_domain: "DefaultStorageDomain"
+        job_name: "protect_vm"
         sources:
           - endpoint: "vcenter.domain.com"
         environment: "VMware"
-        include:
-          - automation_vm_1-KsZ4
-          - CentOS-Default
-        exclude:
-          - WindowsServer
-        time_zone: "America/Los_Angeles"
-        start_time: "00:00"
+        # Following list of of virtual machines, will be deleted from the
+        # existing job.
+        delete_vms:
+          - VM1
+          - VM2

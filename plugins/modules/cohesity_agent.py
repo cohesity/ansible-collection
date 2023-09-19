@@ -334,13 +334,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.2",
+                "user-agent": "cohesity-ansible/v1.1.3",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.1.2",
+                "user-agent": "cohesity-ansible/v1.1.3",
             }
 
         agent = open_url(
@@ -406,7 +406,6 @@ def installation_failures(module, stdout, rc, message):
 
 
 def install_agent(module, installer, native):
-
     # => This command will run the self-extracting installer for the agent on machine and
     # => suppress opening a new window (nox11) and not show the extraction (noprogress) results
     # => which end up in stderr.
@@ -473,7 +472,6 @@ def install_agent(module, installer, native):
 
 
 def extract_agent(module, filename):
-
     # => This command will run the self-extracting installer in no execution mode
     #
     # => Note: Python 2.6 doesn't fully support the new string formatters, so this
@@ -497,7 +495,6 @@ def extract_agent(module, filename):
 
 
 def remove_agent(module, installer, native):
-
     # => This command will run the self-extracting installer for the agent on machine and
     # => suppress opening a new window (nox11) and not show the extraction (noprogress) results
     # => which end up in stderr.
@@ -615,7 +612,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.2",
+            "user-agent": "cohesity-ansible/v1.1.3",
         }
         response = open_url(
             url=uri,
@@ -667,7 +664,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.2",
+                "user-agent": "cohesity-ansible/v1.1.3",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(
@@ -769,6 +766,7 @@ def main():
     if module.params.get("download_location"):
         tempdir = module.params.get("download_location")
         create_download_dir(module, tempdir)
+
     else:
         tempdir = mkdtemp(prefix="ansible.")
 

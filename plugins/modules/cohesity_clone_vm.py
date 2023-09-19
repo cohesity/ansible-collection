@@ -127,7 +127,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: 1.1.2
+version_added: 1.1.3
 """
 
 
@@ -506,7 +506,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.2"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.3"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 
@@ -560,7 +560,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if clone_exists:
             results = dict(
                 changed=False,
@@ -572,7 +571,6 @@ def main():
             clone_vm(module)
 
     elif module.params.get("state") == "absent":
-
         if clone_exists:
             destroy_clone(module, clone_details.id)
             results = dict(
