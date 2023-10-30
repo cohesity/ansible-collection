@@ -225,8 +225,8 @@ options:
       - Required when environment is set to View.
     type: str
 extends_documentation_fragment:
-  - cohesity.dataprotect.cohesity
-short_description: Management of Cohesity Protection Jobs
+- cohesity.dataprotect.cohesity
+short_description: "Management of Cohesity Protection Jobs"
 version_added: 1.1.4
 """
 
@@ -610,6 +610,50 @@ def get_vmware_ids(module, job_meta_data, job_details, vm_names):
         raise__cohesity_exception__handler(error, module)
 
 
+def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = job_details["token"]
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources/virtualMachines?vCenterId="
+            + str(job_meta_data["parentSourceId"])
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.1.4",
+        }
+        response = open_url(
+            url=uri,
+            method="GET",
+            headers=headers,
+            validate_certs=validate_certs,
+            timeout=REQUEST_TIMEOUT,
+        )
+
+        if not response.getcode() == 200:
+            raise ProtectionException(
+                msg="Failed to get VMware protection source details"
+            )
+        response = json.loads(response.read())
+        vm_ids = []
+        vm_names_lowercase = [v.lower() for v in vm_names]
+        for vm in response:
+            if vm["name"].lower() in vm_names_lowercase:
+                vm_ids.append(vm["id"])
+        return vm_ids
+
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
+>>>>>>> ea2a31b (Updated user-agent versions)
 def get_view_storage_domain_id(module, self):
     """
     function to get view's storage domain id.

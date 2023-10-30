@@ -305,7 +305,7 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v2.3.0",
+                "user-agent": "cohesity-ansible/v1.1.4",
             }
         elif not module.params.get("download_uri"):
             os_type = "Linux"

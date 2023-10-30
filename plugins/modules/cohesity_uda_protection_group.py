@@ -455,7 +455,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.10",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
