@@ -307,6 +307,54 @@ def get_source_details(module):
         raise__cohesity_exception__handler(error, module)
 
 
+def get_vm_folder_id(module, source_id, resource_pool_id):
+    """
+    Check VM folder name exists in the source.
+
+    :param module: Source Id of the Vcenter source.
+    :return vm folder id.
+    """
+    folder_id = None
+    folder_name = module.params.get("vm_folder_name")
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = get__cohesity_auth__token(module)
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/vmwareFolders?vCenterId=%s&resourcePoolId=%s" % (
+                source_id, resource_pool_id)
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.1.4",
+        }
+        response = open_url(
+            url=uri,
+            headers=headers,
+            validate_certs=validate_certs,
+            method="GET",
+            timeout=REQUEST_TIMEOUT,
+        )
+        for obj in response.get("vmFolders", []):
+            if obj.get("displayName") == folder_name:
+               folder_id = obj["id"]
+               break
+        if folder_id:
+            module.fail_json(
+                changed=False,
+                msg="Couldn't find VM folder with name %s" % folder_name,
+            )
+        return folder_id
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def get_resource_pool_id(module, source_id):
     """
     Check resource pool name exists in the source.
@@ -316,7 +364,7 @@ def get_resource_pool_id(module, source_id):
     are used to uniquely identify the resourcepool.
 
     :param module: Source Id of the Vcenter source.
-    :return reosurce pool id.
+    :return resource pool id.
     """
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
@@ -369,7 +417,54 @@ def get_resource_pool_id(module, source_id):
         raise__cohesity_exception__handler(error, module)
 
 
->>>>>>> ea2a31b (Updated user-agent versions)
+def get_datastore_id(module, source_id, resource_pool_id):
+    """
+    Check datastore exists in the source.
+
+    :param module: Source Id and resource pool id of the Vcenter source.
+    :return datastore id.
+    """
+    data_store_id = None
+    data_store_name = module.params.get("datastore_name")
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = get__cohesity_auth__token(module)
+    try:
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/datastores?vCenterId=%s&resourcePoolId=%s" % (
+                source_id, resource_pool_id)
+        )
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.1.4",
+        }
+        response = open_url(
+            url=uri,
+            headers=headers,
+            validate_certs=validate_certs,
+            method="GET",
+            timeout=REQUEST_TIMEOUT,
+        )
+        for obj in response:
+            if obj.get("displayName") == data_store_name:
+               data_store_id = obj["id"]
+               break
+        if data_store_id:
+            module.fail_json(
+                changed=False,
+                msg="Couldn't find datastore with name %s" % data_store_name,
+            )
+        return data_store_id
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def get_backup_job_run_id(module, job_id):
     """
     Get Backup job run Id.
@@ -767,11 +862,13 @@ def main():
                 check_mode_results[
                     "msg"
                 ] = "Check Mode: Cohesity Migrate Job is not currently registered.  This action would register the Cohesity Migrate Job."
+                resource_pool_id = None
                 check_mode_results["id"] = job_exists
                 restore_to_source_objects = get_vmware_source_objects(module, source_id)
                 if module.params.get("resource_pool_name"):
                     job_details["sourceId"] = source_id
                     resource_pool_id = get_resource_pool_id(module, job_details)
+                    job_details["resourcePoolId"] = resource_pool_id
                     if not resource_pool_id:
                         error_list += (
                             "Failed to find Resource Pool '%s'"
@@ -792,12 +889,8 @@ def main():
                                 if cluster_resource
                                 else ""
                             )
-                if module.params.get("datastore_name"):
-                    datastore_id = get_vmware_object_id(
-                        restore_to_source_objects,
-                        module.params.get("datastore_name"),
-                        "kDatastore",
-                    )
+                if module.params.get("datastore_name") and resource_pool_id:
+                    datastore_id = get_datastore_id(module, source_id, resource_pool_id)
                     if not datastore_id:
                         error_list += (
                             "Datastore '%s' is not available in the source."
@@ -812,11 +905,10 @@ def main():
                         error_list += (
                             "Failed to find network with name '%s'." % network_name
                         )
-                if module.params.get("vm_folder_name"):
+                if module.params.get("vm_folder_name") and resource_pool_id:
                     vm_folder_name = module.params.get("vm_folder_name")
-                    vm_folder_id = get_vmware_object_id(
-                        restore_to_source_objects, vm_folder_name, "kFolder"
-                    )
+                    vm_folder_id = get_vm_folder_id(
+                        module, source_id, resource_pool_id)
                     if not vm_folder_id:
                         error_list += (
                             "Failed to find folder with name '%s'." % vm_folder_name
@@ -908,11 +1000,7 @@ def main():
                         )
                     module.fail_json(error_list)
             if module.params.get("datastore_name"):
-                datastore_id = get_vmware_object_id(
-                    restore_to_source_objects,
-                    module.params.get("datastore_name"),
-                    "kDatastore",
-                )
+                datastore_id = get_datastore_id(module, source_id, resource_pool_id)
                 if not datastore_id:
                     module.fail_json(
                         "Datastore '%s' is not available in the source"
@@ -945,9 +1033,8 @@ def main():
             )
             if module.params.get("vm_folder_name"):
                 vm_folder_name = module.params.get("vm_folder_name")
-                vm_folder_id = get_vmware_object_id(
-                    restore_to_source_objects, vm_folder_name, "kFolder"
-                )
+                vm_folder_id = get_vm_folder_id(
+                    module, source_id, resource_pool_id)
                 if not vm_folder_id:
                     module.fail_json(
                         msg="Failed to find folder with name '%s'" % vm_folder_name,
