@@ -653,6 +653,7 @@ def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
         raise__cohesity_exception__handler(error, module)
 
 
+>>>>>>> ea2a31b (Updated user-agent versions)
 def get_view_storage_domain_id(module, self):
     """
     function to get view's storage domain id.
