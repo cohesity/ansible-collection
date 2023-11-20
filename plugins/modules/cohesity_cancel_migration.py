@@ -64,7 +64,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Cancel the VM migration
-version_added: 1.1.4
+version_added: 1.1.5
 """
 
 EXAMPLES = """
@@ -129,7 +129,7 @@ def check__protection_restore__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.4",
+            "user-agent": "cohesity-ansible/v1.1.5",
         }
         response = open_url(
             url=uri,
@@ -176,7 +176,7 @@ def cancel_migration(module, task_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.4",
+            "user-agent": "cohesity-ansible/v1.1.5",
         }
         response = open_url(
             url=uri,

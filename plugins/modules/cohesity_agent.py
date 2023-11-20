@@ -305,7 +305,7 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.4",
+                "user-agent": "cohesity-ansible/v1.1.5",
             }
         elif not module.params.get("download_uri"):
             os_type = "Linux"
@@ -334,13 +334,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.4",
+                "user-agent": "cohesity-ansible/v1.1.5",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.1.4",
+                "user-agent": "cohesity-ansible/v1.1.5",
             }
 
         agent = open_url(
@@ -612,7 +612,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.4",
+            "user-agent": "cohesity-ansible/v1.1.5",
         }
         response = open_url(
             url=uri,
@@ -664,7 +664,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.4",
+                "user-agent": "cohesity-ansible/v1.1.5",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(
