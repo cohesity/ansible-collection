@@ -15,7 +15,7 @@ module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: 1.0.11
+version_added: 1.1.4
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -130,6 +130,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__cluster,
         get__nodes,
+        get_cohesity_client,
         get__prot_source__all,
         get__prot_policy__all,
         get__prot_job__all,
@@ -159,6 +160,8 @@ def main():
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(changed=False, cluster="")
     params = dict(
         server=module.params.get("cluster"),

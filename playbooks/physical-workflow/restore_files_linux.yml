@@ -13,7 +13,7 @@
           name: "Ansible File Restore1"
           environment: "PhysicalFiles"
           job_name: "bbbbbbbbb"
-          endpoint: "10.2.192.135"
+          endpoint: "192.168.1.1"
           file_names: 
             - "/home/cohesity/.bashrc"
           wait_for_job: True

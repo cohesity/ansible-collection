@@ -131,7 +131,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
@@ -183,12 +183,12 @@ try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
     from ansible.module_utils.urls import urllib_error
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+        get_cohesity_client,
+    )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         cohesity_common_argument_spec,
         raise__cohesity_exception__handler,
-    )
-    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get_cohesity_client,
     )
 except Exception:
     pass
@@ -417,7 +417,6 @@ def stop_job(module, _id):
             msg="The Protection Job for this host is active and cannot be stopped",
         )
     try:
-
         output = dict(
             id=_id, cancel_active=module.params.get("cancel_active"), jobRunIds=list()
         )
@@ -528,7 +527,7 @@ def main():
         check__mandatory__params(module)
         body = ProtectionJobRequestBody()
         body.name = module.params.get("name")
-        body.parent_source_id = source_id
+        body.parent_source_id = parent_id
         body.source_ids = [source_id]
         body.view_box_id = get__storage_domain_id__by_name(module)
         body.environment = module.params.get("environment")
@@ -604,6 +603,7 @@ def main():
                 minute=int(start_time[2] + start_time[3]),
             )
         try:
+            body.qos_type = "kBackupAll"
             if job_exists:
                 response = cohesity_client.protection_jobs.update_protection_job(
                     body, job_exists

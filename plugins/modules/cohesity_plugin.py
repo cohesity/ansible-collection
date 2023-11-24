@@ -92,7 +92,7 @@ options:
       - "Determines whether to upgrade the connector plugin if already installed."
     type: bool
 short_description: "Management of Cohesity Datastore Plugin"
-version_added: "1.0.11"
+version_added: "1.1.4"
 """
 
 EXAMPLES = """
@@ -124,6 +124,9 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_util
     cohesity_common_argument_spec,
     raise__cohesity_exception__handler,
     REQUEST_TIMEOUT,
+)
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+    get_cohesity_client,
 )
 
 
@@ -202,7 +205,7 @@ def download_datastore_plugin(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.11",
+            "user-plugin": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -249,7 +252,7 @@ def update_global_allow_lists(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.0.11",
+            "user-plugin": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -368,6 +371,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to install datastore plugin on the datastore server",

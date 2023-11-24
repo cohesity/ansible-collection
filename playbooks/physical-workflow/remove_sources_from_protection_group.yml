@@ -1,0 +1,22 @@
+# => Delete one or more sources from a Physical protection job.
+# => Applicable only when job is already available, enabling delete_sources
+# => to true will remove the list of sources from the job.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Delete sources from Physical Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "present"
+        name: "PhysicalJob"
+        environment: "PhysicalFiles"
+        sources:
+          - endpoint: "{{ item }}"
+        delete_sources: true
+      with_items: "{{ groups['linux'] }}"

@@ -21,7 +21,7 @@
         vm_folder_name: "cohesity_folder"
         wait_for_job: true
         state: "present"
-        # restore_to_source: "myvmware.host.com"
+        restore_to_source: true
         resource_pool_name: "cohesity-resource_pool"
         datastore_name: "cohesity_datastore"
         network_connected: false

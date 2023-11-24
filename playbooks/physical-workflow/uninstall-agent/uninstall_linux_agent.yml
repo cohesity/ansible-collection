@@ -15,7 +15,7 @@
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: "Cohesity agent: Set Agent to state of absent }}"
+    - name: "Cohesity agent: Set Agent to state of absent"
       cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

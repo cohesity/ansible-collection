@@ -135,18 +135,17 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
 # Restore Oracle database.
 - name: Restore Oracle database.
-  cohesity_oracle:
+  cohesity_oracle_restore:
     source_db: cdb1
     task_name: recover_tasks
-    view_name: xyz
-    source_server: "10.2.103.113"
-    target_server: "10.2.103.113"
+    source_server: "192.168.1.1"
+    target_server: "192.168.1.1"
     target_db: cdb2
     oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
     oracle_base: /u01/app/oracle
@@ -169,6 +168,7 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
+        get__prot_source_id__by_endpoint,
         get_cohesity_client,
     )
 except Exception:
@@ -228,6 +228,7 @@ def create_recover_job(module, token, database_info):
     target_db = module.params.get("target_db")
     target_server = module.params.get("target_server")
     oracle_restore_params = dict(captureTailLogs=False)
+    restore_params = dict()
 
     if clone_app_view:
         action = "kCloneAppView"
@@ -235,6 +236,15 @@ def create_recover_job(module, token, database_info):
         oracle_restore_params["oracleCloneAppViewParamsVec"] = [dict()]
 
     elif source_server != target_server or source_db != target_db:
+        module_params = dict(
+            token=token, environment="Physical", endpoint=target_server
+        )
+        target_source_id = get__prot_source_id__by_endpoint(module, module_params)
+        if not target_source_id:
+            error_msg = "Failed to find target server '%s'" % target_server
+            if module.check_mode:
+                module.exit_json(msg="Check Mode " + error_msg)
+            module.fail_json(msg=error_msg)
         alternate_location_params = dict(
             newDatabaseName=module.params.get("target_db"),
             homeDir=module.params.get("oracle_home"),
@@ -242,10 +252,12 @@ def create_recover_job(module, token, database_info):
             oracleDBConfig=oracle_db_config,
             databaseFileDestination=module.params.get("oracle_home"),
         )
+        restore_params["targetHost"] = dict(id=target_source_id)
         oracle_restore_params["alternateLocationParams"] = alternate_location_params
+    restore_params["oracleRestoreParams"] = oracle_restore_params
     restore_obj_vec = dict(
         appEntity=database_info["vmDocument"]["objectId"]["entity"],
-        restoreParams=dict(oracleRestoreParams=oracle_restore_params),
+        restoreParams=restore_params,
     )
     owner_restore_info = dict(
         ownerObject=owner_object,
@@ -385,6 +397,7 @@ def main():
     token = get__cohesity_auth__token(module)
     database_info = search_for_database(token, module)
     resp = create_recover_job(module, token, database_info)
+
     # Check for restore task status.
     task_id = resp["restoreTask"]["performRestoreTaskState"]["base"]["taskId"]
     status = check_for_status(module, task_id)

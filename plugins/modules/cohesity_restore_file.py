@@ -15,7 +15,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.0.11
+version_added: 1.1.4
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -202,6 +202,7 @@ try:
         get__protection_jobs__by_environment,
         get__file_snapshot_information__by_filename,
         get__restore_job__by_type,
+        get_cohesity_client,
     )
 except ImportError:
     pass
@@ -229,7 +230,6 @@ def check__protection_restore__exists(module, self):
 # => This method will convert the Windows Based file paths into correctly formatted
 # => versions consumable by Cohesity Restore Jobs.
 def convert__windows_file_name(filename):
-
     # => Raise an exception if the Path format is incorrect
     if "\\" in filename and ":" not in filename:
         msg = "Windows Based files must be in /Drive/path/to/file or Drive:\\path\\to\\file format."
@@ -255,9 +255,8 @@ def convert__windows_file_name(filename):
 # => Remove the Prefix from a File Path.  This is used to remove the Share
 # => or Export path from the restored file information.
 def strip__prefix(prefix, file_path):
-
     if file_path.startswith(prefix):
-        return file_path[len(prefix):]
+        return file_path[len(prefix) :]
     return file_path
 
 
@@ -380,7 +379,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         payload = self.copy()
 
@@ -429,12 +428,11 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
         while attempts < wait_counter:
-
             response = open_url(
                 url=uri,
                 headers=headers,
@@ -514,6 +512,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
@@ -566,7 +566,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if job_exists:
             results = dict(
                 changed=False,
@@ -674,7 +673,6 @@ def main():
                 module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Restore: This feature (absent) has not be implemented yet.",

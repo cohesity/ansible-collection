@@ -14,7 +14,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.0.11
+version_added: 1.1.4
 author: "Naveena (@naveena-maplelabs)"
 
 options:
@@ -265,7 +265,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         payload = self.copy()
 
@@ -353,12 +353,11 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
         while attempts < wait_counter:
-
             response = open_url(
                 url=uri,
                 headers=headers,
@@ -453,7 +452,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "Ansible-v2.3.4"
+    base_controller.global_headers["user-agent"] = "Ansible-v1.1.4"
     cohesity_client = get_cohesity_client(module)
 
     if module.params.get("backup_id"):
@@ -493,7 +492,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if job_exists:
             results = dict(
                 changed=False,
@@ -620,7 +618,6 @@ def main():
                 module.fail_json(**results)
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Restore: This feature (absent) has not be implemented yet.",

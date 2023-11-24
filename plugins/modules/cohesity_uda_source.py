@@ -63,17 +63,22 @@ options:
       - Type of the UDA source to be registered.
     default: Linux
     choices:
-      - Linux
-      - Windows
       - Aix
-      - Solaris
-      - SapHana
-      - SapOracle
       - CockroachDB
+      - DB2
+      - Linux
       - MySQL
-      - VMWareCDPFilter
-      - PostgreSQL
       - Other
+      - PostgreSQL
+      - SapASE
+      - SapHana
+      - SapMaxDB
+      - SapOracle
+      - SapSybase
+      - SapSybaseIQ
+      - Solaris
+      - VMWareCDPFilter
+      - Windows
   cohesity_password:
     aliases:
       - password
@@ -109,6 +114,12 @@ options:
       - "be an URL or hostname or an IP address of the Protection Source"
     required: true
     type: str
+  refresh:
+    default: false
+    description:
+      - "Switch determines whether to refresh the existing source."
+      - "Applicable only when source is already registered."
+    type: bool
   update_source:
     type: bool
     default: False
@@ -117,12 +128,12 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
 # Unegister an existing Cohesity Protection Source on a selected endpoint
-- cohesity_source:
+- cohesity_uda_source:
     server: cohesity.lab
     username: admin
     password: password
@@ -150,6 +161,8 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__prot_source__all,
+        get_cohesity_client,
+        refresh_protection_source,
         unregister_source,
     )
     from ansible_collections.cohesity.dataprotect.plugins.modules.cohesity_source import (
@@ -205,7 +218,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         payload = dict(
             environment="kUDA",
@@ -280,17 +293,22 @@ def main():
             source_type=dict(
                 type="str",
                 choices=[
-                    "Linux",
-                    "Windows",
                     "Aix",
-                    "Solaris",
-                    "SapHana",
-                    "SapOracle",
                     "CockroachDB",
+                    "DB2",
+                    "Linux",
                     "MySQL",
-                    "VMWareCDPFilter",
-                    "PostgreSQL",
                     "Other",
+                    "PostgreSQL",
+                    "SapASE",
+                    "SapHana",
+                    "SapMaxDB",
+                    "SapOracle",
+                    "SapSybase",
+                    "SapSybaseIQ",
+                    "Solaris",
+                    "VMWareCDPFilter",
+                    "Windows",
                 ],
                 default="Linux",
             ),
@@ -298,6 +316,7 @@ def main():
             endpoint=dict(type="str", required=True),
             hosts=dict(type="list", default=[], elements="str"),
             mount_view=dict(default=False, type="bool"),
+            refresh=dict(default=False, type="bool"),
             scripts_dir=dict(default="/opt/cohesity/postgres/scripts/", type="str"),
             db_username=dict(type="str", default=""),
             db_password=dict(type="str", default="", no_log=True),
@@ -309,6 +328,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage UDA Protection Source",
@@ -353,13 +374,20 @@ def main():
         check__mandatory__params(module)
         results["changed"] = True
 
-        if current_status and not module.params.get("update_source"):
+        if current_status:
             results = dict(
                 changed=False,
                 msg="The Protection Source for this host is already registered",
                 id=current_status,
                 endpoint=module.params.get("endpoint"),
             )
+            if module.params.get("update_source"):
+                results["changed"] = False
+            elif module.params.get("refresh"):
+                refresh_protection_source(module, current_status)
+                results["msg"] = "Successfully refreshed the UDA Source '%s'." % (
+                    module.params.get("endpoint")
+                )
         else:
             prot_sources["sourceId"] = current_status
             response = register_source(module, prot_sources)

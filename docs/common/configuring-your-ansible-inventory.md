@@ -53,11 +53,11 @@ The list below comprises the required settings and values in order to use the De
 # => Workstation Declaration which will also be included in our
 # => Backup
 [workstation]
-control ansible_connection=local ansible_host=10.2.x.x type=Linux
+control ansible_connection=local ansible_host=192.168.1.1 type=Linux
 
 [centos]
-centos6 ansible_host=10.2.x.x
-centos7 ansible_host=10.2.x.x
+centos6 ansible_host=192.168.1.1
+centos7 ansible_host=192.168.1.2
 
 # => Default variables for all CentOS environments
 [centos:vars]
@@ -72,8 +72,8 @@ workstation
 
 # Physical Windows Servers
 [windows]
-windows12 ansible_host=10.2.x.x
-windows16 ansible_host=10.2.x.x
+windows12 ansible_host=192.168.1.1
+windows16 ansible_host=192.168.1.2
 
 # => Windows Variables to leverage for each Windows Server.
 [windows:vars]
@@ -94,7 +94,7 @@ windows
 
 # => Declare the VMware environments to manage.
 [vmware]
-vcenter01 ansible_host=10.2.x.x
+vcenter01 ansible_host=192.168.1.1
 
 [vmware:vars]
 type=VMware
@@ -104,9 +104,9 @@ source_password=password
 
 # => Declare the GenericNas endpoints to manage
 [generic_nas]
-export_path endpoint="10.2.x.x:/export_path" nas_protocol=NFS
-nas_share endpoint="\\\\10.2.x.x\\nas_share"
-data endpoint="\\\\10.2.x.x\\data"
+export_path endpoint="192.168.1.1:/export_path" nas_protocol=NFS
+nas_share endpoint="\\\\192.168.1.1\\nas_share"
+data endpoint="\\\\192.168.1.1\\data"
 
 # => Default variables for GenericNas endpoints.
 [generic_nas:vars]

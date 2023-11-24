@@ -149,6 +149,12 @@ options:
     description:
       - "Switch determines whether to update the existing source."
     type: bool
+  refresh:
+    default: false
+    description:
+      - "Switch determines whether to refresh the existing source."
+      - "Applicable only when source is already registered."
+    type: bool
   validate_certs:
     aliases:
       - cohesity_validate_certs
@@ -181,7 +187,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
@@ -270,6 +276,7 @@ try:
         get__prot_source__all,
         check_source_reachability,
         unregister_source,
+        get_cohesity_client,
     )
 except Exception:
     pass
@@ -357,6 +364,46 @@ def get__protection_source_registration__status(module, self):
         raise__cohesity_exception__handler(error, module)
 
 
+def refresh_source(module, self):
+    """
+    Function to register Sql Source.
+    """
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    try:
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+            "user-agent": "cohesity-ansible/v1.1.4",
+        }
+        uri = (
+            "https://"
+            + server
+            + "/irisservices/api/v1/public/protectionSources/refresh/"
+            + str(self["sourceId"])
+        )
+        open_url(
+            url=uri,
+            headers=headers,
+            method="POST",
+            validate_certs=validate_certs,
+            timeout=module.params.get("timeout"),
+        )
+        results = dict(
+            changed=False,
+            msg="Successfully refreshed the Protection Source '%s'." % self["endpoint"],
+            id=self["sourceId"],
+            endpoint=module.params.get("endpoint"),
+        )
+        module.exit_json(**results)
+    except urllib_error.URLError as e:
+        # => Capture and report any error messages.
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def register_sql_source(module, self):
     """
     Function to register Sql Source.
@@ -373,7 +420,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         sql_payload = dict(
             applications=["kSQL"],
@@ -421,7 +468,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.0.11",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]
@@ -514,6 +561,7 @@ def main():
             nas_username=dict(type="str", default=""),
             nas_password=dict(type="str", no_log=True, default=""),
             nas_type=dict(type="str", default="Host"),
+            refresh=dict(type="bool", default=False),
             skip_validation=dict(type="bool", default=False),
             timeout=dict(type="int", default=120),
             update_source=dict(type="bool", default=False),
@@ -522,13 +570,14 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
         state=module.params.get("state"),
     )
 
-    # try:
     prot_sources = dict(
         token=get__cohesity_auth__token(module),
         endpoint=module.params.get("endpoint"),
@@ -631,13 +680,17 @@ def main():
         results["changed"] = True
         results["source_vars"] = prot_sources
 
-        if current_status and not module.params.get("update_source"):
-            results = dict(
-                changed=False,
-                msg="The Protection Source for this host is already registered",
-                id=current_status,
-                endpoint=module.params.get("endpoint"),
-            )
+        if current_status:
+            if module.params.get("update_source"):
+                results = dict(
+                    changed=False,
+                    msg="The Protection Source for this host is already registered",
+                    id=current_status,
+                    endpoint=module.params.get("endpoint"),
+                )
+            elif module.params.get("refresh"):
+                prot_sources["sourceId"] = current_status
+                refresh_source(module, prot_sources)
         else:
             prot_sources["sourceId"] = current_status
             if not is_sql or not is_physical_source:

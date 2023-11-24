@@ -5,7 +5,7 @@
   collections:
     - cohesity.dataprotect
   tasks:
-    - name: "Cohesity Protection Source: Set Source to state of present }}"
+    - name: "Cohesity Protection Source: Set Source to state of present"
       cohesity_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

@@ -45,6 +45,16 @@ options:
       - Password belonging to the selected Username.  This parameter will not be
         logged.
     type: str
+  cluster_compute_resource:
+    description:
+      - If the cluster compute resource is specified, VM will be recovered to resource pool
+        under the specified compute resource.
+    type: str
+  datacenter:
+    description:
+      - If multiple datastore exists, datacenter and cluster resource details
+        are used to uniquely identify the resourcepool.
+    type: str
   datastore_name:
     description:
       - Specifies the datastore where the files should be recovered to. This
@@ -92,7 +102,7 @@ options:
     description:
       - Descriptor to assign to the Recovery Job.  The Recovery Job name will
         consist of the name_date_time format.
-    required: true
+    required: false
     type: str
   network_name:
     description:
@@ -109,11 +119,19 @@ options:
       - Specifies a prefix to prepended to the source object name to derive a
         new name for the recovered object.
     type: str
+  preserve_mac_address:
+    default: false
+    description:
+      - Specifies whether to preserve the MAC address of the migrated VM.
+    type: bool
   recovery_process_type:
     default: CopyRecovery
     description:
       - Specifies the recovery type.
     type: str
+    choices:
+      - "CopyRecovery"
+      - "InstantRecovery"
   resource_pool_name:
     description:
       - Specifies the resource pool name where the migrated objects are attached.
@@ -142,13 +160,12 @@ options:
     description:
       - Key value pair with job names as key and list of Virtual Machines to
         migrate
-    elements: list
     required: true
     type: dict
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
@@ -219,6 +236,7 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
         get_cohesity_client,
+        get_resource_pool_id,
     )
 except ImportError:
     pass
@@ -261,7 +279,7 @@ def get_source_details(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -361,7 +379,7 @@ def get_resource_pool_id(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -518,7 +536,7 @@ def get_backup_job_run_id(module, job_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -558,7 +576,7 @@ def get_backup_job_ids(module, job_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -602,7 +620,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
 
         response = open_url(
@@ -664,7 +682,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         payload = self.copy()
 
@@ -706,7 +724,7 @@ def create_migration_task(module, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         # module.fail_json(msg=body)
         response = open_url(
@@ -796,7 +814,7 @@ def get_protection_groups(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         response = open_url(
             url=uri,
@@ -824,7 +842,7 @@ def main():
     argument_spec = cohesity_common_argument_spec()
     argument_spec.update(
         dict(
-            name=dict(type="str", required=True),
+            name=dict(type="str", required=False),
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             environment=dict(choices=["VMware"], default="VMware"),
@@ -832,8 +850,8 @@ def main():
             datastore_name=dict(type="str", required=True),
             interface_group_name=dict(type="str"),
             network_name=dict(type="str"),
-            cluster_compute_resource=dict(type="str", default=None),
-            datacenter=dict(type="str", default=None),
+            cluster_compute_resource=dict(type="str"),
+            datacenter=dict(type="str"),
             power_state=dict(type="bool", default=True),
             preserve_mac_address=dict(type="bool", default=False),
             enable_network=dict(type="bool", default=True),
@@ -852,6 +870,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
@@ -868,7 +888,6 @@ def main():
     job_exists = check__protection_restore__exists(module, job_details)
     source_details = get_source_details(module)
     source_id = source_details["id"] if source_details else None
-    cohesity_client = get_cohesity_client(module)
     if not source_id:
         msg = "Check Mode: " if module.check_mode else ""
         module.fail_json(
@@ -898,7 +917,8 @@ def main():
                 check_mode_results["id"] = job_exists
                 restore_to_source_objects = get_vmware_source_objects(module, source_id)
                 if module.params.get("resource_pool_name"):
-                    resource_pool_id = get_resource_pool_id(module, source_id)
+                    job_details["sourceId"] = source_id
+                    resource_pool_id = get_resource_pool_id(module, job_details)
                     if not resource_pool_id:
                         error_list += (
                             "Failed to find Resource Pool '%s'"
@@ -909,7 +929,10 @@ def main():
                         if datacenter or cluster_resource:
                             error_list += " associated with "
                             error_list += (
-                                "datacenter '%s', " % datacenter if datacenter else ""
+                                "datacenter '%s'" % datacenter if datacenter else ""
+                            )
+                            error_list += (
+                                ", " if datacenter and cluster_resource else ""
                             )
                             error_list += (
                                 "cluster_compute_resource '%s'." % cluster_resource
@@ -981,9 +1004,8 @@ def main():
         else:
             environment = "k" + module.params.get("environment")
             response = []
-            task_name = (
-                "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
-            )
+            t_name = "Migrate_VM" + "_" + datetime.now().strftime("%b_%d_%Y_%I_%M_%p")
+            task_name = job_details["name"] or t_name
 
             if environment != "kVMware":
                 # => This error should never happen based on the set assigned to the parameter.
@@ -1005,7 +1027,8 @@ def main():
             if errors:
                 module.fail_json(errors)
             if module.params.get("resource_pool_name"):
-                resource_pool_id = get_resource_pool_id(module, source_id)
+                job_details["sourceId"] = source_id
+                resource_pool_id = get_resource_pool_id(module, job_details)
                 if not resource_pool_id:
                     error_list = (
                         "Failed to find Resource Pool '%s'"
@@ -1129,7 +1152,6 @@ def main():
             )
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",

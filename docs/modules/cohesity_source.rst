@@ -146,6 +146,12 @@ Parameters
     Switch determines whether to update the existing source.
 
 
+  refresh (optional, bool, False)
+    Switch determines whether to refresh the existing source.
+
+    Applicable only when source is already registered.
+
+
   validate_certs (optional, bool, True)
     Switch determines if SSL Validation should be enabled.
 

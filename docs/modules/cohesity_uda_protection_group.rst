@@ -32,6 +32,24 @@ The below requirements are needed on the host that executes this module.
 Parameters
 ----------
 
+  alerting_policy (optional, str, Success)
+    Specifies a policy for alerting users of the status of a Protection Group.
+
+    Default value is Success
+
+
+  alert_targets (optional, list, None)
+    Specifies list of alert target objects to receive an alert
+
+    For every object, User need to specify email address, language and recepient type.
+
+    email_address - Specifies an email address to receive an alert
+
+    language - Specifies the language of the delivery target. Default value is 'en-us'. choices - en-us, ja-jp, zh-cn
+
+    recipient_type - Specifies the recipient type of email recipient. Default value is 'kTo'. choices - To, Cc
+
+
   cancel_active (optional, bool, False)
     Specifies if Current Running Backup Group should be canceled.  If False, active groups will not be stopped
 
@@ -170,7 +188,12 @@ Examples
         endpoint: cohesity-source-ip
         protection_policy: Bronze
         storage_domain: Default
-
+        alerting_policy: Failure
+        alert_targets:
+          - email_address: test@cohesity.com
+            language: ja-jp
+            recipient_type: Cc
+          - email_address: demo@cohesity.com
 
 
 

@@ -66,7 +66,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Sync objects available in the VM migration task
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 EXAMPLES = """
@@ -154,7 +154,7 @@ def sync_objects(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v2.3.4",
+            "user-agent": "cohesity-ansible/v1.1.4",
         }
         body = {
             "restoreTaskId": self["task_id"],
@@ -191,6 +191,8 @@ def main():
 
     # => Create a new module object
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    global cohesity_client
+    cohesity_client = get_cohesity_client(module)
     results = dict(
         changed=False,
         msg="Attempting to finalize migration",
@@ -249,7 +251,6 @@ def main():
             )
 
     elif module.params.get("state") == "absent":
-
         results = dict(
             changed=False,
             msg="Cohesity Migrate: This feature (absent) has not be implemented yet.",

@@ -72,6 +72,14 @@ Parameters
     datastore locations in the parent source.
 
 
+  cluster_compute_resource (optional, str, None)
+    If the cluster compute resource is specified, VM will be recovered to resource pool under the specified compute resource.
+
+
+  datacenter (optional, str, None)
+    If multiple datastore exists, datacenter and cluster resource details are used to uniquely identify the resourcepool.
+
+
   datastore_name (optional, str, None)
     Specifies the datastore where the files should be recovered to. This field is required to recover objects to
 
@@ -83,7 +91,7 @@ Parameters
   endpoint (True, str, None)
     Specifies the network endpoint of the Protection Source where it is reachable. It could
 
-    be an URL or hostname or an IP address of the Protection Source or a NAS Share/Export Path.
+    be an URL or hostname or an IP address of the VMware Protection Source.
 
 
   environment (False, str, VMware)

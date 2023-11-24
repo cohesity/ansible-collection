@@ -50,6 +50,14 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
+  cluster_compute_resource (optional, str, None)
+    If the cluster compute resource is specified, VM will be recovered to resource pool under the specified compute resource.
+
+
+  datacenter (optional, str, None)
+    If multiple datastore exists, datacenter and cluster resource details are used to uniquely identify the resourcepool.
+
+
   datastore_name (True, str, None)
     Specifies the datastore where the files should be recovered to. This field is required to recover objects to
 
@@ -82,7 +90,7 @@ Parameters
     Specifies the interface name to connect after restoring the VM.
 
 
-  name (True, str, None)
+  name (False, str, None)
     Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the name_date_time format.
 
 
@@ -96,6 +104,10 @@ Parameters
 
   prefix (optional, str, None)
     Specifies a prefix to prepended to the source object name to derive a new name for the recovered object.
+
+
+  preserve_mac_address (optional, bool, False)
+    Specifies whether to preserve the MAC address of the migrated VM.
 
 
   recovery_process_type (optional, str, CopyRecovery)

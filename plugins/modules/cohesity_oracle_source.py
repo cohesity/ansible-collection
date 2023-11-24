@@ -53,16 +53,22 @@ options:
     description:
       - "Enabling this option will force the registration of the Cohesity Protection Source."
     type: bool
+  refresh:
+    default: false
+    description:
+      - "Switch determines whether to refresh the existing source."
+      - "Applicable only when source is already registered."
+    type: bool
   db_password:
     description:
       - "Specifies the password to access the target source database."
       - "This parameter will not be logged."
-      - "Required when I(state=present)"
+      - "Applicable only when state is set to present."
     type: str
   db_username:
     description:
       - "Specifies username to access the target source database."
-      - "Required when I(state=present)"
+      - "Applicable only when state is set to present."
     type: str
   state:
     choices:
@@ -76,7 +82,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.0.11
+version_added: 1.1.4
 """
 
 
@@ -122,6 +128,7 @@ try:
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
+        refresh_protection_source,
         check_source_reachability,
     )
 except Exception:
@@ -245,6 +252,7 @@ def main():
             state=dict(choices=["present", "absent"], default="present"),
             endpoint=dict(type="str", required=True),
             force_register=dict(default=False, type="bool"),
+            refresh=dict(default=False, type="bool"),
             db_username=dict(default="", type="str"),
             db_password=dict(default="", type="str", no_log=True),
         )
@@ -312,7 +320,6 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
-
         if current_status:
             prot_sources = dict(
                 token=get__cohesity_auth__token(module),
@@ -336,9 +343,16 @@ def main():
                     )
 
             else:
+                msg = "The Protection Source for this host is already registered"
+                if module.params.get("refresh"):
+                    refresh_protection_source(module, current_status)
+                    msg = "Successfully refreshed the Oracle Source '%s'." % (
+                        module.params.get("endpoint")
+                    )
+
                 results = dict(
                     changed=False,
-                    msg="The Protection Source for this host is already registered",
+                    msg=msg,
                     id=current_status,
                     endpoint=module.params.get("endpoint"),
                 )
