@@ -15,7 +15,7 @@ module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: 1.1.5
+version_added: 1.1.6
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
