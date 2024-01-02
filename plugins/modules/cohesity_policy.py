@@ -457,6 +457,81 @@ def create_policy(module):
         raise__cohesity_exception__handler(error, module)
 
 
+
+def update_policy(module, policy):
+    """
+    Function to update a protection policy.
+    :param module: object that holds parameters passed to the module
+    :param policy: existing policy object.
+    :return:
+    """
+    try:
+        policy = ProtectionPolicyRequest()
+        policy.name = module.params.get("name")
+        policy.description = module.params.get("description")
+        policy.days_to_keep = module.params.get("days_to_retain")
+        policy.retries = module.params.get("retries")
+        policy.retry_interval_mins = module.params.get("retry_interval")
+        if module.params.get("blackout_window"):
+            policy.blackout_periods = blackout_window(module)
+
+        if module.params.get("incremental_backup_schedule"):
+            policy.incremental_scheduling_policy = policy_schedule(
+                module, module.params.get("incremental_backup_schedule")
+            )
+
+        if module.params.get("full_backup_schedule"):
+            policy.full_scheduling_policy = policy_schedule(
+                module, module.params.get("full_backup_schedule")
+            )
+
+        if module.params.get("log_backup_schedule"):
+            policy.log_scheduling_policy = policy_schedule(
+                module, module.params.get("log_backup_schedule")
+            )
+            policy.days_to_keep_log = module.params.get(
+                "log_backup_schedule"
+            ).get("days_to_retain", module.params.get("days_to_retain"))
+
+        if module.params.get("bmr_backup_schedule"):
+            policy.system_scheduling_policy = policy_schedule(
+                module, module.params.get("bmr_backup_schedule")
+            )
+            policy.days_to_keep_system = module.params.get(
+                "bmr_backup_schedule"
+            ).get("days_to_retain", module.params.get("days_to_retain"))
+
+        if module.params.get("extended_retention"):
+            policy.extended_retention_policies = extended_retention(module)
+
+        if module.params.get("replication_copy"):
+            policy.snapshot_replication_copy_policies = (
+                replication_copy_policies(module)
+            )
+        if module.params.get("archival_copy"):
+            policy.snapshot_archival_copy_policies = archival_copy_policies(
+                module
+            )
+
+        policy_response = cohesity_client.protection_policies.update_protection_policy(
+            policy, policy.id
+        )
+
+        result = dict(
+            changed=True,
+            msg="Cohesity protection policy is updated successfully",
+            id=policy_response.id,
+            task_name=module.params.get("name"),
+        )
+        module.exit_json(**result)
+    except APIException as ex:
+        raise__cohesity_exception__handler(
+            str(json.loads(ex.context.response.raw_body)), module
+        )
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def delete_policy(module, policy_id):
     """
     function to delete the protection policy
@@ -569,6 +644,7 @@ def main():
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
+        update_policy = update_policy(module, policy_details)
         if policy_exists:
             results = dict(
                 changed=False,

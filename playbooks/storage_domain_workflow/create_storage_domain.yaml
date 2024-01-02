@@ -1,0 +1,16 @@
+# Playbook to create storage domain (view-box).
+---
+- hosts: localhost
+  become: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Create view box in the cohesity server.
+      cohesity_storage_domain:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        name: 'Ansible'
+        state: 'present'
+        cluster_partition_id: 3
