@@ -137,6 +137,16 @@ options:
       - Specifies the resource pool name where the migrated objects are attached.
     type: str
     required: true
+  start_time:
+    description:
+      - Restore tasks will be filtered by a start time specified. If not
+        provided the start time is set to the last week.
+    type: str
+  end_time:
+    description:
+      - Restore tasks will be filtered by a start time specified. If not
+        provided the end time is the current time.
+    type: str
   state:
     choices:
       - present
@@ -255,9 +265,9 @@ def check__protection_restore__exists(module, self):
     if restore_tasks:
         task_list = [task for task in restore_tasks if task["name"] == self["name"]]
         for task in task_list:
-            if task["status"] != "kFinished":
-                return True
-    return False
+            if task["status"] not in ["kFinished", "kCancelled"]:
+                return True, task["status"]
+    return False, None
 
 
 def get_source_details(module):
@@ -856,6 +866,8 @@ def main():
             enable_network=dict(type="bool", default=True),
             detach_network=dict(type="bool", default=False),
             prefix=dict(type="str"),
+            start_time=dict(type="str"),
+            end_time=dict(type="str"),
             resource_pool_name=dict(type="str", required=True),
             recovery_process_type=dict(
                 type="str",
@@ -884,7 +896,7 @@ def main():
     )
     job_details["name"] = module.params.get("name")
 
-    job_exists = check__protection_restore__exists(module, job_details)
+    job_exists, task_status = check__protection_restore__exists(module, job_details)
     source_details = get_source_details(module)
     source_id = source_details["id"] if source_details else None
     if not source_id:
@@ -996,7 +1008,7 @@ def main():
         if job_exists:
             results = dict(
                 changed=False,
-                msg="The Migrate Job for is already registered",
+                msg="The Migrate Job for is already registered, task status %s" % task_status,
                 id=job_exists,
                 name=job_details["name"],
             )
