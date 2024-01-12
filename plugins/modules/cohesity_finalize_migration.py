@@ -65,7 +65,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Finalize the VM migration
-version_added: 1.1.7
+version_added: 1.1.8
 """
 
 EXAMPLES = """
@@ -154,7 +154,7 @@ def finalize_migration(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.7",
+            "user-agent": "cohesity-ansible/v1.1.8",
         }
         body = {
             "restoreTaskId": self["task_id"],
