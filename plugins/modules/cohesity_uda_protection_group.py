@@ -199,7 +199,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Management of Cohesity UDA Protection Groups
-version_added: 1.1.6
+version_added: 1.1.8
 """
 
 EXAMPLES = """
@@ -455,7 +455,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.6",
+            "user-agent": "cohesity-ansible/v1.1.8",
         }
         response = open_url(
             url=uri,

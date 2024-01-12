@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.1.6
+version_added: 1.1.8
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -25,7 +25,7 @@ from Cohesity Platforms.
 import json
 import socket
 import traceback
-
+from datetime import datetime, timedelta
 try:
     from urllib import quote
 except ImportError:
@@ -577,10 +577,23 @@ def get__restore_job__by_type(module, self):
             + "/irisservices/api/v1/public/restore/tasks?taskTypes="
             + self["restore_type"]
         )
+        # Restore tasks will be filtered based on start time and end time if
+        # provided externally.
+        # By default, last one week retore task list will be returned.
+        start_time = module.params.get("start_time")
+        end_time = module.params.get("end_time")
+        today = datetime.now()
+        start_time = datetime.strptime(
+            start_time,"%d/%m/%Y") if start_time else today - timedelta(7)
+        end_time = datetime.strptime(
+            end_time,"%d/%m/%Y") if end_time else today
+        start_time_usecs = int(start_time.timestamp() * 1000 * 1000)
+        end_time_usecs = int(end_time.timestamp() * 1000 * 1000)
+        uri += "&startTimeUsecs=%s&endTimeUsecs=%s" % (
+            start_time_usecs, end_time_usecs)
 
         if "count" in self:
             uri = uri + "&pageCount=" + str(self["count"])
-
         headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
@@ -627,7 +640,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.6",
+            "user-agent": "cohesity-ansible/v1.1.8",
         }
 
         response = open_url(
@@ -701,7 +714,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.1.6",
+            "user-agent": "cohesity-ansible/v1.1.8",
         }
         response = open_url(
             url=uri,
@@ -760,7 +773,7 @@ def get_resource_pool_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.6",
+            "user-agent": "cohesity-ansible/v1.1.8",
         }
         response = open_url(
             url=uri,

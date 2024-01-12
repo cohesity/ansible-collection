@@ -13,7 +13,7 @@ DOCUMENTATION = """
 module_utils: cohesity_utilities
 short_description: The **CohesityUtilities** utils module provides the authentication token manage
 for Cohesity Platforms.
-version_added: 1.1.6
+version_added: 1.1.8
 description:
     - The **CohesityUtilities** utils module provides the authentication token manage
 for Cohesity Platforms.
