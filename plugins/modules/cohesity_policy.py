@@ -103,7 +103,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Cohesity Protection Policy"
-version_added: 1.1.8
+version_added: 1.1.9
 """
 
 EXAMPLES = """
@@ -374,9 +374,12 @@ def archival_copy_policies(module):
             external_target = ArchivalExternalTarget()
             external_target.vault_name = policy.get("target_name")
             external_target.vault_type = "k" + policy.get("target_type")
-            external_target.vault_id = get_external_target_id(
-                module, policy.get("target_name")
-            )
+            vault_id = get_external_target_id(module, policy.get("target_name"))
+            if not vault_id:
+                module.fail_json(
+                    "External target '%s' is not available" % external_target.vault_name
+                )
+            external_target.vault_id = vault_id
             archival_policy.target = external_target
             archival_policies.append(archival_policy)
         return archival_policies
@@ -457,6 +460,75 @@ def create_policy(module):
         raise__cohesity_exception__handler(error, module)
 
 
+def update_policy(module, policy):
+    """
+    Function to update a protection policy.
+    :param module: object that holds parameters passed to the module
+    :param policy: existing policy object.
+    :return:
+    """
+    try:
+        policy.name = module.params.get("name")
+        policy.description = module.params.get("description")
+        policy.days_to_keep = module.params.get("days_to_retain")
+        policy.retries = module.params.get("retries")
+        policy.retry_interval_mins = module.params.get("retry_interval")
+        if module.params.get("blackout_window"):
+            policy.blackout_periods = blackout_window(module)
+
+        if module.params.get("incremental_backup_schedule"):
+            policy.incremental_scheduling_policy = policy_schedule(
+                module, module.params.get("incremental_backup_schedule")
+            )
+
+        if module.params.get("full_backup_schedule"):
+            policy.full_scheduling_policy = policy_schedule(
+                module, module.params.get("full_backup_schedule")
+            )
+
+        if module.params.get("log_backup_schedule"):
+            policy.log_scheduling_policy = policy_schedule(
+                module, module.params.get("log_backup_schedule")
+            )
+            policy.days_to_keep_log = module.params.get("log_backup_schedule").get(
+                "days_to_retain", module.params.get("days_to_retain")
+            )
+
+        if module.params.get("bmr_backup_schedule"):
+            policy.system_scheduling_policy = policy_schedule(
+                module, module.params.get("bmr_backup_schedule")
+            )
+            policy.days_to_keep_system = module.params.get("bmr_backup_schedule").get(
+                "days_to_retain", module.params.get("days_to_retain")
+            )
+
+        if module.params.get("extended_retention"):
+            policy.extended_retention_policies = extended_retention(module)
+
+        if module.params.get("replication_copy"):
+            policy.snapshot_replication_copy_policies = replication_copy_policies(
+                module
+            )
+        if module.params.get("archival_copy"):
+            policy.snapshot_archival_copy_policies = archival_copy_policies(module)
+        policy_response = cohesity_client.protection_policies.update_protection_policy(
+            policy, policy.id
+        )
+        result = dict(
+            changed=True,
+            msg="Cohesity protection policy is updated successfully",
+            id=policy_response.id,
+            task_name=module.params.get("name"),
+        )
+        module.exit_json(**result)
+    except APIException as ex:
+        raise__cohesity_exception__handler(
+            str(json.loads(ex.context.response.raw_body)), module
+        )
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+
+
 def delete_policy(module, policy_id):
     """
     function to delete the protection policy
@@ -506,7 +578,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.8"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.9"
     cohesity_client = get_cohesity_client(module)
     policy_exists, policy_details = get_policy_details(module)
 
@@ -518,19 +590,16 @@ def main():
         )
         if module.params.get("state") == "present":
             if policy_exists:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Cohesity protection policy is already present. No changes"
+                check_mode_results["msg"] = (
+                    "Check Mode: Cohesity protection policy is already present. No changes"
+                )
                 check_mode_results["id"] = policy_details.id
             else:
-                check_mode_results["msg"] = (
+                check_mode_results["msg"] = ""
+                message = (
                     "Check Mode: Cohesity protection policy doesn't exist."
-                    " This action would create a protection policy"
+                    " This action would create a protection policy."
                 )
-                if module.params.get("extended_retention"):
-                    remote_clusters = (
-                        cohesity_client.remote_cluster.get_remote_clusters()
-                    )
 
                 if module.params.get("archival_copy"):
                     unavailable_targets = []
@@ -545,14 +614,17 @@ def main():
                 if module.params.get("replication_copy"):
                     unavailable_remote_clusters = []
                     for cluster in module.params.get("replication_copy"):
-                        if not get_remote_cluster_id(target["cluster_name"]):
-                            unavailable_remote_clusters.append(target["cluster_name"])
+                        if not get_remote_cluster_id(module, cluster["cluster_name"]):
+                            unavailable_remote_clusters.append(cluster["cluster_name"])
                     if unavailable_remote_clusters:
                         check_mode_results["msg"] += (
                             "Following list of remote clusters "
                             "are not available, '%s'"
                             % ", ".join(unavailable_remote_clusters)
                         )
+                # If there aren't any errors, display the default message.
+                if not check_mode_results["msg"]:
+                    check_mode_results["msg"] = message
                 check_mode_results["changed"] = True
         else:
             if policy_exists:
@@ -563,19 +635,14 @@ def main():
                 check_mode_results["id"] = policy_details.id
                 check_mode_results["changed"] = True
             else:
-                check_mode_results[
-                    "msg"
-                ] = "Check Mode: Cohesity protection policy doesn't exist. No changes."
+                check_mode_results["msg"] = (
+                    "Check Mode: Cohesity protection policy doesn't exist. No changes."
+                )
         module.exit_json(**check_mode_results)
 
     elif module.params.get("state") == "present":
         if policy_exists:
-            results = dict(
-                changed=False,
-                msg="The Cohesity protection policy with specified name is already present",
-                id=policy_details.id,
-                policy_name=module.params.get("name"),
-            )
+            update_policy(module, policy_details)
         else:
             create_policy(module)
 

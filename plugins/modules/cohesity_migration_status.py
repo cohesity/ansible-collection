@@ -61,7 +61,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Check Sync status of objects available in the VM migration task
-version_added: 1.1.8
+version_added: 1.1.9
 """
 
 EXAMPLES = """
@@ -148,7 +148,7 @@ def get_migration_status(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.8",
+            "user-agent": "cohesity-ansible/v1.1.9",
         }
         response = open_url(
             url=uri,
@@ -180,7 +180,7 @@ def get_task_status(module, task_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.8",
+            "user-agent": "cohesity-ansible/v1.1.9",
         }
         response = open_url(
             url=uri,
