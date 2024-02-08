@@ -44,7 +44,7 @@ options:
   ad_domain_name:
     description:
       - "Specifies an active directory domain that this storage domain box is mapped to."
-    required: true
+    required: false
     type: str
   cluster_partition_id:
     default: 3
@@ -52,7 +52,6 @@ options:
       - "Specifies the Cluster Partition id where the Storage Domain is located."
     type: int
   cluster_partition_name:
-    default: DefaultPartition
     description:
       - "Specifies the Cluster Partition Name where the Storage Domain is located."
     type: str
@@ -200,9 +199,9 @@ def set_storage_policy(module):
             ).get("duplicate", True)
         if module.params.get("storage_policy").get("compression", False):
             storage_policy.compression_policy = module.params.get("storage_policy").get(
-                "duplicate", True
+                "compression", "kCompressionNone"
             )
-        if module.params.get("storage_policy").get("erasure_coding_info", False):
+        if module.params.get("storage_policy").get("erasure_coding", False):
             storage_policy.erasure_coding_info = erasure_coding_params(module)
         return storage_policy
     except Exception as error:
@@ -213,26 +212,46 @@ def erasure_coding_params(module):
     try:
         erasure = ErasureCodingInfo()
         if module.params.get("storage_policy").get("erasure_coding", False):
-            erasure.erasure_coding_enabled = (
+            if (
                 module.params.get("storage_policy")
-                .get("erasure_coding", False)
+                .get("erasure_coding")
                 .get("enabled", False)
-            )
-            erasure.inline_erasure_coding = (
+            ):
+                erasure.erasure_coding_enabled = (
+                    module.params.get("storage_policy")
+                    .get("erasure_coding", False)
+                    .get("enabled", False)
+                )
+            if (
                 module.params.get("storage_policy")
-                .get("erasure_coding", False)
+                .get("erasure_coding")
                 .get("inline_erasure", False)
-            )
-            erasure.num_coded_stripes = (
+            ):
+                erasure.inline_erasure_coding = (
+                    module.params.get("storage_policy")
+                    .get("erasure_coding", False)
+                    .get("inline_erasure", False)
+                )
+            if (
                 module.params.get("storage_policy")
-                .get("erasure_coding", False)
-                .get("inline_erasure", 0)
-            )
-            erasure.num_data_stripes = (
+                .get("erasure_coding")
+                .get("num_coded_stripes", False)
+            ):
+                erasure.num_coded_stripes = (
+                    module.params.get("storage_policy")
+                    .get("erasure_coding", False)
+                    .get("num_coded_stripes", 0)
+                )
+            if (
                 module.params.get("storage_policy")
-                .get("erasure_coding", False)
-                .get("data_stripe", 0)
-            )
+                .get("erasure_coding")
+                .get("data_stripe", False)
+            ):
+                erasure.num_data_stripes = (
+                    module.params.get("storage_policy")
+                    .get("erasure_coding", False)
+                    .get("data_stripe", 0)
+                )
         return erasure
 
     except Exception as error:
@@ -248,8 +267,14 @@ def get_partition_id(module):
     partition_name = module.params.get("cluster_partition_name")
     nodes = cohesity_client.nodes.get_nodes()
     for node in nodes:
-        if node.cluster_partition_name == partition_name:
+        if partition_name and node.cluster_partition_name == partition_name:
             return node.cluster_partition_id
+    if partition_name:
+        module.fail_json(
+            msg="Couldn't find cluster partition %s"
+            % module.params.get("cluster_partition_name")
+        )
+    return node.cluster_partition_id
 
 
 def create_update_domain(module, domain_details=False):
@@ -270,13 +295,7 @@ def create_update_domain(module, domain_details=False):
             storage_domain_details.ldap_provider_id = module.params.get(
                 "ldap_provider_id"
             )
-        if module.params.get("cluster_partition_name"):
-            storage_domain_details.cluster_partition_id = get_partition_id(module)
-            if not storage_domain_details.cluster_partition_id:
-                module.fail_json(
-                    msg="Couldn't find cluster partition %s"
-                    % module.params.get("cluster_partition_name")
-                )
+        storage_domain_details.cluster_partition_id = get_partition_id(module)
         if module.params.get("cluster_partition_id"):
             storage_domain_details.cluster_partition_id = module.params.get(
                 "cluster_partition_id"
@@ -351,11 +370,11 @@ def main():
     argument_spec.update(
         dict(
             id=dict(type="int", default=None),
-            name=dict(type="str", required=True),
+            name=dict(type="str", required=False),
             state=dict(choices=["present", "absent"], default="present"),
             ad_domain_name=dict(type="str", default=""),
             cluster_partition_id=dict(type="int", default=3),
-            cluster_partition_name=dict(type="str", default="DefaultPartition"),
+            cluster_partition_name=dict(type="str"),
             default_view_quota=dict(type="dict", required=False),
             kms_server_id=dict(type="int", default=None),
             ldap_provider_id=dict(type="int", default=None),
@@ -435,7 +454,9 @@ def main():
             module.exit_json(**result)
 
     elif module.params.get("state") == "absent":
-        storage_domain_id = module.params.get("id") or domain_details.id
+        storage_domain_id = module.params.get("id")
+        if domain_details:
+            storage_domain_id = domain_details.id
         if storage_domain_id:
             delete_storage_domain(module, storage_domain_id)
         else:
