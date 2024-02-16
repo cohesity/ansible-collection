@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.1.8
+version_added: 1.1.9
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -187,7 +187,11 @@ def get__prot_source__all(self):
             objects = objects[0]
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__prot_source__roots(self):
@@ -210,7 +214,11 @@ def get__prot_source__roots(self):
         objects = json.loads(objects.read())
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__prot_policy__all(self):
@@ -232,8 +240,12 @@ def get__prot_policy__all(self):
         )
         objects = json.loads(objects.read())
         return objects
-    except urllib_error as error:
-        raise HTTPException(error.read())
+    except urllib_error.URLError as error:
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__prot_job__all(self):
@@ -258,8 +270,12 @@ def get__prot_job__all(self):
                     if not objects_item.get("name").startswith("_DELETED_")
                 ]
         return objects
-    except urllib_error as error:
-        raise HTTPException(error.read())
+    except urllib_error.URLError as error:
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__storage_domain_id__all(self):
@@ -280,7 +296,11 @@ def get__storage_domain_id__all(self):
         objects = json.loads(objects.read())
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__protection_run__all(self):
@@ -316,7 +336,11 @@ def get__protection_run__all(self):
                 ]
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 # => Filtered Queries
@@ -536,7 +560,11 @@ def get__file_snapshot_information__by_filename(module, self):
         # => Returns an array of snapshots that contain that file.
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__vmware_snapshot_information__by_vmname(module, self):
@@ -563,7 +591,11 @@ def get__vmware_snapshot_information__by_vmname(module, self):
         # => Returns an array of snapshots that contain that file.
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__restore_job__by_type(module, self):
@@ -603,7 +635,11 @@ def get__restore_job__by_type(module, self):
         # => Returns an array of snapshots that contain that file.
         return objects
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 def get__restore_task_status__by_id(module, self):
@@ -622,7 +658,11 @@ def get__restore_task_status__by_id(module, self):
             return None
         return objects["recoveries"][0]["status"]
     except urllib_error.URLError as error:
-        raise HTTPException(error.read())
+        try:
+            error = error.read()
+        except Exception as e:
+            pass
+        raise HTTPException(error)
 
 
 # => Unregister an existing Cohesity Protection Source.
@@ -640,7 +680,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.8",
+            "user-agent": "cohesity-ansible/v1.1.9",
         }
 
         response = open_url(
@@ -714,7 +754,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.1.8",
+            "user-agent": "cohesity-ansible/v1.1.9",
         }
         response = open_url(
             url=uri,
@@ -773,7 +813,7 @@ def get_resource_pool_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.8",
+            "user-agent": "cohesity-ansible/v1.1.9",
         }
         response = open_url(
             url=uri,

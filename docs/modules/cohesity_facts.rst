@@ -51,31 +51,31 @@ Parameters
   include_sources (optional, bool, False)
     When True, will return the details about all registered Protection Sources.  This value
 
-    is skipped when the ``state=complete``
+    is skipped when the \ :literal:`state=complete`\ 
 
 
   include_jobs (optional, bool, False)
     When True, will return the details about all registered Protection Jobs.  This value
 
-    is skipped when the ``state=complete``
+    is skipped when the \ :literal:`state=complete`\ 
 
 
   include_runs (optional, bool, False)
     When True, will return the details about all registered Protection Job executions.  This value
 
-    is skipped when the ``state=complete``
+    is skipped when the \ :literal:`state=complete`\ 
 
 
   active_only (optional, bool, False)
     When True, will return only the actively running Protection Job executions.  This value
 
-    will filter the Protection Job executions data if *active_only=yes*
+    will filter the Protection Job executions data if \ :emphasis:`active\_only=yes`\ 
 
 
   include_deleted (optional, bool, False)
     When True, will return all details about all registered Protection data included items marked deleted.  This value
 
-    will filter the Protection Sources, Jobs, and Executions data and return only current information if *include_deleted=no*
+    will filter the Protection Sources, Jobs, and Executions data and return only current information if \ :emphasis:`include\_deleted=no`\ 
 
 
   validate_certs (optional, bool, False)

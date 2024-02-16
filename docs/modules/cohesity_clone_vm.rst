@@ -20,8 +20,8 @@ Requirements
 ------------
 The below requirements are needed on the host that executes this module.
 
-- python >= 3.6
-- cohesity_management_sdk >= 1.6.0
+- python \>= 3.6
+- cohesity\_management\_sdk \>= 1.6.0
 
 
 
@@ -69,7 +69,7 @@ Parameters
 
 
   name (True, str, None)
-    Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the job_name:name format.
+    Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the job\_name:name format.
 
 
   network_connected (optional, bool, True)
@@ -93,7 +93,7 @@ Parameters
 
 
   state (optional, str, present)
-    Determines if the clone vm should be ``present`` or ``absent`` from the cluster
+    Determines if the clone vm should be \ :literal:`present`\  or \ :literal:`absent`\  from the cluster
 
 
   suffix (optional, str, None)

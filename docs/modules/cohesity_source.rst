@@ -24,8 +24,8 @@ Requirements
 ------------
 The below requirements are needed on the host that executes this module.
 
-- python >= 3.6
-- cohesity_management_sdk >= 1.6.0
+- python \>= 3.6
+- cohesity\_management\_sdk \>= 1.6.0
 
 
 
@@ -67,15 +67,15 @@ Parameters
 
 
   host_type (optional, str, Linux)
-    Specifies the optional OS type of the Protection Source (such as ``Windows`` or ``Linux``).
+    Specifies the optional OS type of the Protection Source (such as \ :literal:`Windows`\  or \ :literal:`Linux`\ ).
 
-    ``Linux`` indicates the Linux operating system.
+    \ :literal:`Linux`\  indicates the Linux operating system.
 
-    ``Windows`` indicates the Microsoft Windows operating system.
+    \ :literal:`Windows`\  indicates the Microsoft Windows operating system.
 
-    ``Aix`` indicates the IBM AIX operating system.
+    \ :literal:`Aix`\  indicates the IBM AIX operating system.
 
-    Optional when *state=present* and *environment=Physical*.
+    Optional when \ :emphasis:`state=present`\  and \ :emphasis:`environment=Physical`\ .
 
 
   nas_password (optional, str, None)
@@ -83,15 +83,15 @@ Parameters
 
     This parameter will not be logged.
 
-    Required when *state=present* and *environment=GenericNas* and *nas_protocol=SMB*
+    Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=GenericNas`\  and \ :emphasis:`nas\_protocol=SMB`\ 
 
 
   nas_protocol (optional, str, NFS)
     Specifies the protocol type of connection for the NAS Mountpoint.
 
-    SMB Share paths must be in \\server\share format.
+    SMB Share paths must be in \\\\server\\share format.
 
-    Required when *state=present* and *environment=GenericNas*
+    Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=GenericNas`\ 
 
 
   nas_type (optional, str, Host)
@@ -103,17 +103,17 @@ Parameters
 
     Supported Format is Username or username@domain or Domain/username (will be deprecated in future).
 
-    Required when *state=present* and *environment=GenericNas* and *nas_protocol=SMB*
+    Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=GenericNas`\  and \ :emphasis:`nas\_protocol=SMB`\ 
 
 
   physical_type (optional, str, Host)
-    Specifies the entity type such as ``Host`` if the *environment=Physical*.
+    Specifies the entity type such as \ :literal:`Host`\  if the \ :emphasis:`environment=Physical`\ .
 
-    ``Host`` indicates a single physical server.
+    \ :literal:`Host`\  indicates a single physical server.
 
-    ``WindowsCluster`` indicates a Microsoft Windows cluster.
+    \ :literal:`WindowsCluster`\  indicates a Microsoft Windows cluster.
 
-    Optional when *state=present* and *environment=Physical*.
+    Optional when \ :emphasis:`state=present`\  and \ :emphasis:`environment=Physical`\ .
 
 
   skip_validation (optional, bool, False)
@@ -125,13 +125,13 @@ Parameters
 
     This parameter will not be logged.
 
-    Required when *state=present* and *environment=VMware*
+    Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=VMware`\ 
 
 
   source_username (optional, str, None)
     Specifies username to access the target source.
 
-    Required when *state=present* and *environment=VMware*
+    Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=VMware`\ 
 
 
   state (optional, str, present)
@@ -157,7 +157,7 @@ Parameters
 
 
   vmware_type (optional, str, VCenter)
-    Specifies the entity type such as ``VCenter`` if the environment is ``VMware``.
+    Specifies the entity type such as \ :literal:`VCenter`\  if the environment is \ :literal:`VMware`\ .
 
 
 

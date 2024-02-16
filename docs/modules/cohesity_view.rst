@@ -20,8 +20,8 @@ Requirements
 ------------
 The below requirements are needed on the host that executes this module.
 
-- python >= 3.6
-- cohesity_management_sdk >= 1.6.0
+- python \>= 3.6
+- cohesity\_management\_sdk \>= 1.6.0
 
 
 
@@ -91,7 +91,7 @@ Parameters
 
 
   state (optional, str, present)
-    Determines if the agent should be ``present`` or ``absent`` from the host
+    Determines if the agent should be \ :literal:`present`\  or \ :literal:`absent`\  from the host
 
 
   storage_domain (True, str, None)

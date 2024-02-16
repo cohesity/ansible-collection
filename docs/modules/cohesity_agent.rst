@@ -26,8 +26,8 @@ Requirements
 ------------
 The below requirements are needed on the host that executes this module.
 
-- python >= 3.6
-- cohesity_management_sdk >= 1.6.0
+- python \>= 3.6
+- cohesity\_management\_sdk \>= 1.6.0
 
 
 
@@ -53,7 +53,7 @@ Parameters
 
 
   create_user (False, bool, True)
-    When enabled, will create a new user and group based on the values of *service_user* and *service_group*
+    When enabled, will create a new user and group based on the values of \ :emphasis:`service\_user`\  and \ :emphasis:`service\_group`\ 
 
     This parameter does not apply for native installations.
 
@@ -83,13 +83,13 @@ Parameters
 
 
   operating_system (optional, str, None)
-    ansible_distribution from facts, this value is automatically populated. Not given by module user
+    ansible\_distribution from facts, this value is automatically populated. Not given by module user
 
 
   service_group (optional, str, cohesityagent)
     Group underwhich permissions will be configured for the Cohesity Agent configuration.
 
-    This group must exist unless *create_user=True* is also configured.
+    This group must exist unless \ :emphasis:`create\_user=True`\  is also configured.
 
     This parameter doesn't apply for native installation.
 
@@ -97,13 +97,13 @@ Parameters
   service_user (optional, str, cohesityagent)
     Username underwhich the Cohesity Agent will be installed and run.
 
-    This user must exist unless *create_user=True* is also configured.
+    This user must exist unless \ :emphasis:`create\_user=True`\  is also configured.
 
     This user must be an existing user for native installation.
 
 
   state (optional, str, present)
-    Determines if the agent should be ``present`` or ``absent`` from the host
+    Determines if the agent should be \ :literal:`present`\  or \ :literal:`absent`\  from the host
 
 
   upgrade (False, bool, False)

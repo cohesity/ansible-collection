@@ -14,7 +14,7 @@ module: cohesity_view
 short_description: Management of Cohesity View
 description:
     - Ansible Module to create View.
-version_added: 1.1.8
+version_added: 1.1.9
 author: "Naveena (@naveena-maplelabs)"
 options:
   case_insensitive:
@@ -460,7 +460,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.8"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.9"
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 

@@ -24,8 +24,8 @@ Requirements
 ------------
 The below requirements are needed on the host that executes this module.
 
-- python >= 3.6
-- cohesity_management_sdk >= 1.6.0
+- python \>= 3.6
+- cohesity\_management\_sdk \>= 1.6.0
 
 
 
@@ -91,7 +91,7 @@ Parameters
 
 
   name (False, str, None)
-    Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the name_date_time format.
+    Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the name\_date\_time format.
 
 
   network_name (optional, str, None)
@@ -116,6 +116,14 @@ Parameters
 
   resource_pool_name (True, str, None)
     Specifies the resource pool name where the migrated objects are attached.
+
+
+  start_time (optional, str, None)
+    Restore tasks will be filtered by a start time specified. If not provided the start time is set to the last week.
+
+
+  end_time (optional, str, None)
+    Restore tasks will be filtered by a start time specified. If not provided the end time is the current time.
 
 
   state (optional, str, present)
