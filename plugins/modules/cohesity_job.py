@@ -1264,8 +1264,9 @@ def update_vmware_job(module, job_meta_data, job_details):
 
 def delete_sources(module, job_meta_data, job_details):
     missing_sources = []
-    job_details["environment"] = "Physical"
     try:
+        if module.params.get("environment") == "PhysicalFiles":
+            job_details["environment"] = "Physical"
         for source in module.params.get("protection_sources"):
             job_details["endpoint"] = source["endpoint"]
             source_id = get__prot_source_id__by_endpoint(module, job_details)

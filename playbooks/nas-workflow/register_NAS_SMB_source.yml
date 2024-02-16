@@ -15,7 +15,7 @@
         endpoint: "SMB-Endpoint"
         environment: "GenericNas"
         nas_protocol: "SMB"
-        nas_username: "admin"
+        nas_username: "admin@LOCAL"
         nas_password: "admin"
         skip_validation: "true"
         nas_type: "Host"

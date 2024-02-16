@@ -1,0 +1,21 @@
+# => Remove one or more sources from Generic Nas protection job.
+---
+- hosts: workstation
+  gather_facts: false
+  collections:
+    - cohesity.dataprotect
+  tasks:
+    - name: Removing source(s) from a Generic Nas Protection job.
+      cohesity_job:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        state: "present"
+        name: "SqlJob"
+        environment: "GenericNas"
+        sources:
+        # These two sources will be removed from job SqlJob.
+          - endpoint: "\\\\x.x.x.x\\Test"
+          - endpoint: "x.x.x.x:/Test"
+        delete_sources: true

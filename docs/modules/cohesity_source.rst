@@ -225,7 +225,7 @@ Examples
         endpoint: \\myfileserver.host.lab\data
         environment: GenericNas
         nas_protocol: SMB
-        nas_username: administrator
+        nas_username: DOMAIN/administrator or administrator@DOMAIN
         nas_password: password
         state: present
 

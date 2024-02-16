@@ -33,6 +33,8 @@ collections:
 - python version >= '3.6'
 - cohesity_management_sdk >= 1.6.0
 
+To install the requirements, run **pip install -r [requirement.txt](https://github.com/cohesity/ansible-collection/blob/main/requirements.txt)**
+
 ## Table of contents
 
  - [Getting Started](https://github.com/cohesity/ansible-collection/blob/main/README.md#get-started)
