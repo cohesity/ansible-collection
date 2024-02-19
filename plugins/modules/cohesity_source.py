@@ -238,7 +238,7 @@ EXAMPLES = """
     endpoint: \\\\myfileserver.host.lab\\data
     environment: GenericNas
     nas_protocol: SMB
-    nas_username: administrator
+    nas_username: DOMAIN/administrator or administrator@DOMAIN
     nas_password: password
     state: present
 
@@ -659,10 +659,15 @@ def main():
                 prot_sources["nasMountCredentials"]["nasProtocol"] = "kNfs3"
             elif module.params.get("nas_protocol") == "SMB":
                 prot_sources["nasMountCredentials"]["nasProtocol"] = "kCifs1"
-                if "\\" in ["nas_username"]:
-                    user_details = module.params.get("nas_username").split("\\")
+                nas_username = module.params.get("nas_username")
+                if "/" in nas_username:
+                    user_details = module.params.get("nas_username").split("/")
                     prot_sources["nasMountCredentials"]["username"] = user_details[1]
                     prot_sources["nasMountCredentials"]["domain"] = user_details[0]
+                elif "@" in nas_username:
+                    user_details = nas_username.split("@")
+                    prot_sources["nasMountCredentials"]["domain"] = user_details[1]
+                    prot_sources["nasMountCredentials"]["username"] = user_details[0]
                 else:
                     prot_sources["nasMountCredentials"]["username"] = module.params.get(
                         "nas_username"

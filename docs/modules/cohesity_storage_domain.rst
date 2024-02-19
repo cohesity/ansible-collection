@@ -48,7 +48,7 @@ Parameters
     Password belonging to the selected Username. This parameter will not be logged.
 
 
-  ad_domain_name (True, str, None)
+  ad_domain_name (False, str, None)
     Specifies an active directory domain that this storage domain box is mapped to.
 
 
@@ -56,7 +56,7 @@ Parameters
     Specifies the Cluster Partition id where the Storage Domain is located.
 
 
-  cluster_partition_name (optional, str, DefaultPartition)
+  cluster_partition_name (optional, str, None)
     Specifies the Cluster Partition Name where the Storage Domain is located.
 
 
