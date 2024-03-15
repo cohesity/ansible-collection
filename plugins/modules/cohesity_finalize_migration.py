@@ -88,13 +88,7 @@ RETURN = """"""
 
 
 import json
-import time
 
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
-from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
 

@@ -90,11 +90,6 @@ RETURN = """"""
 
 import json
 
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
-from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
 
@@ -110,8 +105,6 @@ try:
         REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
-        get__protection_jobs__by_environment,
-        get__vmware_snapshot_information__by_vmname,
         get__restore_job__by_type,
         get_cohesity_client,
     )

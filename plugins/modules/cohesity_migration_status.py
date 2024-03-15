@@ -85,10 +85,6 @@ RETURN = """"""
 
 import json
 
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
 from collections import defaultdict
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error

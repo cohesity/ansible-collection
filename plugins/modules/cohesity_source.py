@@ -256,7 +256,6 @@ RETURN = """
 """
 
 import json
-import subprocess
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
@@ -270,7 +269,6 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         cohesity_common_argument_spec,
         raise__cohesity_exception__handler,
-        REQUEST_TIMEOUT,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__prot_source__all,
