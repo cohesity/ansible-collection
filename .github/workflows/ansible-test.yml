@@ -8,9 +8,8 @@ jobs:
     # this Action should follow steps to set up Python build environment
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install cohesity-management-sdk
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        sudo python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then sudo pip install -r requirements.txt; fi
     - name: Perform sanity testing with ansible-test
       uses: ansible-community/ansible-test-gh-action@release/v1
       with:
