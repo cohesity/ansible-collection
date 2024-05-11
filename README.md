@@ -29,7 +29,7 @@ collections:
 ```
 # Requirements
 - ansible version >= 8.0
-- requests >= 2.20
+- requests >= 2.31.0
 - python version >= '3.6'
 - cohesity_management_sdk >= 1.6.0
 
