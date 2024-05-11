@@ -84,7 +84,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Storage Domains"
-version_added: 1.1.9
+version_added: 1.1.10
 """
 
 EXAMPLES = """
@@ -340,7 +340,7 @@ def delete_storage_domain(module, domain_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         open_url(
             url=uri,
@@ -393,7 +393,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.9"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.10"
     cohesity_client = get_cohesity_client(module)
     domain_exists, domain_details = get_domain_details(module)
 

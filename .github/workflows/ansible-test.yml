@@ -14,5 +14,5 @@ jobs:
     - name: Perform sanity testing with ansible-test
       uses: ansible-community/ansible-test-gh-action@release/v1
       with:
-        ansible-core-version: stable-2.11
+        ansible-core-version: stable-2.15
         testing-type: sanity

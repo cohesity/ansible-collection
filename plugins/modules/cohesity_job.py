@@ -227,7 +227,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.1.9
+version_added: 1.1.10
 """
 
 EXAMPLES = """
@@ -324,7 +324,6 @@ try:
         get__storage_domain_id__by_name,
         get__protection_jobs__by_environment,
         get__protection_run__all__by_id,
-        get_protection_run__status__by_id,
         get_cohesity_client,
     )
 except Exception:
@@ -586,7 +585,7 @@ def get_vmware_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
@@ -624,7 +623,7 @@ def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
@@ -669,7 +668,7 @@ def get_view_storage_domain_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
@@ -734,7 +733,7 @@ def register_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         payload = self.copy()
 
@@ -839,7 +838,7 @@ def start_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         source_ids = payload.get("sourceIds", [])
         payload = dict()
@@ -898,7 +897,7 @@ def update_job(module, job_details, update_source_ids=None):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         payload = job_details.copy()
         del payload["token"]
@@ -960,7 +959,7 @@ def get_prot_job_details(self, module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
@@ -1021,7 +1020,7 @@ def stop_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         payload = self.copy()
 
@@ -1085,7 +1084,7 @@ def unregister_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
 
         payload = dict(deleteSnapshots=self["deleteSnapshots"])

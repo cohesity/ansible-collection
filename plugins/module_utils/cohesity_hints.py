@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module_utils: cohesity_hints
 short_description: The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
-version_added: 1.1.9
+version_added: 1.1.10
 description:
     - The **CohesityHints** utils module provides standard methods for returning query data
 from Cohesity Platforms.
@@ -616,9 +616,9 @@ def get__restore_job__by_type(module, self):
         end_time = module.params.get("end_time")
         today = datetime.now()
         start_time = datetime.strptime(
-            start_time,"%d/%m/%Y") if start_time else today - timedelta(7)
+            start_time, "%d/%m/%Y") if start_time else today - timedelta(7)
         end_time = datetime.strptime(
-            end_time,"%d/%m/%Y") if end_time else today
+            end_time, "%d/%m/%Y") if end_time else today
         start_time_usecs = int(start_time.timestamp() * 1000 * 1000)
         end_time_usecs = int(end_time.timestamp() * 1000 * 1000)
         uri += "&startTimeUsecs=%s&endTimeUsecs=%s" % (
@@ -680,7 +680,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
 
         response = open_url(
@@ -720,7 +720,7 @@ def get__storage_domain_id__by__name(module):
 
 
 def get_protection_run__status__by_id(module, group_id):
-    #global cohesity_client
+    # global cohesity_client
     try:
         group_run = cohesity_client.protection_runs.get_protection_runs(
             job_id=group_id
@@ -754,7 +754,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
@@ -813,7 +813,7 @@ def get_resource_pool_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.1.10",
         }
         response = open_url(
             url=uri,
