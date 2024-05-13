@@ -130,7 +130,7 @@ try:
     )
     from cohesity_management_sdk.models.register_protection_source_parameters import (
         RegisterProtectionSourceParameters,
-    )   
+    )
 
 except Exception:
     pass

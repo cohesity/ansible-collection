@@ -6,7 +6,10 @@
 #
 
 from __future__ import absolute_import, division, print_function
-from http.client import REQUEST_TIMEOUT
+try:
+    from http.client import REQUEST_TIMEOUT
+except ImportError:
+    from httplib import REQUEST_TIMEOUT
 
 __metaclass__ = type
 
