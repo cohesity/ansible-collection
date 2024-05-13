@@ -60,12 +60,14 @@ options:
       - "Applicable only when source is already registered."
     type: bool
   db_password:
+    default: ""
     description:
       - "Specifies the password to access the target source database."
       - "This parameter will not be logged."
       - "Applicable only when state is set to present."
     type: str
   db_username:
+    default: ""
     description:
       - "Specifies username to access the target source database."
       - "Applicable only when state is set to present."
@@ -82,7 +84,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 

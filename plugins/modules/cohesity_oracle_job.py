@@ -52,6 +52,7 @@ options:
   databases:
     elements: str
     type: list
+    default: []
     description:
       - list of databases to be selected for backup job creation.
   delete_backups:
@@ -64,8 +65,10 @@ options:
     description:
       - "Optional Description to assign to the Protection Job"
     type: str
+    default: ""
   endpoint:
     type: str
+    default: ""
     description: Ip address of the Oracle source.
   environment:
     default: kOracle
@@ -103,6 +106,7 @@ options:
       - "Specifies the registered start time for the Protection Job.  Format must be 24hr time in either HHMM or HH:MM style."
       - "If not configured then the Cluster will automatically select a time."
     type: str
+    default: ""
   state:
     choices:
       - present
@@ -123,15 +127,22 @@ options:
     description:
       - "Specifies the timezone to use when calculating time for this Protection Job such as the Job start time."
     type: str
+  archive_log_keep_days:
+    type: int
+    required: false
+    description:
+      - "No of days to keep archived logs"
   validate_certs:
     default: false
     description:
       - "Switch determines if SSL Validation should be enabled."
     type: bool
+    aliases:
+      - cohesity_validate_certs
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -467,7 +478,7 @@ def main():
                 choices=["Regular", "Full", "Log", "System"], default="Regular"
             ),
             cancel_active=dict(type="bool", default=False),
-            validate_certs=dict(type="bool", default=False),
+            validate_certs=dict(type="bool", default=False, aliases=["cohesity_validate_certs"]),
             endpoint=dict(type="str", default=""),
             databases=dict(type="list", default=[], elements="str"),
             archive_log_keep_days=dict(type="int", required=False),

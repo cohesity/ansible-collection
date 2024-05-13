@@ -21,6 +21,7 @@ options:
       - "Option to identify backups based on a timestamp"
     required: false
     type: str
+    default: ""
   cluster:
     aliases:
       - cohesity_server
@@ -51,6 +52,7 @@ options:
       - "Option to identify backups based on a end timestamp"
     required: false
     type: str
+    default: ""
   environment:
     choices:
     - VMware
@@ -83,6 +85,7 @@ options:
     description:
       - "Specifies a prefix to prepended to the source object name to derive a new name for the recovered or cloned object."
     type: str
+    default: ""
   resource_pool:
     required: true
     description:
@@ -93,6 +96,7 @@ options:
       - "Option to identify backups based on a start timestamp."
     required: false
     type: str
+    default: ""
   state:
     choices:
       - present
@@ -104,6 +108,7 @@ options:
   suffix:
     description: "Specifies a suffix to appended to the original source object name to derive a new name      for the recovered or cloned object."
     type: str
+    default: ""
   view_name:
     description:
       - "Name of the view"
@@ -127,7 +132,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity VM Clone"
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 
@@ -506,7 +511,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.10"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.2.0"
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 

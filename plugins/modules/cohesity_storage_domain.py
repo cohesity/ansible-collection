@@ -23,6 +23,19 @@ options:
     description:
       - "IP or FQDN for the Cohesity Cluster"
     type: str
+  name:
+    description:
+      - "Name of the Storage Domain"
+    required: false
+    type: str
+  state:
+    choices:
+      - present
+      - absent
+    default: present
+    description:
+      - Determines the state of the Storage Domain Job
+    type: str
   cohesity_admin:
     aliases:
       - admin_name
@@ -46,6 +59,7 @@ options:
       - "Specifies an active directory domain that this storage domain box is mapped to."
     required: false
     type: str
+    default: ""
   cluster_partition_id:
     default: 3
     description:
@@ -71,7 +85,6 @@ options:
       - "Specifies the Id of the Storage Domain."
       - "Applicable only when the domain is already created"
   kms_server_id:
-    default: None
     description: "Specifies the associated KMS Server ID."
     type: int
   ldap_provider_id:
@@ -84,7 +97,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Storage Domains"
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -344,7 +357,7 @@ def delete_storage_domain(module, domain_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         open_url(
             url=uri,
@@ -397,7 +410,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.10"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.2.0"
     cohesity_client = get_cohesity_client(module)
     domain_exists, domain_details = get_domain_details(module)
 

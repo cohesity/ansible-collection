@@ -14,7 +14,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.1.10
+version_added: 1.2.0
 author: "Naveena (@naveena-maplelabs)"
 
 options:
@@ -23,6 +23,7 @@ options:
     - protection run timestamp in YYYY-MM-DD:HH:MM format to use as source for the Restore
       operation. If not specified, the most recent timestamp is used
     type: str
+    default: ""
   cluster:
     aliases:
     - cohesity_server
@@ -87,6 +88,7 @@ options:
     description:
     - Alternate location to which the files will be restored
     type: str
+    default: ""
   state:
     choices:
     - present
@@ -109,16 +111,19 @@ options:
     - Name of the Vcenter virtual machine, from where the files are located. Required
       if the environment is VMware.
     type: str
+    default: ""
   vm_password:
     description:
     - Password of the virtual machine, where files will be restored. Required if the
       environment is VMware.
     type: str
+    default: ""
   vm_username:
     description:
     - Username of the virtual machine, where files will be restored. Required if the
       environment is VMware.
     type: str
+    default: ""
   wait_for_job:
     default: true
     description:
@@ -265,7 +270,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -353,7 +358,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -452,7 +457,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "Ansible-v1.1.10"
+    base_controller.global_headers["user-agent"] = "Ansible-v1.2.0"
     cohesity_client = get_cohesity_client(module)
 
     if module.params.get("backup_id"):

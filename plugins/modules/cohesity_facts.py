@@ -15,7 +15,7 @@ module: cohesity_facts
 short_description: Gather facts about a Cohesity Cluster.
 description:
     - Gather facts about Cohesity Clusters.
-version_added: 1.1.10
+version_added: 1.2.0
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -83,10 +83,12 @@ options:
     type: bool
     default: no
   validate_certs:
-    default: false
+    default: true
     description:
       - "Switch determines if SSL Validation should be enabled."
     type: bool
+    aliases:
+    - cohesity_validate_certs
 
 """
 
@@ -159,7 +161,7 @@ def main():
         )
     )
 
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     global cohesity_client
     cohesity_client = get_cohesity_client(module)
     results = dict(changed=False, cluster="")

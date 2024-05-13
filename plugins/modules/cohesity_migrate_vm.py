@@ -176,7 +176,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Migrate one or more Virtual Machines from Cohesity Migrate Jobs
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -285,7 +285,7 @@ def get_source_details(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -335,7 +335,7 @@ def get_vm_folder_id(module, source_id, resource_pool_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -385,7 +385,7 @@ def get_resource_pool_id(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -446,7 +446,7 @@ def get_datastore_id(module, source_id, resource_pool_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -495,7 +495,7 @@ def get_network_id(module, source_id, resource_pool_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -542,7 +542,7 @@ def get_backup_job_run_id(module, job_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -582,7 +582,7 @@ def get_backup_job_ids(module, job_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -626,7 +626,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
 
         response = open_url(
@@ -688,7 +688,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -730,7 +730,7 @@ def create_migration_task(module, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         # module.fail_json(msg=body)
         response = open_url(
@@ -820,7 +820,7 @@ def get_protection_groups(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,

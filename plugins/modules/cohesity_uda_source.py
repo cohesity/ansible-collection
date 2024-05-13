@@ -27,6 +27,7 @@ options:
   hosts:
     type: list
     elements: str
+    default: []
     description:
       - Specifies the list of Ips/hostnames for the nodes forming UDA Source Cluster.
   mount_view:
@@ -88,10 +89,12 @@ options:
     type: str
   db_username:
     type: str
+    default: ""
     description:
       - Username of the database.
   db_password:
     type: str
+    default: ""
     description:
       - Password of the database.
   scripts_dir:
@@ -128,7 +131,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of UDA Protection Sources"
-version_added: 1.1.10
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -218,7 +221,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.10",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = dict(
             environment="kUDA",
