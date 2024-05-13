@@ -172,11 +172,6 @@ import json
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.controllers.base_controller import BaseController
-from cohesity_management_sdk.models.clone_task_request import CloneTaskRequest
-from cohesity_management_sdk.models.vmware_clone_parameters import VmwareCloneParameters
-from cohesity_management_sdk.models.restore_object_details import RestoreObjectDetails
-from cohesity_management_sdk.exceptions.api_exception import APIException
 from datetime import datetime
 
 
@@ -188,6 +183,11 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from cohesity_management_sdk.controllers.base_controller import BaseController
+    from cohesity_management_sdk.models.clone_task_request import CloneTaskRequest
+    from cohesity_management_sdk.models.vmware_clone_parameters import VmwareCloneParameters
+    from cohesity_management_sdk.models.restore_object_details import RestoreObjectDetails
+    from cohesity_management_sdk.exceptions.api_exception import APIException
 except Exception:
     pass
 

@@ -130,32 +130,6 @@ EXAMPLES = """
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.controllers.base_controller import BaseController
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.archival_external_target import (
-    ArchivalExternalTarget,
-)
-from cohesity_management_sdk.models.blackout_period import BlackoutPeriod
-from cohesity_management_sdk.models.continuous_schedule import ContinuousSchedule
-from cohesity_management_sdk.models.daily_schedule import DailySchedule
-from cohesity_management_sdk.models.extended_retention_policy import (
-    ExtendedRetentionPolicy,
-)
-from cohesity_management_sdk.models.monthly_schedule import MonthlySchedule
-from cohesity_management_sdk.models.protection_policy_request import (
-    ProtectionPolicyRequest,
-)
-from cohesity_management_sdk.models.replication_target_settings import (
-    ReplicationTargetSettings,
-)
-from cohesity_management_sdk.models.scheduling_policy import SchedulingPolicy
-from cohesity_management_sdk.models.snapshot_replication_copy_policy import (
-    SnapshotReplicationCopyPolicy,
-)
-from cohesity_management_sdk.models.snapshot_archival_copy_policy import (
-    SnapshotArchivalCopyPolicy,
-)
-from cohesity_management_sdk.models.time_of_day import TimeOfDay
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
@@ -165,6 +139,32 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from cohesity_management_sdk.controllers.base_controller import BaseController
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.archival_external_target import (
+        ArchivalExternalTarget,
+    )
+    from cohesity_management_sdk.models.blackout_period import BlackoutPeriod
+    from cohesity_management_sdk.models.continuous_schedule import ContinuousSchedule
+    from cohesity_management_sdk.models.daily_schedule import DailySchedule
+    from cohesity_management_sdk.models.extended_retention_policy import (
+        ExtendedRetentionPolicy,
+    )
+    from cohesity_management_sdk.models.monthly_schedule import MonthlySchedule
+    from cohesity_management_sdk.models.protection_policy_request import (
+        ProtectionPolicyRequest,
+    )
+    from cohesity_management_sdk.models.replication_target_settings import (
+        ReplicationTargetSettings,
+    )
+    from cohesity_management_sdk.models.scheduling_policy import SchedulingPolicy
+    from cohesity_management_sdk.models.snapshot_replication_copy_policy import (
+        SnapshotReplicationCopyPolicy,
+    )
+    from cohesity_management_sdk.models.snapshot_archival_copy_policy import (
+        SnapshotArchivalCopyPolicy,
+    )
+    from cohesity_management_sdk.models.time_of_day import TimeOfDay
 
 except Exception:
     pass

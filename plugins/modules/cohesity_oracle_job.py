@@ -155,29 +155,6 @@ RETURN = """
 import copy
 import time
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.delete_protection_job_param import (
-    DeleteProtectionJobParam,
-)
-from cohesity_management_sdk.models.cancel_protection_job_run_param import (
-    CancelProtectionJobRunParam,
-)
-from cohesity_management_sdk.models.protection_job_request_body import (
-    ProtectionJobRequestBody,
-)
-from cohesity_management_sdk.models.run_protection_job_param import (
-    RunProtectionJobParam,
-)
-from cohesity_management_sdk.models.source_special_parameter import (
-    SourceSpecialParameter,
-)
-from cohesity_management_sdk.models.oracle_special_parameters import (
-    OracleSpecialParameters,
-)
-from cohesity_management_sdk.models.oracle_database_node_channel import (
-    OracleDatabaseNodeChannel,
-)
-from cohesity_management_sdk.models.oracle_app_params import OracleAppParams
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -190,6 +167,29 @@ try:
         cohesity_common_argument_spec,
         raise__cohesity_exception__handler,
     )
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.delete_protection_job_param import (
+        DeleteProtectionJobParam,
+    )
+    from cohesity_management_sdk.models.cancel_protection_job_run_param import (
+        CancelProtectionJobRunParam,
+    )
+    from cohesity_management_sdk.models.protection_job_request_body import (
+        ProtectionJobRequestBody,
+    )
+    from cohesity_management_sdk.models.run_protection_job_param import (
+        RunProtectionJobParam,
+    )
+    from cohesity_management_sdk.models.source_special_parameter import (
+        SourceSpecialParameter,
+    )
+    from cohesity_management_sdk.models.oracle_special_parameters import (
+        OracleSpecialParameters,
+    )
+    from cohesity_management_sdk.models.oracle_database_node_channel import (
+        OracleDatabaseNodeChannel,
+    )
+    from cohesity_management_sdk.models.oracle_app_params import OracleAppParams
 except Exception:
     pass
 

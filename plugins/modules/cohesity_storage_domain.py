@@ -124,12 +124,16 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hint
 )
 from ansible.module_utils.urls import open_url
 
-from cohesity_management_sdk.controllers.base_controller import BaseController
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.quota_policy import QuotaPolicy
-from cohesity_management_sdk.models.storage_policy import StoragePolicy
-from cohesity_management_sdk.models.erasure_coding_info import ErasureCodingInfo
-from cohesity_management_sdk.models.create_view_box_params import CreateViewBoxParams
+try:
+    from cohesity_management_sdk.controllers.base_controller import BaseController
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.quota_policy import QuotaPolicy
+    from cohesity_management_sdk.models.storage_policy import StoragePolicy
+    from cohesity_management_sdk.models.erasure_coding_info import ErasureCodingInfo
+    from cohesity_management_sdk.models.create_view_box_params import CreateViewBoxParams
+
+except Exception:
+    pass
 
 
 cohesity_client = None

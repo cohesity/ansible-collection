@@ -232,19 +232,6 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
 
-
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.delete_protection_job_param import (
-    DeleteProtectionJobParam,
-)
-from cohesity_management_sdk.models.cancel_protection_job_run_param import (
-    CancelProtectionJobRunParam,
-)
-from cohesity_management_sdk.models.run_protection_job_param import (
-    RunProtectionJobParam,
-)
-
-
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
@@ -267,6 +254,16 @@ try:
         check_source_reachability,
         get__prot_policy_id__by_name,
         get__storage_domain_id__by_name,
+    )
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.delete_protection_job_param import (
+        DeleteProtectionJobParam,
+    )
+    from cohesity_management_sdk.models.cancel_protection_job_run_param import (
+        CancelProtectionJobRunParam,
+    )
+    from cohesity_management_sdk.models.run_protection_job_param import (
+        RunProtectionJobParam,
     )
 except Exception:
     pass

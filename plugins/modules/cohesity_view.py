@@ -132,15 +132,6 @@ RETURN = """
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.controllers.base_controller import BaseController
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.create_view_request import CreateViewRequest
-from cohesity_management_sdk.models.nfs_root_permissions import NfsRootPermissions
-from cohesity_management_sdk.models.qo_s import QoS
-from cohesity_management_sdk.models.quota_policy import QuotaPolicy
-from cohesity_management_sdk.models.storage_policy_override import StoragePolicyOverride
-from cohesity_management_sdk.models.subnet import Subnet
-from cohesity_management_sdk.models.update_view_param import UpdateViewParam
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
@@ -150,6 +141,16 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from cohesity_management_sdk.controllers.base_controller import BaseController
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.create_view_request import CreateViewRequest
+    from cohesity_management_sdk.models.nfs_root_permissions import NfsRootPermissions
+    from cohesity_management_sdk.models.qo_s import QoS
+    from cohesity_management_sdk.models.quota_policy import QuotaPolicy
+    from cohesity_management_sdk.models.storage_policy_override import StoragePolicyOverride
+    from cohesity_management_sdk.models.subnet import Subnet
+    from cohesity_management_sdk.models.update_view_param import UpdateViewParam
+
 except Exception:
     pass
 
