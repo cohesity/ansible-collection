@@ -57,7 +57,7 @@ To install the requirements, run **pip install -r [requirement.txt](https://gith
 
 ## <a name="suggest"></a> Suggestions and Feedback
 
-We would love to hear from you. Please send your suggestions and feedback to: [cohesity-api-sdks@cohesity.com](mailto:cohesity-api-sdks@cohesity.com)
+We would love to hear from you. Please send your suggestions and feedback to: [support@cohesity.com](mailto:support@cohesity.com)
 
 ## Code of Conduct
 This collection follows the [Ansible project's Code of Conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html).
