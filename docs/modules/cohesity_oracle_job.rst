@@ -58,7 +58,7 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
-  databases (optional, list, None)
+  databases (optional, list, [])
     list of databases to be selected for backup job creation.
 
 
@@ -68,11 +68,11 @@ Parameters
     Optional and only valid when \ :emphasis:`state=absent`\ 
 
 
-  description (optional, str, None)
+  description (optional, str, )
     Optional Description to assign to the Protection Job
 
 
-  endpoint (optional, str, None)
+  endpoint (optional, str, )
     Ip address of the Oracle source.
 
 
@@ -94,7 +94,7 @@ Parameters
     Required when \ :emphasis:`state=present`\ .
 
 
-  start_time (optional, str, None)
+  start_time (optional, str, )
     Specifies the registered start time for the Protection Job.  Format must be 24hr time in either HHMM or HH:MM style.
 
     If not configured then the Cluster will automatically select a time.
@@ -110,6 +110,10 @@ Parameters
 
   time_zone (optional, str, America/Los_Angeles)
     Specifies the timezone to use when calculating time for this Protection Job such as the Job start time.
+
+
+  archive_log_keep_days (False, int, None)
+    No of days to keep archived logs
 
 
   validate_certs (optional, bool, False)

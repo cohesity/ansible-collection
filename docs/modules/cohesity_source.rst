@@ -78,7 +78,7 @@ Parameters
     Optional when \ :emphasis:`state=present`\  and \ :emphasis:`environment=Physical`\ .
 
 
-  nas_password (optional, str, None)
+  nas_password (optional, str, )
     Specifies the password to accessthe target NAS Environment.
 
     This parameter will not be logged.
@@ -98,7 +98,7 @@ Parameters
     Specifies the type of connection for the NAS Mountpoint.
 
 
-  nas_username (optional, str, None)
+  nas_username (optional, str, )
     Specifies username to access the target NAS Environment.
 
     Supported Format is Username or username@domain or Domain/username (will be deprecated in future).
@@ -120,7 +120,7 @@ Parameters
     Switch for source validation during registeration.
 
 
-  source_password (optional, str, None)
+  source_password (optional, str, )
     Specifies the password to access the target source.
 
     This parameter will not be logged.
@@ -128,7 +128,7 @@ Parameters
     Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=VMware`\ 
 
 
-  source_username (optional, str, None)
+  source_username (optional, str, )
     Specifies username to access the target source.
 
     Required when \ :emphasis:`state=present`\  and \ :emphasis:`environment=VMware`\ 

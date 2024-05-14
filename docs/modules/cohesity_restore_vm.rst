@@ -80,7 +80,7 @@ Parameters
     If multiple datastore exists, datacenter and cluster resource details are used to uniquely identify the resourcepool.
 
 
-  datastore_name (optional, str, None)
+  datastore_name (optional, str, )
     Specifies the datastore where the files should be recovered to. This field is required to recover objects to
 
     a different resource pool or to a different parent source. If not specified, objects are recovered to their original
@@ -104,7 +104,7 @@ Parameters
     Specifies the interface name to connect after restoring the VM.
 
 
-  job_name (False, str, None)
+  job_name (False, str, )
     Name of the Protection Job
 
 
@@ -146,7 +146,7 @@ Parameters
     Specifies the resource pool Id where the cloned or recovered objects are attached.
 
 
-  resource_pool_name (optional, str, None)
+  resource_pool_name (optional, str, )
     Specifies the resource pool name where the cloned or recovered objects are attached.
 
 

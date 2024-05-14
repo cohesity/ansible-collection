@@ -66,7 +66,7 @@ Parameters
     Applicable only when source is already registered.
 
 
-  db_password (optional, str, None)
+  db_password (optional, str, )
     Specifies the password to access the target source database.
 
     This parameter will not be logged.
@@ -74,7 +74,7 @@ Parameters
     Applicable only when state is set to present.
 
 
-  db_username (optional, str, None)
+  db_username (optional, str, )
     Specifies username to access the target source database.
 
     Applicable only when state is set to present.

@@ -34,6 +34,14 @@ Parameters
     IP or FQDN for the Cohesity Cluster
 
 
+  name (False, str, None)
+    Name of the Storage Domain
+
+
+  state (optional, str, present)
+    Determines the state of the Storage Domain Job
+
+
   cohesity_admin (optional, str, None)
     Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
 
@@ -48,7 +56,7 @@ Parameters
     Password belonging to the selected Username. This parameter will not be logged.
 
 
-  ad_domain_name (False, str, None)
+  ad_domain_name (False, str, )
     Specifies an active directory domain that this storage domain box is mapped to.
 
 

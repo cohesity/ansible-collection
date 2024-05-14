@@ -58,7 +58,7 @@ Parameters
     This parameter does not apply for native installations.
 
 
-  download_location (optional, str, None)
+  download_location (optional, str, )
     Optional directory path to which the installer will be downloaded.  If not selected, then a temporary
 
     directory will be created in the default System Temp Directory.  When choosing an alternate directory,
@@ -82,7 +82,7 @@ Parameters
     When enabled, native installer packages are used based on the operating system
 
 
-  operating_system (optional, str, None)
+  operating_system (optional, str, )
     ansible\_distribution from facts, this value is automatically populated. Not given by module user
 
 

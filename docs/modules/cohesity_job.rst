@@ -88,7 +88,7 @@ Parameters
     Optional and only valid when (environment=VMware)
 
 
-  description (optional, str, None)
+  description (optional, str, )
     Optional Description to assign to the Protection Job
 
 
@@ -102,13 +102,13 @@ Parameters
     is protecting. Supported environment types include 'PhysicalFiles', 'VMware'
 
 
-  exclude (optional, list, None)
+  exclude (optional, list, [])
     Specifies the list of VMs to be exclude.
 
     Applicable only when environment is set to VMware.
 
 
-  exclude_tags (optional, list, None)
+  exclude_tags (optional, list, [])
     Specifies the list of VMware tags to be exclude.
 
     Applicable only when environment is set to VMware.
@@ -116,13 +116,13 @@ Parameters
     Yet to be implemented.
 
 
-  include (optional, list, None)
+  include (optional, list, [])
     Specifies the list of VMs to be included.
 
     Applicable only when environment is set to VMware.
 
 
-  include_tags (optional, list, None)
+  include_tags (optional, list, [])
     Specifies the list of VMware tags to be included.
 
     List of objects with category name as key and user tags as list should be provided
@@ -130,7 +130,7 @@ Parameters
     Applicable only when environment is set to VMware.
 
 
-  indexing (optional, dict, None)
+  indexing (optional, dict, {})
     Specifies the list of allowed and denied indexing prefixes
 
     Applicable only when disable\_indexing is set to false.
@@ -154,7 +154,7 @@ Parameters
     Required when \ :emphasis:`state=present`\ .
 
 
-  protection_sources (optional, list, None)
+  protection_sources (optional, list, [])
     A list of dictionaries with endpoints and paths to backup. Required when \ :emphasis:`state=present`\ .
 
     (valid only for physical sources and file based protection jobs)
@@ -168,7 +168,7 @@ Parameters
     skipNestedVolumes - True (Boolean, defaults to True)
 
 
-  start_time (optional, str, None)
+  start_time (optional, str, )
     Specifies the registered start time for the Protection Job.  Format must be 24hr time in either HHMM or HH:MM style.
 
     If not configured then the Cluster will automatically select a time.
@@ -190,7 +190,7 @@ Parameters
     Switch determines if SSL Validation should be enabled.
 
 
-  view_name (optional, str, )
+  view_name (optional, str, None)
     Specifies the name of view to be protected.
 
     Required when environment is set to View.
