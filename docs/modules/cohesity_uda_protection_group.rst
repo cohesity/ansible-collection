@@ -32,13 +32,13 @@ The below requirements are needed on the host that executes this module.
 Parameters
 ----------
 
-  alerting_policy (optional, str, Success)
+  alerting_policy (optional, str, None)
     Specifies a policy for alerting users of the status of a Protection Group.
 
     Default value is Success
 
 
-  alert_targets (optional, list, None)
+  alert_targets (optional, list, [])
     Specifies list of alert target objects to receive an alert
 
     For every object, User need to specify email address, language and recepient type.
@@ -84,11 +84,11 @@ Parameters
     Optional and only valid when \ :emphasis:`state=absent`\ 
 
 
-  description (optional, str, None)
+  description (optional, str, )
     Optional Description to assign to the Protection Group
 
 
-  endpoint (optional, str, None)
+  endpoint (optional, str, )
     Ip address of the Uda host.
 
 
@@ -120,7 +120,7 @@ Parameters
     Name to assign to the Protection Group
 
 
-  objects (optional, list, None)
+  objects (optional, list, [])
     Defines the list of objects to be protected.
 
 

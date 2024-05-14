@@ -21,7 +21,6 @@ description:
 module: cohesity_uda_protection_group
 options:
   alerting_policy:
-    default: Success
     description:
       - Specifies a policy for alerting users of the status of a Protection
         Group.
@@ -33,6 +32,8 @@ options:
       - SlaViolation
   alert_targets:
     type: list
+    default: []
+    elements: dict
     description:
       - Specifies list of alert target objects to receive an alert
       - For every object, User need to specify email address, language and
@@ -88,8 +89,10 @@ options:
     description:
       - Optional Description to assign to the Protection Group
     type: str
+    default: ""
   endpoint:
     type: str
+    default: ""
     description: Ip address of the Uda host.
   environment:
     default: UDA
@@ -135,6 +138,7 @@ options:
     type: str
   objects:
     type: list
+    default: []
     elements: str
     description: Defines the list of objects to be protected.
   ondemand_run_type:
@@ -190,6 +194,8 @@ options:
     description:
       - Switch determines if SSL Validation should be enabled or not.
     type: bool
+    aliases:
+      - cohesity_validate_certs
   is_paused:
     default: true
     description:
@@ -199,7 +205,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Management of Cohesity UDA Protection Groups
-version_added: 1.1.9
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -232,19 +238,6 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
 
-
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.delete_protection_job_param import (
-    DeleteProtectionJobParam,
-)
-from cohesity_management_sdk.models.cancel_protection_job_run_param import (
-    CancelProtectionJobRunParam,
-)
-from cohesity_management_sdk.models.run_protection_job_param import (
-    RunProtectionJobParam,
-)
-
-
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
@@ -267,6 +260,16 @@ try:
         check_source_reachability,
         get__prot_policy_id__by_name,
         get__storage_domain_id__by_name,
+    )
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.delete_protection_job_param import (
+        DeleteProtectionJobParam,
+    )
+    from cohesity_management_sdk.models.cancel_protection_job_run_param import (
+        CancelProtectionJobRunParam,
+    )
+    from cohesity_management_sdk.models.run_protection_job_param import (
+        RunProtectionJobParam,
     )
 except Exception:
     pass
@@ -455,7 +458,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -514,7 +517,7 @@ def main():
             ),
             alert_targets=dict(type="list", default=[], elements="dict"),
             cancel_active=dict(type="bool", default=False),
-            validate_certs=dict(type="bool", default=False),
+            validate_certs=dict(type="bool", default=False, aliases=["cohesity_validate_certs"]),
             endpoint=dict(type="str", default=""),
             objects=dict(type="list", default=[], elements="str"),
             concurrency=dict(type="int", default=1),

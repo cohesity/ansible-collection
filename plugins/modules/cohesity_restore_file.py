@@ -15,7 +15,7 @@ description:
     - Ansible Module used to start a Cohesity Recovery Job on a Cohesity Cluster.
     - When executed in a playbook, the Cohesity Recovery Job will be validated and the appropriate state action
     - will be applied.
-version_added: 1.1.9
+version_added: 1.2.0
 author: "Naveena (@naveena-maplelabs)"
 options:
   cluster:
@@ -88,6 +88,7 @@ options:
     required: yes
   backup_id:
     type: int
+    default: 0
     description:
       - Optional Cohesity ID to use as source for the Restore operation.  If not selected, the most recent RunId will be used
   file_names:
@@ -118,6 +119,7 @@ options:
     default: yes
   restore_location:
     type: str
+    default: ""
     description:
       - Alternate location to which the files will be restored
   backup_timestamp:
@@ -125,6 +127,7 @@ options:
       - protection run timestamp in YYYY-MM-DD:HH:MM format to use as source for the Restore operation. If not specified,
         the most recent timestamp is used
     type: str
+    default: ""
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 notes:
@@ -379,7 +382,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -428,7 +431,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.

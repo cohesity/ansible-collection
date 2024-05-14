@@ -78,7 +78,7 @@ Parameters
     be an URL or hostname or an IP address of the Protection Source or a NAS Share/Export Path.
 
 
-  backup_id (optional, int, None)
+  backup_id (optional, int, 0)
     Optional Cohesity ID to use as source for the Restore operation.  If not selected, the most recent RunId will be used
 
 
@@ -102,11 +102,11 @@ Parameters
     Should the restore operation maintain the original file or folder attributes
 
 
-  restore_location (optional, str, None)
+  restore_location (optional, str, )
     Alternate location to which the files will be restored
 
 
-  backup_timestamp (optional, str, None)
+  backup_timestamp (optional, str, )
     protection run timestamp in YYYY-MM-DD:HH:MM format to use as source for the Restore operation. If not specified, the most recent timestamp is used
 
 

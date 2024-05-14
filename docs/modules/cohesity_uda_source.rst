@@ -36,7 +36,7 @@ Parameters
     IP or FQDN for the Cohesity Cluster
 
 
-  hosts (optional, list, None)
+  hosts (optional, list, [])
     Specifies the list of Ips/hostnames for the nodes forming UDA Source Cluster.
 
 
@@ -72,11 +72,11 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
-  db_username (optional, str, None)
+  db_username (optional, str, )
     Username of the database.
 
 
-  db_password (optional, str, None)
+  db_password (optional, str, )
     Password of the database.
 
 

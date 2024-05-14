@@ -55,6 +55,7 @@ options:
       - "directory will be created in the default System Temp Directory.  When choosing an alternate directory,"
       - "the directory and installer will not be deleted at the end of the execution."
     type: str
+    default: ""
   download_uri:
     default: ""
     description:
@@ -80,6 +81,7 @@ options:
     description:
       - "ansible_distribution from facts, this value is automatically populated. Not given by module user"
     type: str
+    default: ""
   service_group:
     default: cohesityagent
     description:
@@ -118,7 +120,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Physical Agent"
-version_added: 1.0.8
+version_added: 1.2.0
 """
 
 import os
@@ -305,7 +307,7 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.9",
+                "user-agent": "cohesity-ansible/v1.2.0",
             }
         elif not module.params.get("download_uri"):
             os_type = "Linux"
@@ -334,13 +336,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.9",
+                "user-agent": "cohesity-ansible/v1.2.0",
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.1.9",
+                "user-agent": "cohesity-ansible/v1.2.0",
             }
 
         agent = open_url(
@@ -612,7 +614,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -664,7 +666,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.1.9",
+                "user-agent": "cohesity-ansible/v1.2.0",
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(

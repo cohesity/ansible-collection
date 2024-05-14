@@ -14,7 +14,7 @@ module: cohesity_view
 short_description: Management of Cohesity View
 description:
     - Ansible Module to create View.
-version_added: 1.1.9
+version_added: 1.2.0
 author: "Naveena (@naveena-maplelabs)"
 options:
   case_insensitive:
@@ -132,15 +132,6 @@ RETURN = """
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from cohesity_management_sdk.controllers.base_controller import BaseController
-from cohesity_management_sdk.exceptions.api_exception import APIException
-from cohesity_management_sdk.models.create_view_request import CreateViewRequest
-from cohesity_management_sdk.models.nfs_root_permissions import NfsRootPermissions
-from cohesity_management_sdk.models.qo_s import QoS
-from cohesity_management_sdk.models.quota_policy import QuotaPolicy
-from cohesity_management_sdk.models.storage_policy_override import StoragePolicyOverride
-from cohesity_management_sdk.models.subnet import Subnet
-from cohesity_management_sdk.models.update_view_param import UpdateViewParam
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
@@ -150,6 +141,16 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from cohesity_management_sdk.controllers.base_controller import BaseController
+    from cohesity_management_sdk.exceptions.api_exception import APIException
+    from cohesity_management_sdk.models.create_view_request import CreateViewRequest
+    from cohesity_management_sdk.models.nfs_root_permissions import NfsRootPermissions
+    from cohesity_management_sdk.models.qo_s import QoS
+    from cohesity_management_sdk.models.quota_policy import QuotaPolicy
+    from cohesity_management_sdk.models.storage_policy_override import StoragePolicyOverride
+    from cohesity_management_sdk.models.subnet import Subnet
+    from cohesity_management_sdk.models.update_view_param import UpdateViewParam
+
 except Exception:
     pass
 
@@ -460,7 +461,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.1.9"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.2.0"
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 

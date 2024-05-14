@@ -77,6 +77,7 @@ options:
       - "a different resource pool or to a different parent source. If not specified, objects are recovered to their original"
       - "datastore locations in the parent source."
     type: str
+    default: ""
   endpoint:
     description:
       - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
@@ -101,6 +102,7 @@ options:
       - "Name of the Protection Job"
     required: false
     type: str
+    default: ""
   name:
     description:
       - "Descriptor to assign to the Recovery Job.  The Recovery Job name will consist of the job_name:name format."
@@ -144,6 +146,7 @@ options:
     description:
       - "Specifies the resource pool name where the cloned or recovered objects are attached."
     type: str
+    default: ""
   restore_to_source:
     description:
       - "Switch determines if VM is restored to original source."
@@ -190,7 +193,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Restore one or more Virtual Machines from Cohesity Protection Jobs"
-version_added: 1.1.9
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -305,7 +308,7 @@ def get_source_details(module, restore_to_source):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -354,7 +357,7 @@ def get_vmware_source_objects(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
 
         response = open_url(
@@ -432,7 +435,7 @@ def get__vmware_snapshot_information__by_source(module, self, source_details):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         objects = open_url(
             url=uri,
@@ -580,7 +583,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -629,7 +632,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.

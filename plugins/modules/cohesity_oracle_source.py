@@ -60,12 +60,14 @@ options:
       - "Applicable only when source is already registered."
     type: bool
   db_password:
+    default: ""
     description:
       - "Specifies the password to access the target source database."
       - "This parameter will not be logged."
       - "Applicable only when state is set to present."
     type: str
   db_username:
+    default: ""
     description:
       - "Specifies username to access the target source database."
       - "Applicable only when state is set to present."
@@ -82,7 +84,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.1.9
+version_added: 1.2.0
 """
 
 
@@ -111,9 +113,6 @@ import json
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url, urllib_error
-from cohesity_management_sdk.models.register_protection_source_parameters import (
-    RegisterProtectionSourceParameters,
-)
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -131,6 +130,10 @@ try:
         refresh_protection_source,
         check_source_reachability,
     )
+    from cohesity_management_sdk.models.register_protection_source_parameters import (
+        RegisterProtectionSourceParameters,
+    )
+
 except Exception:
     pass
 

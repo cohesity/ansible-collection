@@ -32,7 +32,7 @@ The below requirements are needed on the host that executes this module.
 Parameters
 ----------
 
-  backup_timestamp (optional, str, None)
+  backup_timestamp (optional, str, )
     protection run timestamp in YYYY-MM-DD:HH:MM format to use as source for the Restore operation. If not specified, the most recent timestamp is used
 
 
@@ -78,7 +78,7 @@ Parameters
     Should the restore operation maintain the original file or folder attributes
 
 
-  restore_location (optional, str, None)
+  restore_location (optional, str, )
     Alternate location to which the files will be restored
 
 
@@ -94,15 +94,15 @@ Parameters
     Switch determines if SSL Validation should be enabled.
 
 
-  vm_name (optional, str, None)
+  vm_name (optional, str, )
     Name of the Vcenter virtual machine, from where the files are located. Required if the environment is VMware.
 
 
-  vm_password (optional, str, None)
+  vm_password (optional, str, )
     Password of the virtual machine, where files will be restored. Required if the environment is VMware.
 
 
-  vm_username (optional, str, None)
+  vm_username (optional, str, )
     Username of the virtual machine, where files will be restored. Required if the environment is VMware.
 
 

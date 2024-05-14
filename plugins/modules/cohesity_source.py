@@ -80,6 +80,7 @@ options:
     type: str
   nas_password:
     type: str
+    default: ""
     description:
       - "Specifies the password to accessthe target NAS Environment."
       - "This parameter will not be logged."
@@ -101,6 +102,7 @@ options:
     default: Host
   nas_username:
     type: str
+    default: ""
     description:
       - "Specifies username to access the target NAS Environment."
       - "Supported Format is Username or username@domain or Domain/username (will be deprecated in future)."
@@ -126,11 +128,13 @@ options:
       - "This parameter will not be logged."
       - "Required when I(state=present) and I(environment=VMware)"
     type: str
+    default: ""
   source_username:
     description:
       - "Specifies username to access the target source."
       - "Required when I(state=present) and I(environment=VMware)"
     type: str
+    default: ""
   state:
     choices:
       - present
@@ -187,7 +191,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Sources"
-version_added: 1.1.9
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -373,7 +377,7 @@ def refresh_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         uri = (
             "https://"
@@ -418,7 +422,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         sql_payload = dict(
             applications=["kSQL"],
@@ -466,7 +470,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]

@@ -28,7 +28,7 @@ The below requirements are needed on the host that executes this module.
 Parameters
 ----------
 
-  backup_timestamp (False, str, None)
+  backup_timestamp (False, str, )
     Option to identify backups based on a timestamp
 
 
@@ -52,7 +52,7 @@ Parameters
     Password belonging to the selected Username.  This parameter will not be logged.
 
 
-  end_timestamp (False, str, None)
+  end_timestamp (False, str, )
     Option to identify backups based on a end timestamp
 
 
@@ -80,7 +80,7 @@ Parameters
     Specifies the power state of the cloned or recovered objects. By default, the cloned or recovered objects are powered off.
 
 
-  prefix (optional, str, None)
+  prefix (optional, str, )
     Specifies a prefix to prepended to the source object name to derive a new name for the recovered or cloned object.
 
 
@@ -88,7 +88,7 @@ Parameters
     Specifies the resource pool where the cloned or recovered objects are attached.
 
 
-  start_timestamp (False, str, None)
+  start_timestamp (False, str, )
     Option to identify backups based on a start timestamp.
 
 
@@ -96,7 +96,7 @@ Parameters
     Determines if the clone vm should be \ :literal:`present`\  or \ :literal:`absent`\  from the cluster
 
 
-  suffix (optional, str, None)
+  suffix (optional, str, )
     Specifies a suffix to appended to the original source object name to derive a new name      for the recovered or cloned object.
 
 

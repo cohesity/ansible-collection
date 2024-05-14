@@ -86,10 +86,12 @@ options:
       - List of virtual machines will be removed from the job.
       - Optional and only valid when (environment=VMware)
     type: list
+    elements: str
   description:
     description:
       - Optional Description to assign to the Protection Job
     type: str
+    default: ""
   disable_indexing:
     default: false
     description: Enabling this will disable indexing while creating/updating the
@@ -116,27 +118,31 @@ options:
       - Applicable only when environment is set to VMware.
     elements: str
     type: list
+    default: []
   exclude_tags:
     description:
       - Specifies the list of VMware tags to be exclude.
       - Applicable only when environment is set to VMware.
       - Yet to be implemented.
-    elements: str
     type: list
+    default: []
+    elements: dict
   include:
     description:
       - Specifies the list of VMs to be included.
       - Applicable only when environment is set to VMware.
     elements: str
     type: list
+    default: []
   include_tags:
     description:
       - Specifies the list of VMware tags to be included.
       - List of objects with category name as key and user tags as list should
         be provided
       - Applicable only when environment is set to VMware.
-    elements: str
     type: list
+    default: []
+    elements: dict
   indexing:
     description:
       - Specifies the list of allowed and denied indexing prefixes
@@ -144,6 +150,7 @@ options:
       - allowed_prefix contains list of prefixes to be allowed while indexing.
       - denied_prefix contains list of prefixes to be denied while indexing.
     type: dict
+    default: {}
   name:
     aliases:
       - job_name
@@ -173,6 +180,7 @@ options:
   protection_sources:
     aliases:
       - sources
+    default: []
     description:
       - A list of dictionaries with endpoints and paths to backup. Required when
         I(state=present).
@@ -191,6 +199,7 @@ options:
         be 24hr time in either HHMM or HH:MM style.
       - If not configured then the Cluster will automatically select a time.
     type: str
+    default: ""
   state:
     choices:
       - present
@@ -218,8 +227,9 @@ options:
     description:
       - Switch determines if SSL Validation should be enabled.
     type: bool
+    aliases:
+      - cohesity_validate_certs
   view_name:
-    default: ""
     description:
       - Specifies the name of view to be protected.
       - Required when environment is set to View.
@@ -227,7 +237,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.1.9
+version_added: 1.2.0
 """
 
 EXAMPLES = """
@@ -324,7 +334,6 @@ try:
         get__storage_domain_id__by_name,
         get__protection_jobs__by_environment,
         get__protection_run__all__by_id,
-        get_protection_run__status__by_id,
         get_cohesity_client,
     )
 except Exception:
@@ -586,7 +595,7 @@ def get_vmware_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -624,7 +633,7 @@ def get_vmware_vm_ids(module, job_meta_data, job_details, vm_names):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -669,7 +678,7 @@ def get_view_storage_domain_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -734,7 +743,7 @@ def register_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -839,7 +848,7 @@ def start_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         source_ids = payload.get("sourceIds", [])
         payload = dict()
@@ -898,7 +907,7 @@ def update_job(module, job_details, update_source_ids=None):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = job_details.copy()
         del payload["token"]
@@ -960,7 +969,7 @@ def get_prot_job_details(self, module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         response = open_url(
             url=uri,
@@ -1021,7 +1030,7 @@ def stop_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
         payload = self.copy()
 
@@ -1085,7 +1094,7 @@ def unregister_job(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.1.9",
+            "user-agent": "cohesity-ansible/v1.2.0",
         }
 
         payload = dict(deleteSnapshots=self["deleteSnapshots"])
@@ -1528,12 +1537,12 @@ def main():
                 choices=["Regular", "Full", "Log", "System"], default="Regular"
             ),
             cancel_active=dict(type="bool", default=False),
-            validate_certs=dict(type="bool", default=False),
+            validate_certs=dict(type="bool", default=False, aliases=["cohesity_validate_certs"]),
             append_to_existing=dict(type="bool", default=False),
             exclude=dict(type="list", default=[], elements="str"),
             include=dict(type="list", default=[], elements="str"),
-            exclude_tags=dict(type="list", default=[]),
-            include_tags=dict(type="list", default=[]),
+            exclude_tags=dict(type="list", default=[], elements="dict"),
+            include_tags=dict(type="list", default=[], elements="dict"),
             disable_indexing=dict(type="bool", default=False),
             indexing=dict(type="dict", default={}),
         )
