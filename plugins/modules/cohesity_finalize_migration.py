@@ -62,6 +62,17 @@ options:
     description:
       - Name of the recovery task name.
     type: str
+  start_time:
+    description:
+      - Restore tasks will be filtered by a start time specified. If not
+        provided the start time is set to the last week. Provide value as
+        "origin" for using cluster creation date.
+    type: str
+  end_time:
+    description:
+      - Restore tasks will be filtered by a start time specified. If not
+        provided the end time is the current time.
+    type: str
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Finalize the VM migration
@@ -179,6 +190,8 @@ def main():
             task_name=dict(type="str"),
             state=dict(choices=["present", "absent"], default="present"),
             task_id=dict(type="str"),
+            start_time=dict(type="str"),
+            end_time=dict(type="str"),
         )
     )
 
