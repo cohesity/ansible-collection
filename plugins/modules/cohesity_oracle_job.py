@@ -142,7 +142,7 @@ options:
 extends_documentation_fragment:
 - cohesity.dataprotect.cohesity
 short_description: "Management of Cohesity Protection Jobs"
-version_added: 1.2.0
+version_added: 1.3.0
 """
 
 EXAMPLES = """
