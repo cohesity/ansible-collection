@@ -66,7 +66,7 @@ options:
 extends_documentation_fragment:
   - cohesity.dataprotect.cohesity
 short_description: Sync objects available in the VM migration task
-version_added: 1.2.0
+version_added: 1.3.0
 """
 
 EXAMPLES = """
@@ -147,7 +147,7 @@ def sync_objects(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.2.0",
+            "user-agent": "cohesity-ansible/v1.3.0",
         }
         body = {
             "restoreTaskId": self["task_id"],
