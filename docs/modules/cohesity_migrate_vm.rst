@@ -119,7 +119,7 @@ Parameters
 
 
   start_time (optional, str, None)
-    Restore tasks will be filtered by a start time specified. If not provided the start time is set to the last week.
+    Restore tasks will be filtered by a start time specified. If not provided the start time is set to the last week. Provide value as "origin" for using cluster creation date.
 
 
   end_time (optional, str, None)

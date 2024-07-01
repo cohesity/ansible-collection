@@ -65,7 +65,7 @@ options:
   start_time:
     description:
       - Restore tasks will be filtered by a start time specified. If not
-        provided the start time is set to the last week. Provide value as 
+        provided the start time is set to the last week. Provide value as
         "origin" for using cluster creation date.
     type: str
   end_time:

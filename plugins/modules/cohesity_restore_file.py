@@ -259,7 +259,7 @@ def convert__windows_file_name(filename):
 # => or Export path from the restored file information.
 def strip__prefix(prefix, file_path):
     if file_path.startswith(prefix):
-        return file_path[len(prefix) :]
+        return file_path[len(prefix):]
     return file_path
 
 
