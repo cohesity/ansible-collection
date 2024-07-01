@@ -618,14 +618,21 @@ def get__restore_job__by_type(module, self):
         start_time = module.params.get("start_time")
         end_time = module.params.get("end_time")
         today = datetime.now()
-        start_time = datetime.strptime(
-            start_time, "%d/%m/%Y") if start_time else today - timedelta(7)
+        if start_time:
+            if start_time.lower() != "origin":
+                start_time = datetime.strptime(start_time, "%d/%m/%Y")
+                start_time_usecs = int(start_time.timestamp() * 1000 * 1000)
+            else:
+                start_time_usecs = None
+        else:
+            start_time = today - timedelta(7)
+            start_time_usecs = int(start_time.timestamp() * 1000 * 1000)
         end_time = datetime.strptime(
             end_time, "%d/%m/%Y") if end_time else today
-        start_time_usecs = int(start_time.timestamp() * 1000 * 1000)
         end_time_usecs = int(end_time.timestamp() * 1000 * 1000)
-        uri += "&startTimeUsecs=%s&endTimeUsecs=%s" % (
-            start_time_usecs, end_time_usecs)
+        if start_time_usecs:
+            uri += "&startTimeUsecs=%s" % start_time_usecs
+        uri += "&endTimeUsecs=%s" % end_time_usecs
 
         if "count" in self:
             uri = uri + "&pageCount=" + str(self["count"])
