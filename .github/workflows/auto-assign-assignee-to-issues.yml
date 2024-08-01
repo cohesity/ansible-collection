@@ -14,5 +14,5 @@ jobs:
       - name: Add assignees
         uses: pozil/auto-assign-issue@v1
         with:
-          assignees: naveena-maplelabs
+          assignees: kavinagrawalcohesity
           allowSelfAssign: True
