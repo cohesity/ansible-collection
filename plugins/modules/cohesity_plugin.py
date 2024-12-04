@@ -128,6 +128,9 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_util
 from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
     get_cohesity_client,
 )
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+    RELEASE_VERSION,
+)
 
 
 class InstallError(Exception):
@@ -205,7 +208,7 @@ def download_datastore_plugin(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.3.0",
+            "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
@@ -252,7 +255,7 @@ def update_global_allow_lists(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.3.0",
+            "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,

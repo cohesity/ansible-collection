@@ -142,6 +142,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
         get__cohesity_auth__token,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
 except Exception:
     pass
 
@@ -307,7 +310,7 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.3.0",
+                "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
             }
         elif not module.params.get("download_uri"):
             os_type = "Linux"
@@ -336,13 +339,13 @@ def download_agent(module, path):
             headers = {
                 "Accept": "application/octet-stream",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.3.0",
+                "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
             }
         else:
             uri = module.params.get("download_uri")
             headers = {
                 "Accept": "application/octet-stream",
-                "user-agent": "cohesity-ansible/v1.3.0",
+                "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
             }
 
         agent = open_url(
@@ -614,7 +617,7 @@ def get_source_details(module, source_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
@@ -666,7 +669,7 @@ def update_agent(module):
             headers = {
                 "Accept": "application/json",
                 "Authorization": "Bearer " + token,
-                "user-agent": "cohesity-ansible/v1.3.0",
+                "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
             }
             payload = {"agentIds": [source_details["agent"]["id"]]}
             open_url(

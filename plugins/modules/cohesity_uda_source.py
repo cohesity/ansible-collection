@@ -171,6 +171,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.modules.cohesity_source import (
         unregister_source,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
 except Exception:
     pass
 
@@ -221,7 +224,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         payload = dict(
             environment="kUDA",

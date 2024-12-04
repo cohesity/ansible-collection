@@ -141,6 +141,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
     from cohesity_management_sdk.controllers.base_controller import BaseController
     from cohesity_management_sdk.exceptions.api_exception import APIException
     from cohesity_management_sdk.models.create_view_request import CreateViewRequest
@@ -461,7 +464,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.3.0"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v{}".format(RELEASE_VERSION)
     cohesity_client = get_cohesity_client(module)
     view_exists, view_details = get_view_details(module)
 
