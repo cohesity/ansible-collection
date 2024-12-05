@@ -25,7 +25,8 @@ from ansible.module_utils.urls import open_url
 try:
     from urllib import error as urllib_error
 except ImportError:
-    import urllib2 as urllib_error
+    from ansible.module_utils.urls import urllib_error
+
 
 class ParameterViolation(Exception):
     pass
