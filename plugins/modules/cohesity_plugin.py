@@ -115,7 +115,11 @@ import json
 
 # Ansible Imports.
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    import urllib2 as urllib_error
 
 from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
     get__cohesity_auth__token,

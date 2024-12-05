@@ -228,7 +228,11 @@ import json
 
 from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    import urllib2 as urllib_error
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,

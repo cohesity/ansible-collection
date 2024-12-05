@@ -130,7 +130,11 @@ import shutil
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    import urllib2 as urllib_error
 from tempfile import mkdtemp
 
 try:
