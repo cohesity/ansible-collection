@@ -114,7 +114,7 @@ Function New-CohesityToken {
 }
 
 Function Get-CohesityAgent {
-    Get-ItemProperty -LiteralPath HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -like "Cohesity Agent *" }
+    Get-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -like "Cohesity Agent *" }
 }
 
 Function Find-CohesityAgent {
