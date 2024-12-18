@@ -236,12 +236,15 @@ import time
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
-    from ansible.module_utils.urls import urllib_error
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
         get__cohesity_auth__token,
     )
@@ -260,6 +263,9 @@ try:
         check_source_reachability,
         get__prot_policy_id__by_name,
         get__storage_domain_id__by_name,
+    )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
     )
     from cohesity_management_sdk.exceptions.api_exception import APIException
     from cohesity_management_sdk.models.delete_protection_job_param import (
@@ -458,7 +464,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,

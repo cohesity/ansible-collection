@@ -115,7 +115,11 @@ import json
 
 # Ansible Imports.
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 
 from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
     get__cohesity_auth__token,
@@ -127,6 +131,9 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_util
 )
 from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
     get_cohesity_client,
+)
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+    RELEASE_VERSION,
 )
 
 
@@ -205,7 +212,7 @@ def download_datastore_plugin(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.3.0",
+            "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
@@ -252,7 +259,7 @@ def update_global_allow_lists(module):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-plugin": "cohesity-ansible/v1.3.0",
+            "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,

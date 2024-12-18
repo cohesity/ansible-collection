@@ -262,7 +262,11 @@ RETURN = """
 import json
 import time
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -279,6 +283,9 @@ try:
         check_source_reachability,
         unregister_source,
         get_cohesity_client,
+    )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
     )
 except Exception:
     pass
@@ -377,7 +384,7 @@ def refresh_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         uri = (
             "https://"
@@ -422,7 +429,7 @@ def register_sql_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         sql_payload = dict(
             applications=["kSQL"],
@@ -470,7 +477,7 @@ def register_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         payload = self.copy()
         payload["environment"] = "k" + self["environment"]

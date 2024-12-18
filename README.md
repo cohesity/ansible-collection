@@ -28,7 +28,7 @@ collections:
   - cohesity.dataprotect
 ```
 # Requirements
-- ansible version >= 8.0
+- ansible version >= 9.0
 - requests >= 2.31.0
 - python version >= '3.6'
 - cohesity_management_sdk >= 1.6.0

@@ -188,6 +188,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
     from cohesity_management_sdk.controllers.base_controller import BaseController
     from cohesity_management_sdk.models.clone_task_request import CloneTaskRequest
     from cohesity_management_sdk.models.vmware_clone_parameters import VmwareCloneParameters
@@ -511,7 +514,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.3.0"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v{}".format(RELEASE_VERSION)
     cohesity_client = get_cohesity_client(module)
     clone_exists, clone_details = get_clone_task(module, False)
 

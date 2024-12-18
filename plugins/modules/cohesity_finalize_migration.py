@@ -101,7 +101,11 @@ RETURN = """"""
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
@@ -117,6 +121,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get__restore_job__by_type,
         get_cohesity_client,
+    )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
     )
 except ImportError:
     pass
@@ -159,7 +166,7 @@ def finalize_migration(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         body = {
             "restoreTaskId": self["task_id"],

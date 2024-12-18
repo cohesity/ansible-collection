@@ -166,11 +166,14 @@ RETURN = """
 import copy
 import time
 from ansible.module_utils.basic import AnsibleModule
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 
 try:
     # => When unit testing, we need to look in the correct location however, when run via ansible,
     # => the expectation is that the modules will live under ansible.
-    from ansible.module_utils.urls import urllib_error
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
         get_cohesity_client,
     )
