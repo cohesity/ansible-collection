@@ -164,6 +164,9 @@ try:
         get__restore_job__by_type,
         get_cohesity_client,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
     from cohesity_management_sdk.controllers.base_controller import BaseController
     from cohesity_management_sdk.exceptions.api_exception import APIException
 except ImportError:
@@ -270,7 +273,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         payload = self.copy()
 
@@ -358,7 +361,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.
@@ -457,7 +460,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "Ansible-v1.3.0"
+    base_controller.global_headers["user-agent"] = "Ansible-v{}".format(RELEASE_VERSION)
     cohesity_client = get_cohesity_client(module)
 
     if module.params.get("backup_id"):

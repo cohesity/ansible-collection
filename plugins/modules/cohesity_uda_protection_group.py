@@ -261,6 +261,9 @@ try:
         get__prot_policy_id__by_name,
         get__storage_domain_id__by_name,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
     from cohesity_management_sdk.exceptions.api_exception import APIException
     from cohesity_management_sdk.models.delete_protection_job_param import (
         DeleteProtectionJobParam,
@@ -458,7 +461,7 @@ def create_group(module, self, body):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,

@@ -135,6 +135,9 @@ from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth
 from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_hints import (
     get_cohesity_client,
 )
+from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+    RELEASE_VERSION,
+)
 from ansible.module_utils.urls import open_url
 
 try:
@@ -357,7 +360,7 @@ def delete_storage_domain(module, domain_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         open_url(
             url=uri,
@@ -410,7 +413,7 @@ def main():
 
     global cohesity_client
     base_controller = BaseController()
-    base_controller.global_headers["user-agent"] = "cohesity-ansible/v1.3.0"
+    base_controller.global_headers["user-agent"] = "cohesity-ansible/v{}".format(RELEASE_VERSION)
     cohesity_client = get_cohesity_client(module)
     domain_exists, domain_details = get_domain_details(module)
 

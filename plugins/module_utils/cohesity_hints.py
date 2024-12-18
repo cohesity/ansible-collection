@@ -45,6 +45,9 @@ try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         raise__cohesity_exception__handler,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
 except Exception:
     pass
 
@@ -690,7 +693,7 @@ def unregister_source(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
 
         response = open_url(
@@ -764,7 +767,7 @@ def check__protection_group__exists(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + self["token"],
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
@@ -823,7 +826,7 @@ def get_resource_pool_id(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,

@@ -207,6 +207,9 @@ try:
         get__restore_job__by_type,
         get_cohesity_client,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
 except ImportError:
     pass
 
@@ -382,7 +385,7 @@ def start_restore(module, uri, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         payload = self.copy()
 
@@ -431,7 +434,7 @@ def wait_restore_complete(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         attempts = 0
         # => Wait for the restore based on a predetermined number of minutes with checks every 30 seconds.

@@ -115,6 +115,9 @@ try:
         get__restore_job__by_type,
         get_cohesity_client,
     )
+    from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_constants import (
+        RELEASE_VERSION,
+    )
 except ImportError:
     pass
 
@@ -155,7 +158,7 @@ def get_migration_status(module, self):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
@@ -187,7 +190,7 @@ def get_task_status(module, task_id):
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + token,
-            "user-agent": "cohesity-ansible/v1.3.0",
+            "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
         response = open_url(
             url=uri,
