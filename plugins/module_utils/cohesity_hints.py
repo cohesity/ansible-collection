@@ -34,7 +34,11 @@ try:
 except ImportError:
     from urllib.parse import quote
 
-from ansible.module_utils.urls import open_url, urllib_error
+from ansible.module_utils.urls import open_url
+try:
+    from urllib import error as urllib_error
+except ImportError:
+    from ansible.module_utils.urls import urllib_error
 from ansible.module_utils.six.moves import urllib_parse
 
 try:
