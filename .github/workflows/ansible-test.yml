@@ -3,6 +3,13 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ansible:
+        - stable-2.16
+        - stable-2.17
+        - stable-2.18
+        - stable-2.19
     steps:
     - uses: actions/checkout@v2
     # this Action should follow steps to set up Python build environment
@@ -14,5 +21,5 @@ jobs:
     - name: Perform sanity testing with ansible-test
       uses: ansible-community/ansible-test-gh-action@release/v1
       with:
-        ansible-core-version: stable-2.15
+        ansible-core-version: ${{ matrix.ansible }}
         testing-type: sanity

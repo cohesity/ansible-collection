@@ -5,6 +5,10 @@
 
 #Requires -Module Ansible.ModuleUtils.Legacy
 
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSCustomUseLiteralPath', '',
+    Justification = 'This module has supported wildcard comparison since it was created')]
+param()
+
 Function Set-CohesityValidation {
     try {
 
@@ -114,7 +118,7 @@ Function New-CohesityToken {
 }
 
 Function Get-CohesityAgent {
-    Get-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -like "Cohesity Agent *" }
+    Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -like "Cohesity Agent *" }
 }
 
 Function Find-CohesityAgent {
@@ -203,7 +207,7 @@ Function Invoke-AgentDownload {
                 uri = $url
                 filename = $filename
             }
-            Remove-Item -LiteralPath $tmpdir -Confirm:$False -Force -Recurse
+            Remove-Item $tmpdir -Confirm:$False -Force -Recurse
             Fail-Json $errors $_.Exception.Message
         }
 
@@ -219,7 +223,7 @@ Function Install-CohesityAgent {
     )
 
     process {
-        $tmpdir = (Get-Item -LiteralPath $self.filename).DirectoryName
+        $tmpdir = (Get-Item $self.filename).DirectoryName
 
         $arguments = "/verysilent /norestart /suppressmsgboxes /type=" + $self.args.install_type
 
@@ -249,7 +253,7 @@ Function Install-CohesityAgent {
         }
         finally {
             # => Remove the downloaded file and temporary directory.
-            Remove-Item -LiteralPath $tmpdir -Confirm:$False -Force -Recurse
+            Remove-Item $tmpdir -Confirm:$False -Force -Recurse
         }
         $agent = Get-CohesityAgent
 
