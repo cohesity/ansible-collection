@@ -1,6 +1,7 @@
 # Create tag based Vmware protection group.
 ---
-- hosts: workstation
+- name: Create tag based Vmware protection group
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

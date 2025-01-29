@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: centos
+- name: Install the Cohesity Agent on each Centos host
+  hosts: centos
   vars:
     create_user: false
     native_package: false

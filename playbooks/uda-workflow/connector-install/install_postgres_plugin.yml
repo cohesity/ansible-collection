@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: postgresql
+- name: Install the Cohesity Datastore Agent on each Postgresql Centos host
+  hosts: postgresql
   # => We need to gather facts to determine the OS type of
   # => the machine
   gather_facts: true

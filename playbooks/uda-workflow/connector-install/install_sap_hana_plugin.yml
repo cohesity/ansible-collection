@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: saphana
+- name: Install the Cohesity Datastore Agent on each SapHana host
+  hosts: saphana
   # => We need to gather facts to determine the OS type of
   # => the machine
   gather_facts: true

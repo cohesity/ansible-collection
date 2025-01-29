@@ -1,6 +1,7 @@
 # => Create/Update a Generic Nas protection job for list of Sources.
 ---
-- hosts: workstation
+- name: Create/Update a Generic Nas protection job for list of Sources
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

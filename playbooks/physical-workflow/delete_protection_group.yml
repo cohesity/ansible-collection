@@ -1,6 +1,7 @@
 # => Delete a Physical protection job.
 ---
-- hosts: workstation
+- name: Delete a Physical protection job
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

@@ -1,7 +1,8 @@
 # => Cancel VM migration
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Cancel VM migration
+  hosts: localhost
+  gather_facts: false
   become: false
   collections:
     - cohesity.dataprotect

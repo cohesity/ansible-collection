@@ -1,7 +1,8 @@
 # => Poll for migration status of the task.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Poll for migration status of the task
+  hosts: localhost
+  gather_facts: false
   become: false
   collections:
     - cohesity.dataprotect

@@ -1,7 +1,8 @@
-#=> Create a Cohesity protection job for UDA hosts.
+# => Create a Cohesity protection job for UDA hosts.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Create a Cohesity protection job for UDA hosts
+  hosts: localhost
+  gather_facts: false
   collections:
     - cohesity.dataprotect
   tasks:

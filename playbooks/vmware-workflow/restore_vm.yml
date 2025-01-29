@@ -1,8 +1,9 @@
 # => restore vms from VMware Backup based on timestamp provided or recent
 # => job run is used for the operation.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Restore vms from VMware Backup based on timestamp provided or recent job run is used for the operation
+  hosts: localhost
+  gather_facts: false
   become: false
   collections:
     - cohesity.dataprotect

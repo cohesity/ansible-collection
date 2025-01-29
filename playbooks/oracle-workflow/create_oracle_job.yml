@@ -1,7 +1,8 @@
-#=> Create a Oracle protection job for oracle sources.
+# => Create a Oracle protection job for oracle sources.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Create a Oracle protection job for oracle sources
+  hosts: localhost
+  gather_facts: false
   collections:
     - cohesity.dataprotect
   tasks:

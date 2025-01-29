@@ -1,6 +1,7 @@
 # => Remove one or more sources from Generic Nas protection job.
 ---
-- hosts: workstation
+- name: Remove one or more sources from Generic Nas protection job
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

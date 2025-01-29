@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Playbok for Cloning VM
+  hosts: localhost
   become: false
   collections:
     - cohesity.dataprotect

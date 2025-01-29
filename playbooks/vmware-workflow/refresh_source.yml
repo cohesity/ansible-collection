@@ -1,6 +1,7 @@
 # Playbook to refresh Vmware source in the cluster.
 ---
-- hosts: localhost
+- name: Playbook to refresh Vmware source in the cluster
+  hosts: localhost
   become: false
   collections:
     - cohesity.dataprotect

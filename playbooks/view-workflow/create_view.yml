@@ -1,6 +1,7 @@
 # => Playbook to Create a new Protection View.
 ---
-- hosts: workstation
+- name: Playbook to Create a new Protection View
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

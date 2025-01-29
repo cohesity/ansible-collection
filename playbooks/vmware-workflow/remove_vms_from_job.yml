@@ -1,6 +1,7 @@
 # => Remove virtual machines from a Vmware Protection job.
 ---
-- hosts: workstation
+- name: Remove virtual machines from a Vmware Protection job
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

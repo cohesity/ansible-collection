@@ -1,6 +1,7 @@
 # => Update a Vmware protection job for list of Sources.
 ---
-- hosts: workstation
+- name: Update a Vmware protection job for list of Sources
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

@@ -1,6 +1,7 @@
 # Playbook to register GenericNas(NFS) Source.
 ---
-- hosts: localhost
+- name: Playbook to register GenericNas(NFS) Source
+  hosts: localhost
   vars:
     endpoint: SourceName
     state: present

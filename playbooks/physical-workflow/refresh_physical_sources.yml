@@ -4,7 +4,8 @@
 # with_items: "{{ groups['linux'] }}"
 
 ---
-- hosts: localhost
+- name: Playbook to refresh list of Physical source to the cluster
+  hosts: localhost
   become: false
   collections:
     - cohesity.dataprotect

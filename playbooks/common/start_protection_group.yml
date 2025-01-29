@@ -2,7 +2,8 @@
 # =>
 # => Start a protection job run.
 ---
-- hosts: workstation
+- name: Start a protection job run
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

@@ -1,7 +1,8 @@
 # => Migrate vms from VMware Backup based.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Migrate vms from VMware Backup based
+  hosts: localhost
+  gather_facts: false
   become: false
   collections:
     - cohesity.dataprotect

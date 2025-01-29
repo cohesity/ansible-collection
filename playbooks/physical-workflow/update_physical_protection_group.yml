@@ -3,7 +3,8 @@
 # => If available source is provided, for PhysicalFiles environment existing
 # => file paths will be replaced with new filepaths.
 ---
-- hosts: workstation
+- name: Update a Physical protection job for list of Sources
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

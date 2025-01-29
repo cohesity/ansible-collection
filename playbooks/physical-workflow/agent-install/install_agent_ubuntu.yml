@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: ubuntu
+- name: Install the Cohesity Agent on each Ubuntu host
+  hosts: ubuntu
   vars:
     state: present
     create_user: false

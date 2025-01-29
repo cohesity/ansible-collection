@@ -1,6 +1,7 @@
 # => Playbook to delete a View.
 ---
-- hosts: workstation
+- name: Playbook to delete a View
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

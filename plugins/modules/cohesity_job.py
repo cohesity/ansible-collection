@@ -284,7 +284,7 @@ EXAMPLES = """
     state: absent
     name: myvcenter
     environment: VMware
-    delete_backups: True
+    delete_backups: true
 
 # Start an existing VMware Server Protection Job
 - cohesity_job:

@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: windows
+- name: Install the Cohesity Agent on each Windows host
+  hosts: windows
   gather_facts: true
   become: false
   collections:

@@ -1,7 +1,8 @@
 # => Update VMware Vcenter source already available in the cluster.
 ---
-- hosts: workstation
-  gather_facts: no
+- name: Update VMware Vcenter source already available in the cluster
+  hosts: workstation
+  gather_facts: false
   become: false
   collections:
     - cohesity.dataprotect

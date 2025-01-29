@@ -1,6 +1,7 @@
 # => Delete Vmware protection job.
 ---
-- hosts: workstation
+- name: Delete Vmware protection job
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect

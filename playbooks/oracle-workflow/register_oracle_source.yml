@@ -1,6 +1,7 @@
 # Playbook to register Oracle source to the cluster.
 ---
-- hosts: localhost
+- name: Playbook to register Oracle source to the cluster
+  hosts: localhost
   become: false
   collections:
     - cohesity.dataprotect

@@ -2,7 +2,8 @@
 # =>
 # => Stop a running protection job.
 ---
-- hosts: workstation
+- name: Stop a running protection job
+  hosts: workstation
   gather_facts: false
   collections:
     - cohesity.dataprotect
