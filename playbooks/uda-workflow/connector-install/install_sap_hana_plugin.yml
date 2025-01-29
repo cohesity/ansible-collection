@@ -18,13 +18,14 @@
     sap_hana_user: sss_admin
     sap_hana_password: password
     sap_hana_home: /usr/sap/ABC/home
-    SID: ABC
+    sid: ABC
     user_store_key: KEY
   tasks:
     - name: Check if firewall is enabled on CentOS or RedHat
       ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status
+      changed_when: false
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "RedHat" or ansible_distribution == "SLES"
       tags: always
@@ -34,6 +35,7 @@
       with_items:
         - --zone=public --permanent --add-port 11113/tcp
         - --reload
+      changed_when: "'success' in ansible_facts.stdout"
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "RedHat" or ansible_distribution == "SLES"
         - firewall_status.rc == 0
@@ -54,13 +56,19 @@
       when: state == "present" and platform == "SapHana"
 
     - name: "Install the Cohesity UDA connector plugin"
-      ansible.builtin.shell: "echo {{ sap_hana_password}} | su - {{ sap_hana_user }} -c '{{ result.filename }}  -- -i -s {{ SID }} -k {{ user_store_key }} -w uda -a {{ cohesity_server }} -d {{ sap_hana_home }} -y'"
+      ansible.builtin.shell: >
+        set -o pipefail && echo {{ sap_hana_password }} | su - {{ sap_hana_user }} -c '
+        {{ result.filename }}  -- -i -s {{ sid }} -k {{ user_store_key }}
+        -w uda -a {{ cohesity_server }} -d {{ sap_hana_home }} -y'
       when: state == "present" and platform == "SapHana"
+      changed_when: true
 
     - name: "Creation soft link to /opt/cohesity/agent/uda_scripts path"
-      ansible.builtin.shell: "ln -s /usr/sap/SSS/home/cohesity_backint_plugin/uda_scripts /opt/cohesity/agent/uda_scripts"
+      ansible.builtin.command: "ln -s /usr/sap/SSS/home/cohesity_backint_plugin/uda_scripts /opt/cohesity/agent/uda_scripts"
       when: state == "present" and platform == "SapHana"
+      changed_when: true
 
     - name: "UDA scripts will be available in {{ sap_hana_home }}/cohesity_backint_plugin/uda_scripts"
       when: state == "present" and platform == "SapHana"
-      ansible.builtin.shell: ls  /opt/cohesity/agent
+      ansible.builtin.command: ls  /opt/cohesity/agent
+      changed_when: false

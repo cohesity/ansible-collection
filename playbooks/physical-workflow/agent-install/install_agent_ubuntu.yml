@@ -30,12 +30,14 @@
     - name: Check if firewall is enabled on Ubuntu
       ansible.builtin.command: "ufw status"
       register: firewall_status_ubuntu
+      changed_when: false
       when:
         - ansible_distribution == "Ubuntu"
       tags: always
 
     - name: Enable tcp port 50051 for Ubuntu
       ansible.builtin.command: ufw allow 50051/tcp
+      changed_when: "'success' in ansible_facts.stdout"
       when:
         - ansible_distribution == "Ubuntu"
         - 'firewall_status_ubuntu.stdout_lines[0] == "Status: active"'

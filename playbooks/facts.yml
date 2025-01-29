@@ -17,5 +17,8 @@
       register: cohesity
 
     - name: "Write the Collected Facts to {{ inventory_dir }}/cohesity_facts.json"
-      ansible.builtin.copy: content="{{ cohesity | to_nice_json }}" dest="{{ inventory_dir }}/cohesity_facts.json"
+      ansible.builtin.copy:
+        content: "{{ cohesity | to_nice_json }}"
+        dest: "{{ inventory_dir }}/cohesity_facts.json"
+        mode: '0644'
       delegate_to: localhost

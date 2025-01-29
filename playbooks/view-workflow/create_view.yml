@@ -4,10 +4,10 @@
   hosts: workstation
   gather_facts: false
   vars:
-    name: ViewName
+    view_name: ViewName
     state: present
   tasks:
-    - name: "Cohesity view: Set {{ name }} to state of present"
+    - name: "Cohesity view: Set state to present for {{ view_name }}"
       cohesity.dataprotect.cohesity_view:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

@@ -49,5 +49,5 @@
         reboot_timeout: 180
       when:
         - installed.changed
-        - "{{ reboot }}"
+        - reboot
       tags: always

@@ -18,6 +18,7 @@
       ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status_centos
+      changed_when: false
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
       tags: always
