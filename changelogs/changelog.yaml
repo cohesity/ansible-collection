@@ -1,1 +1,11 @@
-ancestor: null
+---
+ancestor: 1.3.0
+releases:
+  1.4.2:
+    release_date: '2025-01-30'
+    changes:
+      major_changes:
+        - Ansible-Core Minimum Version Bumped to 2.16
+      bugfixes:
+        - Fixed collection failure issues for some ansible version
+        - Fixed LiteralPath Issue During Cohesity Window Agent Installation
