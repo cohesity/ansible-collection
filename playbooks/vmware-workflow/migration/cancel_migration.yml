@@ -4,11 +4,9 @@
   hosts: localhost
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Cancel migration of VMs
-      cohesity_cancel_migration:
+      cohesity.dataprotect.cohesity_cancel_migration:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

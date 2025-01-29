@@ -17,8 +17,6 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     # Alert: Don't edit these tasks.
     - name: Install Prerequisite Packages for SLES
@@ -29,7 +27,7 @@
       tags: always
 
     - name: Check if firewall is enabled on SLES
-      command: "firewall-cmd --state"
+      ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status_centos
       when:
@@ -37,7 +35,7 @@
       tags: always
 
     - name: Enable tcp port 50051 for SLES
-      command: "firewall-cmd {{ item }}"
+      ansible.builtin.command: "firewall-cmd {{ item }}"
       with_items:
         - --zone=public --permanent --add-port 50051/tcp
         - --reload
@@ -47,7 +45,7 @@
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of present"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

@@ -13,11 +13,9 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Check if firewall is enabled on CentOS or RedHat
-      command: "firewall-cmd --state"
+      ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status_centos
       when:
@@ -25,7 +23,7 @@
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
-      cohesity_plugin:
+      cohesity.dataprotect.cohesity_plugin:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

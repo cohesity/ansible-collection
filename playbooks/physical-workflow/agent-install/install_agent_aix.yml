@@ -17,8 +17,6 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     # Alert: Don't edit these tasks.
     - name: Install Prerequisite Packages for AIX
@@ -29,7 +27,7 @@
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

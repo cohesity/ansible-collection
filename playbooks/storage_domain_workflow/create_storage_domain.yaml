@@ -3,11 +3,9 @@
 - name: Playbook to Create a storage domain
   hosts: localhost
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Create storage domain in the cohesity server.
-      cohesity_storage_domain:
+      cohesity.dataprotect.cohesity_storage_domain:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

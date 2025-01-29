@@ -18,8 +18,6 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     # Alert: Don't edit these tasks.
     - name: Install Prerequisite Packages for CentOS or RedHat
@@ -63,7 +61,7 @@
       tags: always
 
     - name: Check if firewall is enabled on CentOS or RedHat
-      command: "firewall-cmd --state"
+      ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status_centos
       when:
@@ -72,7 +70,7 @@
       tags: always
 
     - name: Enable tcp port 50051 for CentOS or RedHat
-      command: "firewall-cmd {{ item }}"
+      ansible.builtin.command: "firewall-cmd {{ item }}"
       with_items:
         - --zone=public --permanent --add-port 50051/tcp
         - --reload
@@ -83,7 +81,7 @@
       tags: always
 
     - name: Check if firewall is enabled on Ubuntu
-      command: "ufw status"
+      ansible.builtin.command: "ufw status"
       register: firewall_status_ubuntu
       when:
         - ansible_distribution == "Ubuntu"
@@ -91,7 +89,7 @@
       tags: always
 
     - name: Enable tcp port 50051 for Ubuntu
-      command: ufw allow 50051/tcp
+      ansible.builtin.command: ufw allow 50051/tcp
       when:
         - ansible_distribution == "Ubuntu"
         - state == "present"
@@ -99,7 +97,7 @@
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

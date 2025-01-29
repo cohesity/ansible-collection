@@ -21,11 +21,9 @@
     installer: cohesity_secure_connector_service_version_sap_hana_installer
     SID: ABC
     user_store_key: KEY
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Cohesity agent: Set Agent to state of absent"
-      cohesity_plugin:
+      cohesity.dataprotect.cohesity_plugin:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -38,5 +36,5 @@
       when: state == "absent" and platform == "SapHana"
 
     - name: "Uninstall the Cohesity UDA connector plugin"
-      shell: "echo {{ sap_hana_password}} | su - {{ sap_hana_user }} -c '{{ installer }}  -- -u -s {{ SID }} -k {{ user_store_key }} -w uda -a {{ cohesity_server }} -d {{ sap_hana_home }} -y'"
+      ansible.builtin.shell: "echo {{ sap_hana_password}} | su - {{ sap_hana_user }} -c '{{ installer }}  -- -u -s {{ SID }} -k {{ user_store_key }} -w uda -a {{ cohesity_server }} -d {{ sap_hana_home }} -y'"
       when: state == "absent" and platform == "SapHana"

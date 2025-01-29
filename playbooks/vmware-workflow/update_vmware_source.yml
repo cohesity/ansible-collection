@@ -4,11 +4,9 @@
   hosts: workstation
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Update the existing Protection Source for given Vmware source.
-      cohesity_source:
+      cohesity.dataprotect.cohesity_source:
         state: present
         endpoint: "vcenter-domain.com"
         environment: VMware

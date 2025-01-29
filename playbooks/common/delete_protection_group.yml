@@ -3,11 +3,9 @@
 - name: Delete a protection job from cluster
   hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Delete Protection job
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

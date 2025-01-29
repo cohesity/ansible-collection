@@ -6,11 +6,9 @@
     endpoint: SourceName
     state: present
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Cohesity Protection Source: Set {{ endpoint | default('endpoint') }} to state of {{ cohesity_source.state | default('present') }}"
-      cohesity_source:
+      cohesity.dataprotect.cohesity_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

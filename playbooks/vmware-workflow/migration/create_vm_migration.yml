@@ -4,11 +4,9 @@
   hosts: localhost
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Migrate VMs
-      cohesity_migrate_vm:
+      cohesity.dataprotect.cohesity_migrate_vm:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -29,7 +27,7 @@
         resource_pool_name: resource_pool
         datastore_name: datastore
         enable_network: false
-        endpoint: vcenter.domain.com 
+        endpoint: vcenter.domain.com
         suffix: "_1"
         prefix: "copy_"
         preserve_mac_address: true

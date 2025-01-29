@@ -3,11 +3,9 @@
 - name: Create a Oracle protection job for oracle sources
   hosts: localhost
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Oracle Protection job"
-      cohesity_oracle_job:
+      cohesity.dataprotect.cohesity_oracle_job:
         state: present
         job_name: protect_oracle
         storage_domain: "DefaultStorageDomain"

@@ -13,11 +13,9 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Cohesity agent: Set Agent to state of absent"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

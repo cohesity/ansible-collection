@@ -3,11 +3,9 @@
 - name: Create tag based Vmware protection group
   hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Update Vmware Protection job with virtual machines.
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -21,11 +19,11 @@
         environment: "VMware"
         include_tags:
           - TagCategoryName:
-            - Tag1
-            - Tag2
+              - Tag1
+              - Tag2
           - TagCategoryName3:
-            - Tag3
+              - Tag3
             TagCategoryName2:
-            - Tag4
+              - Tag4
         time_zone: "America/Los_Angeles"
         start_time: "00:00"

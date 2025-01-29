@@ -4,11 +4,9 @@
   hosts: localhost
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Restore VMs
-      cohesity_migrate_vm:
+      cohesity.dataprotect.cohesity_migrate_vm:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -29,7 +27,7 @@
         vm_folder_name: "cohesity_folder"
         resource_pool_name: resource_pool
         datastore_name: datastore_name
-        endpoint: vcenter.domain.com 
+        endpoint: vcenter.domain.com
         detach_network: false
         suffix: "_1"
         prefix: "copy_"
@@ -58,7 +56,7 @@
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         task_id: "{{ task.id }}"
-      when: job_result.status.sync_vms < job_result.status.total_vms/2
+      when: job_result.status.sync_vms < job_result.status.total_vms / 2
 
     # This task finalise the migration if the number of objects in-sync is greater
     # than the total number of vms migrated available in the task.
@@ -69,4 +67,4 @@
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         task_id: "{{ task.id }}"
-      when: job_result.status.sync_vms >= job_result.status.total_vms/2
+      when: job_result.status.sync_vms >= job_result.status.total_vms / 2

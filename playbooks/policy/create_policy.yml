@@ -6,11 +6,9 @@
   # => the machine
   gather_facts: true
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Create protection policy to cohesity server.
-      cohesity_policy:
+      cohesity.dataprotect.cohesity_policy:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

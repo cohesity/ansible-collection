@@ -3,11 +3,9 @@
 - name: Update a Vmware protection job for list of Sources
   hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Update Vmware Protection job with virtual machines.
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -25,16 +23,16 @@
         # List of tags in include_tags will be added to the job.
         include_tags:
           - StorageBasedTags: # Tag Category Name
-            - Tag1 # Tag Name
-            - Tag2 # Tag Name
+              - Tag1 # Tag Name
+              - Tag2 # Tag Name
           - CustomStorageTagCategory:
-            - Tag3 # Tag Name
+              - Tag3 # Tag Name
             StorageBasedTags:
-            - Tag4 # Tag Name
+              - Tag4 # Tag Name
         # Following list of tags in exclude_tags will be excluded from the job.
         exclude_tags:
           - TagCategory: # Tag Category Name
-            - Tag
+              - Tag
         # Enabling append_to_existing will add the new list of VMs to existing
         # VMs, and add new list of tags to the existing tags available in the
         # job.

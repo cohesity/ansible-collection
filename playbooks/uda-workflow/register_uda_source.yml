@@ -4,12 +4,10 @@
   hosts: workstation
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     # => Register a UDA Protection Source
     - name: Create new Protection Source for Postgresql hosts.
-      cohesity_uda_source:
+      cohesity.dataprotect.cohesity_uda_source:
         state: absent
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

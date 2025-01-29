@@ -5,11 +5,9 @@
   hosts: localhost
   gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Restore Files
-      cohesity_restore_vmware_file:
+      cohesity.dataprotect.cohesity_restore_vmware_file:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

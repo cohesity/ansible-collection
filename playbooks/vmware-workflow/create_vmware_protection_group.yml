@@ -3,11 +3,9 @@
 - name: Create/Update a new Vmware protection job for list of Sources
   hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Create Vmware Protection job.
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

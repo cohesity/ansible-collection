@@ -3,14 +3,12 @@
 - name: Playbook to Create a new Protection View
   hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   vars:
     name: ViewName
     state: present
   tasks:
     - name: "Cohesity view: Set {{ name }} to state of present"
-      cohesity_view:
+      cohesity.dataprotect.cohesity_view:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

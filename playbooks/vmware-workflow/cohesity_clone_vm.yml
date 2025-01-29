@@ -2,11 +2,9 @@
 - name: Playbok for Cloning VM
   hosts: localhost
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Cohesity Clone VM: Set state to present"
-      cohesity_clone_vm:
+      cohesity.dataprotect.cohesity_clone_vm:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

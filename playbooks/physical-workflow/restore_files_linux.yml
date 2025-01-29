@@ -2,11 +2,9 @@
 ---
 - name: Restore files from linux machine, recent job run is used for the operation
   hosts: localhost
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Restore Files
-      cohesity_restore_file:
+      cohesity.dataprotect.cohesity_restore_file:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
@@ -15,7 +13,7 @@
         environment: "PhysicalFiles"
         job_name: "bbbbbbbbb"
         endpoint: "192.168.1.1"
-        file_names: 
+        file_names:
           - "/home/cohesity/.bashrc"
         wait_for_job: true
         state: "present"
