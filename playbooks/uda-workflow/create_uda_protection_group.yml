@@ -1,12 +1,11 @@
-#=> Create a Cohesity protection job for UDA hosts.
+# => Create a Cohesity protection job for UDA hosts.
 ---
-- hosts: localhost
-  gather_facts: no
-  collections:
-    - cohesity.dataprotect
+- name: Create a Cohesity protection job for UDA hosts
+  hosts: localhost
+  gather_facts: false
   tasks:
     - name: "Uda Protection job"
-      cohesity_uda_protection_group:
+      cohesity.dataprotect.cohesity_uda_protection_group:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

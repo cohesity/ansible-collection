@@ -85,7 +85,6 @@ EXAMPLES = """
     password: password
     state: present
     task_id: "2520974734107749:1675035602065:2559"
-
 """
 
 RETURN = """"""

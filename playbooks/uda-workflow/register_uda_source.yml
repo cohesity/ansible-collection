@@ -1,24 +1,23 @@
 # => Register windows machines as Cohesity protection sources
 ---
-  - hosts: workstation
-    gather_facts: no
-    become: False
-    collections:
-      - cohesity.dataprotect
-    tasks:
-      # => Register a UDA Protection Source
-      - name: Create new Protection Source for Postgresql hosts.
-        cohesity_uda_source:
-            state: absent
-            cluster: "{{ cohesity_server }}"
-            username: "{{ cohesity_username }}"
-            password: "{{ cohesity_password }}"
-            validate_certs: "{{ cohesity_validate_certs }}"
-            source_type: PostgreSQL
-            hosts:
-             - 192.168.1.1
-            # The source will be registered with the provided source_name.
-            source_name: endpoint.domain.name
-            endpoint: endpoint.domain.name
-            source_registration_args: "--source-name=192.168.1.1 --port=5433"
-            update_source: true
+- name: Register windows machines as Cohesity protection sources
+  hosts: workstation
+  gather_facts: false
+  become: false
+  tasks:
+    # => Register a UDA Protection Source
+    - name: Create new Protection Source for Postgresql hosts.
+      cohesity.dataprotect.cohesity_uda_source:
+        state: absent
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        source_type: PostgreSQL
+        hosts:
+          - 192.168.1.1
+        # The source will be registered with the provided source_name.
+        source_name: endpoint.domain.name
+        endpoint: endpoint.domain.name
+        source_registration_args: "--source-name=192.168.1.1 --port=5433"
+        update_source: true

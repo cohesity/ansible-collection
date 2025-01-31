@@ -2,13 +2,12 @@
 # =>
 # => Start a protection job run.
 ---
-- hosts: workstation
+- name: Start a protection job run
+  hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Start Protection job
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

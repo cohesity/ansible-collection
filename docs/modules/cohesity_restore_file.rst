@@ -141,7 +141,7 @@ Examples
         endpoint: mywindows.host.lab
         file_names:
           - C:\data\big_file
-        wait_for_job: no
+        wait_for_job: false
 
     # Restore a single file from a GenericNas NFS Backup and wait for the job to complete
     - cohesity_restore_file:
@@ -156,7 +156,7 @@ Examples
         file_names:
           - /data
         restore_location: /restore
-        wait_for_job: yes
+        wait_for_job: true
 
     # Restore multiple files from a specific Physical Windows Backup and wait for up to 10 minutes for the process to complete
     - cohesity_restore_file:
@@ -171,7 +171,7 @@ Examples
         file_names:
           - C:\data\files
           - C:\data\large_directory
-        wait_for_job: yes
+        wait_for_job: true
         wait_minutes: 10
 
 

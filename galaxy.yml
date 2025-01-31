@@ -1,3 +1,4 @@
+---
 ### REQUIRED
 
 # The namespace of the collection. This can be a company/brand/organization or product namespace under which all
@@ -18,7 +19,6 @@ readme: README.md
 # @nicks:irc/im.site#channel'
 authors:
   - Naveena.B <naveena.maplelabs@cohesity.com>
-
 
 ### OPTIONAL but strongly recommended
 
@@ -46,7 +46,6 @@ tags:
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
 dependencies: {}
-
 # The URL of the originating SCM repository
 repository: https://github.com/cohesity/ansible-collection
 
@@ -60,4 +59,4 @@ repository: https://github.com/cohesity/ansible-collection
 issues: https://github.com/cohesity/ansible-collection/issues/new/choose
 
 build_ignore:
-  - '*.gz'
+  - "*.gz"

@@ -2,13 +2,12 @@
 # =>
 # => Stop a running protection job.
 ---
-- hosts: workstation
+- name: Stop a running protection job
+  hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Stop Protection job
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

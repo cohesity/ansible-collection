@@ -140,7 +140,7 @@ Examples
         state: present
         name: 'Ansible'
         incremental_backup_schedule:
-            periodicity: Daily
+          periodicity: Daily
 
     # Delete a protection policy.
 

@@ -7,24 +7,24 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: postgresql
+- name: Install the Cohesity Datastore Agent on each Postgresql Centos host
+  hosts: postgresql
   # => We need to gather facts to determine the OS type of
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Check if firewall is enabled on CentOS or RedHat
-      command: "firewall-cmd --state"
+      ansible.builtin.command: "firewall-cmd --state"
       ignore_errors: true
       register: firewall_status_centos
+      changed_when: false
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
-      cohesity_plugin:
+      cohesity.dataprotect.cohesity_plugin:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

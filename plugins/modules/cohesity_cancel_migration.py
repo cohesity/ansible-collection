@@ -77,7 +77,6 @@ EXAMPLES = """
     password: password
     state: present
     task_name: "Ansible Test VM Restore"
-
 """
 
 RETURN = """"""

@@ -2,13 +2,12 @@
 # => Applicable only when job is already available, enabling delete_sources
 # => to true will remove the list of sources from the job.
 ---
-- hosts: workstation
+- name: Delete one or more sources from a Physical protection job
+  hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Delete sources from Physical Protection job.
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

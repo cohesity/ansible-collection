@@ -3,13 +3,12 @@
 # => If available source is provided, for PhysicalFiles environment existing
 # => file paths will be replaced with new filepaths.
 ---
-- hosts: workstation
+- name: Update a Physical protection job for list of Sources
+  hosts: workstation
   gather_facts: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Update sources and file paths of a Physical Protection job.
-      cohesity_job:
+      cohesity.dataprotect.cohesity_job:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

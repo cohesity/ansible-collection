@@ -1,27 +1,26 @@
-#=> restore files from VMware Backup based on timestamp provided or recent
-#=> job run is used for the operation.
+# => restore files from VMware Backup based on timestamp provided or recent
+# => job run is used for the operation.
 ---
-  - hosts: localhost
-    gather_facts: no
-    become: False
-    collections:
-      - cohesity.dataprotect
-    tasks:
-      - name: Restore Files
-        cohesity_restore_vmware_file:
-          cluster: "{{ cohesity_server }}"
-          username: "{{ cohesity_username }}"
-          password: "{{ cohesity_password }}"
-          validate_certs: "{{ cohesity_validate_certs }}"
-          name: "Ansible File Restore"
-          job_name: "snowJob"
-          endpoint: "vcenter.domain.com"
-          vm_name: "snow-dag01"
-          file_names:
-            - "/lib64"
-          wait_for_job: True
-          state: "present"
-          backup_timestamp: 2021-04-11:21:37
-          restore_location: /home/cohesity/a
-          vm_username: myvm.username
-          vm_password: myvm.password
+- name: Restore files from VMware Backup based on timestamp provided or recent job run is used for the operation
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Restore Files
+      cohesity.dataprotect.cohesity_restore_vmware_file:
+        cluster: "{{ cohesity_server }}"
+        username: "{{ cohesity_username }}"
+        password: "{{ cohesity_password }}"
+        validate_certs: "{{ cohesity_validate_certs }}"
+        name: "Ansible File Restore"
+        job_name: "snowJob"
+        endpoint: "vcenter.domain.com"
+        vm_name: "snow-dag01"
+        file_names:
+          - "/lib64"
+        wait_for_job: true
+        state: "present"
+        backup_timestamp: 2021-04-11:21:37
+        restore_location: /home/cohesity/a
+        vm_username: myvm.username
+        vm_password: myvm.password

@@ -150,7 +150,6 @@ EXAMPLES = """
     oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
     oracle_base: /u01/app/oracle
     oracle_data: /u01/app/oracle/product/12.1.0.2/db_1
-
 """
 
 import json

@@ -215,7 +215,6 @@ EXAMPLES = """
         - chs-ubun-01
         - chs-ubun-02
     prefix: "rst-"
-
 """
 
 RETURN = """"""

@@ -79,7 +79,6 @@ EXAMPLES = """
     password: password
     state: present
     task_name: "Ansible Migrate VM- In Sync"
-
 """
 
 RETURN = """"""
