@@ -149,7 +149,7 @@ Examples
         vm_name: "demo"
         vm_username: admin
         vm_password: admin
-        wait_for_job: yes
+        wait_for_job: true
         wait_minutes: 10
 
 
@@ -161,14 +161,13 @@ Examples
         endpoint: "myvcenter.cohesity.demo"
         files:
           - "/home/cohesity/sample"
-        wait_for_job: True
+        wait_for_job: true
         state: "present"
         backup_timestamp: 2021-04-11:21:37
         restore_location: /home/cohesity/
         vm_name: "demo"
         vm_username: admin
         vm_password: admin
-
 
 
 
