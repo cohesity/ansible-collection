@@ -1,13 +1,12 @@
 # => Poll for migration status of the task.
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Poll for migration status of the task
+  hosts: localhost
+  gather_facts: false
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Poll for migration status of VMs
-      cohesity_migration_status:
+      cohesity.dataprotect.cohesity_migration_status:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

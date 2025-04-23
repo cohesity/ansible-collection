@@ -107,7 +107,7 @@ Examples
         username: admin
         password: password
         state: minimal
-        include_sources: True
+        include_sources: true
 
     # Gather facts about all nodes and return active job executions in a cluster
     - cohesity_facts:
@@ -115,9 +115,8 @@ Examples
         username: admin
         password: password
         state: minimal
-        include_runs: True
-        active_only: True
-
+        include_runs: true
+        active_only: true
 
 
 

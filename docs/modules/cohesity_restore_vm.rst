@@ -239,8 +239,7 @@ Examples
           - chs-win-01
           - chs-win-02
         prefix: "rst-"
-        network_connected: no
-
+        network_connected: false
 
 
 

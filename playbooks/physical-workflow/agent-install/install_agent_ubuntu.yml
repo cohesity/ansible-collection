@@ -7,7 +7,8 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: ubuntu
+- name: Install the Cohesity Agent on each Ubuntu host
+  hosts: ubuntu
   vars:
     state: present
     create_user: false
@@ -17,8 +18,6 @@
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     # Alert: Don't edit these tasks.
     - name: Install Prerequisite Packages for Ubuntu
@@ -29,21 +28,23 @@
       tags: always
 
     - name: Check if firewall is enabled on Ubuntu
-      command: "ufw status"
+      ansible.builtin.command: "ufw status"
       register: firewall_status_ubuntu
+      changed_when: false
       when:
         - ansible_distribution == "Ubuntu"
       tags: always
 
     - name: Enable tcp port 50051 for Ubuntu
-      command: ufw allow 50051/tcp
+      ansible.builtin.command: ufw allow 50051/tcp
+      changed_when: "'success' in ansible_facts.stdout"
       when:
         - ansible_distribution == "Ubuntu"
         - 'firewall_status_ubuntu.stdout_lines[0] == "Status: active"'
       tags: always
 
     - name: "Cohesity agent: Set Agent to state of {{ state | default('present') }}"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

@@ -156,7 +156,6 @@ EXAMPLES = """
     endpoint: cohesity-source-ip
     protection_policy: Bronze
     storage_domain: Default
-
 """
 
 RETURN = """
