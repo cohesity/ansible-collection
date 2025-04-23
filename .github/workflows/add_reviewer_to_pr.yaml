@@ -1,3 +1,4 @@
+---
 name: Add reviewer(s) and assignee for Pull requests.
 on: pull_request
 jobs:

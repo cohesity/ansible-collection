@@ -1,15 +1,14 @@
 # Playbook to create protection policy.
 ---
-- hosts: localhost
+- name: Playbook to create protection policy
+  hosts: localhost
   # => We need to gather facts to determine the OS type of
   # => the machine
   gather_facts: true
   become: false
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: Create protection policy to cohesity server.
-      cohesity_policy:
+      cohesity.dataprotect.cohesity_policy:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

@@ -4,17 +4,16 @@
 # with_items: "{{ groups['linux'] }}"
 
 ---
-- hosts: localhost
+- name: Playbook to refresh list of Physical source to the cluster
+  hosts: localhost
   become: false
-  collections:
-    - cohesity.dataprotect
   vars:
     linux_servers:
       - ServerA
       - ServerB
   tasks:
     - name: "Cohesity Protection Source: Refresh list of Sources"
-      cohesity_source:
+      cohesity.dataprotect.cohesity_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

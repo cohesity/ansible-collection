@@ -7,16 +7,15 @@
 # => specified in the Ansible inventory
 # =>
 ---
-- hosts: linux
+- name: UnInstall the Cohesity Agent on each Linux host
+  hosts: linux
   # => We need to gather facts to determine the OS type of
   # => the machine
   gather_facts: true
   become: true
-  collections:
-    - cohesity.dataprotect
   tasks:
     - name: "Cohesity agent: Set Agent to state of absent"
-      cohesity_agent:
+      cohesity.dataprotect.cohesity_agent:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

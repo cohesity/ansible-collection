@@ -169,7 +169,7 @@ EXAMPLES = """
     state: present
     service_user: cagent
     service_group: cagent
-    create_user: True
+    create_user: true
 
 # Removes the current installed agent from the host
 - cohesity_agent:
@@ -194,15 +194,14 @@ EXAMPLES = """
     cohesity_password: password
     state: present
     service_user: cagent
-    native_package: True
+    native_package: true
 
 # Install the cohesity agent using native package downloaded from given URI. Here, the Cohesity cluster credentials are not required
 - cohesity_agent:
     state: present
     service_user: cagent
-    native_package: True
+    native_package: true
     download_uri: 'http://192.168.1.1/files/bin/installers/el-cohesity-agent-6.3-1.x86_64.rpm'
-
 """
 
 RETURN = """
