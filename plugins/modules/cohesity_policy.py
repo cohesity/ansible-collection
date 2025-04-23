@@ -147,6 +147,7 @@ try:
     from cohesity_management_sdk.models.archival_external_target import (
         ArchivalExternalTarget,
     )
+    from cohesity_management_sdk.models.data_lock_config import DataLockConfig
     from cohesity_management_sdk.models.blackout_period import BlackoutPeriod
     from cohesity_management_sdk.models.continuous_schedule import ContinuousSchedule
     from cohesity_management_sdk.models.daily_schedule import DailySchedule
@@ -358,6 +359,15 @@ def replication_copy_policies(module):
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
+def data_lock_config(module):
+    try:
+        data_lock_config = DataLockConfig()
+        if module.params.get('data_lock_config'):
+            data_lock_config.days_to_keep = module.params.get("days_to_keep")
+            data_lock_config.worm_retention_type = "k" + module.params.get("worm_retention_type")
+        return data_lock_config
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
 
 def archival_copy_policies(module):
     """
@@ -403,6 +413,8 @@ def create_policy(module):
         policy_request.days_to_keep = module.params.get("days_to_retain")
         policy_request.retries = module.params.get("retries")
         policy_request.retry_interval_mins = module.params.get("retry_interval")
+        if module.params.get("data_lock_config"):
+            policy_request.data_lock_config = data_lock_config(module)
         if module.params.get("blackout_window"):
             policy_request.blackout_periods = blackout_window(module)
 
@@ -568,6 +580,7 @@ def main():
             extended_retention=dict(type="list", elements="dict"),
             archival_copy=dict(type="list", elements="dict"),
             replication_copy=dict(type="list", elements="dict"),
+            data_lock_config=dict(type="dict")
         )
     )
 
