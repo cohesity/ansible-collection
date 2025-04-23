@@ -21,3 +21,6 @@
           - cluster_name: ClusterB
         incremental_backup_schedule:
           periodicity: Daily
+        data_lock_config:
+          days_to_keep: 2
+          worm_retention_type: 'Compliance'

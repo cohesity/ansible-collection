@@ -1,4 +1,4 @@
-cohesity-management-sdk==1.10.1
+cohesity-management-sdk==1.12.3
 pywinrm
 requests==2.31.0
 ansible==9.2.0
