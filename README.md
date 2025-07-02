@@ -41,6 +41,7 @@ To install the requirements, run **pip install -r [requirement.txt](https://gith
  - [More samples playbooks](https://github.com/cohesity/ansible-collection/blob/main/README.md#examples)
  - [How can you contribute](https://github.com/cohesity/ansible-collection/blob/main/README.md#contribute)
  - [Suggestions and Feedback](https://github.com/cohesity/ansible-collection/blob/main/README.md#suggest)
+ - [Disclaimer](#disclaimer)
 
 
 ## <a name="get-started"></a> Let's get started
@@ -65,3 +66,8 @@ This collection follows the [Ansible project's Code of Conduct](https://docs.ans
 ## License
 
 GNU General Public License v3.0.
+
+## <a name ="disclaimer"></a> Disclaimer
+
+The scripts, recipes, and integrations provided here are community-contributed or best-effort solutions from Cohesity engineering and ecosystem partners. These resources are not officially supported by Cohesity Support or Field teams.
+For production-grade use or enterprise implementation support, please contact Cohesity Professional Services or your account team.
