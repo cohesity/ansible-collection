@@ -22,7 +22,7 @@ for Cohesity Platforms.
 
 def cohesity_common_argument_spec():
     return dict(
-        cluster=dict(type="str", aliases=["cohesity_server"]),
+        cluster=dict(type="str", aliases=["cohesity_server", "cohesity_cluster"]),
         username=dict(
             type="str", aliases=["cohesity_user", "admin_name", "cohesity_admin"]
         ),
@@ -33,6 +33,9 @@ def cohesity_common_argument_spec():
             default=True, type="bool", aliases=["cohesity_validate_certs"]
         ),
         state=dict(choices=["present", "absent"], default="present"),
+        api_key=dict(
+            type="str", aliases=["cohesity_apikey", "apikey"]
+        ),
     )
 
 
