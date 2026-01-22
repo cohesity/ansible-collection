@@ -1,6 +1,12 @@
 ---
 name: Ansible Lint
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,6 +16,8 @@ jobs:
           - stable-2.16
           - stable-2.17
           - stable-2.18
+          - stable-2.19
+          - stable-2.20
     steps:
       - uses: actions/checkout@v2
       # this Action should follow steps to set up Python build environment
