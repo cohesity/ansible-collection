@@ -18,16 +18,17 @@ description:
 version_added: 1.3.0
 author: "Naveena (@naveena-maplelabs)"
 options:
-  cluster:
+  cohesity_cluster:
     aliases:
       - cohesity_server
+      - cluster
     description:
       - "IP or FQDN for the Cohesity Cluster"
     type: str
-  cohesity_admin:
+  cohesity_user:
     aliases:
       - admin_name
-      - cohesity_user
+      - cohesity_admin
       - username
     description:
       - Username with which Ansible will connect to the Cohesity Cluster. Domain Specific credentails can be configured in following formats
@@ -42,11 +43,16 @@ options:
     description:
       - "Password belonging to the selected Username.  This parameter will not be logged."
     type: str
+  cohesity_apikey:
+    aliases:
+      - apikey
+      - api_key
+    description:
+      - Cohesity generated API key used for authentication. If both cohesity_apikey and cohesity_username/cohesity_password are specified, the cohesity_apikey will be used.
+    type: str
   state:
     description:
-      - Determines the level of data collection to perform. Complete will gather all details
-      - currently supported by the module.  Minimal will gather basic cluster information but
-      - not gather details about source, jobs, or executions.
+      - Determines the level of data collection to perform. Complete will gather all details currently supported by the module.  Minimal will gather basic cluster information but not gather details about source, jobs, or executions.
     choices:
       - complete
       - minimal
@@ -54,32 +60,27 @@ options:
     type: str
   include_sources:
     description:
-      - When True, will return the details about all registered Protection Sources.  This value
-      - is skipped when the C(state=complete)
+      - When True, will return the details about all registered Protection Sources.  This value is skipped when the state parameter is set to complete.
     type: bool
     default: no
   include_jobs:
     description:
-      - When True, will return the details about all registered Protection Jobs.  This value
-      - is skipped when the C(state=complete)
+      - When True, will return the details about all registered Protection Jobs.  This value is skipped when the state parameter is set to complete.
     type: bool
     default: no
   include_runs:
     description:
-      - When True, will return the details about all registered Protection Job executions.  This value
-      - is skipped when the C(state=complete)
+      - When True, will return the details about all registered Protection Job executions.  This value is skipped when the state parameter is set to complete.
     type: bool
     default: no
   active_only:
     description:
-      - When True, will return only the actively running Protection Job executions.  This value
-      - will filter the Protection Job executions data if I(active_only=yes)
+      - When True, will return only the actively running Protection Job executions.  This value will filter the Protection Job executions data if I(active_only=yes)
     type: bool
     default: no
   include_deleted:
     description:
-      - When True, will return all details about all registered Protection data included items marked deleted.  This value
-      - will filter the Protection Sources, Jobs, and Executions data and return only current information if I(include_deleted=no)
+      - When True, will return all details about all registered Protection data included items marked deleted.  This value will filter the Protection Sources, Jobs, and Executions data and return only current information if I(include_deleted=no)
     type: bool
     default: no
   validate_certs:
@@ -102,8 +103,7 @@ EXAMPLES = """
 # Gather facts about all nodes and protection sources in a cluster
 - cohesity_facts:
     cluster: cohesity.lab
-    username: admin
-    password: password
+    api_key: 8c0019ab-7600-4aa0-5bcd-9d817c7a108b
     state: minimal
     include_sources: true
 
@@ -123,7 +123,7 @@ import traceback
 
 try:
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_auth import (
-        get__cohesity_auth__token,
+        get__cohesity_auth__header,
     )
     from ansible_collections.cohesity.dataprotect.plugins.module_utils.cohesity_utilities import (
         cohesity_common_argument_spec,
@@ -168,11 +168,12 @@ def main():
         server=module.params.get("cluster"),
         username=module.params.get("username"),
         password=module.params.get("password"),
+        api_key=module.params.get("api_key"),
         validate_certs=module.params.get("validate_certs"),
         active_only=module.params.get("active_only"),
         is_deleted=module.params.get("is_deleted"),
     )
-    params["token"] = get__cohesity_auth__token(module)
+    params["auth_dict"] = get__cohesity_auth__header(module)
     try:
         include_sources = True
         include_jobs = True
