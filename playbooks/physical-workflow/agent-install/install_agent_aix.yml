@@ -12,6 +12,7 @@
   vars:
     create_user: false
     native_package: false
+    # install_path is not supported on AIX because the native package controls the layout.
 
   # => We need to gather facts to determine the OS type of
   # => the machine

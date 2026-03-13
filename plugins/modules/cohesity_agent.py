@@ -54,6 +54,8 @@ options:
       - "Optional directory path to which the installer will be downloaded.  If not selected, then a temporary"
       - "directory will be created in the default System Temp Directory.  When choosing an alternate directory,"
       - "the directory and installer will not be deleted at the end of the execution."
+      - "This option controls only where the installer is downloaded and extracted.  It does not change"
+      - "the Cohesity Agent installation directory."
     type: str
     default: ""
   download_uri:
@@ -71,6 +73,13 @@ options:
     default: ""
     description:
       - "Host name of the source."
+    type: str
+  install_path:
+    default: ""
+    description:
+      - "Optional installation directory for the non-native Linux script installer."
+      - "If not provided, the installer uses its default location under the selected service user's home directory."
+      - "This parameter is not supported for native package installations or AIX."
     type: str
   native_package:
     default: false
@@ -162,7 +171,7 @@ EXAMPLES = """
     cohesity_password: password
     state: present
 
-# Install the current version of the agent with custom User and Group
+# Install the current version of the agent with custom User, Group, and install path
 - cohesity_agent:
     server: cohesity.lab
     cohesity_admin: admin
@@ -171,6 +180,7 @@ EXAMPLES = """
     service_user: cagent
     service_group: cagent
     create_user: true
+    install_path: /opt/cohesity
 
 # Removes the current installed agent from the host
 - cohesity_agent:
@@ -220,6 +230,24 @@ def verify_dependencies():
     # => TODO:  Need to add package dependency checks for:
     # => wget, rsync, lsof, nfs-utils, lvm2
     pass
+
+
+def validate_install_path(module):
+    install_path = module.params.get("install_path")
+    if not install_path:
+        return
+
+    if module.params.get("operating_system") == "AIX":
+        module.fail_json(
+            changed=False,
+            msg="install_path is not supported for AIX because the native package manages the install layout",
+        )
+
+    if module.params.get("native_package"):
+        module.fail_json(
+            changed=False,
+            msg="install_path is supported only for non-native Linux script installations",
+        )
 
 
 def check_agent(module, results):
@@ -443,6 +471,7 @@ def install_agent(module, installer, native):
     #
     # => Note: Python 2.6 doesn't fully support the new string formatters, so this
     # => try..except will give us a clean backwards compatibility.
+    install_data = None
     if not native:
         install_opts = (
             "--create-user " + str(int(module.params.get("create_user"))) + " "
@@ -455,10 +484,20 @@ def install_agent(module, installer, native):
             )
         if module.params.get("file_based"):
             install_opts += "--skip-lvm-check "
+        if module.params.get("install_path"):
+            install_data = "{0}\n".format(module.params.get("install_path"))
         try:
-            cmd = "{0}/setup.sh --install --yes {1}".format(installer, install_opts)
+            cmd = "{0}/setup.sh --install {1}{2}".format(
+                installer,
+                "" if module.params.get("install_path") else "--yes ",
+                install_opts,
+            )
         except Exception:
-            cmd = "%s/setup.sh --install --yes %s" % (installer, install_opts)
+            cmd = "%s/setup.sh --install %s%s" % (
+                installer,
+                "" if module.params.get("install_path") else "--yes ",
+                install_opts,
+            )
     else:
         try:
             if module.params.get("service_user"):
@@ -493,7 +532,7 @@ def install_agent(module, installer, native):
             ):
                 cmd = "sudo COHESITYUSER=%s  rpm -i %s" % (user, installer)
 
-    rc, stdout, stderr = module.run_command(cmd, cwd=installer)
+    rc, stdout, stderr = module.run_command(cmd, cwd=installer, data=install_data)
     # => Any return code other than 0 is considered a failure.
     if rc:
         installation_failures(
@@ -784,6 +823,7 @@ def main():
             download_uri=dict(default=""),
             operating_system=dict(default="", type="str"),
             host=dict(type="str", default=""),
+            install_path=dict(default="", type="str"),
             upgrade=dict(type="bool", default=False),
             wait_minutes=dict(type="int", default=30),
         )
@@ -804,6 +844,8 @@ def main():
     # Agent installation for AIX operating system is done using native package.
     if module.params.get("operating_system") == "AIX":
         module.params["native_package"] = True
+
+    validate_install_path(module)
 
     success = True
     try:
