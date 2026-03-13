@@ -83,9 +83,11 @@ Parameters
 
 
   install_path (optional, str, )
-    Optional installation directory for the non-native Linux script installer.
+    Optional installation root directory for the non-native Linux script installer.
 
     If not provided, the installer uses its default location under the selected service user's home directory.
+
+    This value is passed to setup.sh as --install-dir.
 
     This parameter is not supported for native package installations or AIX.
 

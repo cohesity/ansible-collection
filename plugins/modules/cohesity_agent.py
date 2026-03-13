@@ -77,8 +77,9 @@ options:
   install_path:
     default: ""
     description:
-      - "Optional installation directory for the non-native Linux script installer."
+      - "Optional installation root directory for the non-native Linux script installer."
       - "If not provided, the installer uses its default location under the selected service user's home directory."
+      - "This value is passed to setup.sh as --install-dir."
       - "This parameter is not supported for native package installations or AIX."
     type: str
   native_package:
@@ -471,7 +472,6 @@ def install_agent(module, installer, native):
     #
     # => Note: Python 2.6 doesn't fully support the new string formatters, so this
     # => try..except will give us a clean backwards compatibility.
-    install_data = None
     if not native:
         install_opts = (
             "--create-user " + str(int(module.params.get("create_user"))) + " "
@@ -485,19 +485,11 @@ def install_agent(module, installer, native):
         if module.params.get("file_based"):
             install_opts += "--skip-lvm-check "
         if module.params.get("install_path"):
-            install_data = "{0}\n".format(module.params.get("install_path"))
+            install_opts += "--install-dir " + module.params.get("install_path") + " "
         try:
-            cmd = "{0}/setup.sh --install {1}{2}".format(
-                installer,
-                "" if module.params.get("install_path") else "--yes ",
-                install_opts,
-            )
+            cmd = "{0}/setup.sh --install --yes-all {1}".format(installer, install_opts)
         except Exception:
-            cmd = "%s/setup.sh --install %s%s" % (
-                installer,
-                "" if module.params.get("install_path") else "--yes ",
-                install_opts,
-            )
+            cmd = "%s/setup.sh --install --yes-all %s" % (installer, install_opts)
     else:
         try:
             if module.params.get("service_user"):
@@ -532,7 +524,7 @@ def install_agent(module, installer, native):
             ):
                 cmd = "sudo COHESITYUSER=%s  rpm -i %s" % (user, installer)
 
-    rc, stdout, stderr = module.run_command(cmd, cwd=installer, data=install_data)
+    rc, stdout, stderr = module.run_command(cmd, cwd=installer)
     # => Any return code other than 0 is considered a failure.
     if rc:
         installation_failures(
@@ -573,9 +565,9 @@ def remove_agent(module, installer, native):
     # => try..except will give us a clean backwards compatibility.
     if not native:
         try:
-            cmd = "{0}/setup.sh --full-uninstall --yes".format(installer)
+            cmd = "{0}/setup.sh --full-uninstall --yes-all".format(installer)
         except Exception:
-            cmd = "%s/setup.sh --full-uninstall --yes" % (installer)
+            cmd = "%s/setup.sh --full-uninstall --yes-all" % (installer)
         rc, out, err = module.run_command(cmd, cwd=installer)
 
         # => Any return code other than 0 is considered a failure.
