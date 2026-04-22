@@ -233,11 +233,14 @@ def check_agent(module, results):
     # Resolve the actual home directory from the OS user database so this
     # works regardless of where the home directory is located.
     crux_agent_path = None
-    service_user = module.params.get("service_user") or "cohesityagent"
+    service_user = module.params.get("service_user")
     try:
-        home_dir = pwd.getpwnam(service_user).pw_dir
+        if service_user == "root":
+            install_root = "/opt"
+        else:
+            install_root = pwd.getpwnam(service_user).pw_dir
         crux_agent_path = os.path.join(
-            home_dir, service_user, "software", "crux", "bin",
+            install_root, "cohesityagent", "software", "crux", "bin",
             "cohesity_linux_agent.sh"
         )
     except KeyError:
