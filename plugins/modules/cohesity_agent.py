@@ -125,6 +125,7 @@ version_added: 1.3.0
 
 import os
 import json
+import pwd
 import time
 import shutil
 
@@ -226,10 +227,29 @@ def check_agent(module, results):
     aix_agent_path = "/usr/local/cohesity/agent/aix_agent.sh"
     def_agent_path = "/etc/init.d/cohesity-agent"
 
-    # Look for default ansible agent path and aix agent path.
+    # On systemd hosts the installer registers a systemd unit and does NOT
+    # create the SysV script at def_agent_path.  The agent binary lives at
+    # ~<service_user>/<service_user>/software/crux/bin/cohesity_linux_agent.sh
+    # Resolve the actual home directory from the OS user database so this
+    # works regardless of where the home directory is located.
+    crux_agent_path = None
+    service_user = module.params.get("service_user") or "cohesityagent"
+    try:
+        home_dir = pwd.getpwnam(service_user).pw_dir
+        crux_agent_path = os.path.join(
+            home_dir, service_user, "software", "crux", "bin",
+            "cohesity_linux_agent.sh"
+        )
+    except KeyError:
+        # Service user does not exist (agent not installed yet).
+        pass
+
+    # Check paths in order: SysV script, crux binary, AIX agent.
     agent_path = (
         def_agent_path
         if os.path.exists(def_agent_path)
+        else crux_agent_path
+        if crux_agent_path and os.path.exists(crux_agent_path)
         else aix_agent_path
         if os.path.exists(aix_agent_path)
         else None

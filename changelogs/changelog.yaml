@@ -1,6 +1,11 @@
 ---
 ancestor: 1.3.0
 releases:
+  1.4.3:
+    release_date: '2026-04-22'
+    changes:
+      bugfixes:
+        - cohesity_agent - Fixed agent detection failing with "Cohesity Agent is partially installed" on systemd hosts where the SysV init script is not created by the installer.
   1.4.2:
     release_date: '2025-01-30'
     changes:
