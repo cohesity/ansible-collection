@@ -76,23 +76,31 @@ def get_cohesity_client(module):
     """
     try:
         cluster_vip = module.params.get("cluster")
-        username = module.params.get("username")
-        password = module.params.get("password")
-        domain = "LOCAL"
-        if "/" in username:
-            user_domain = username.split("/")
-            username = user_domain[1]
-            domain = user_domain[0]
-
-        elif "@" in username:
-            user_domain = username.split("@")
-            username = user_domain[0]
-            domain = user_domain[1]
-
         global cohesity_client
-        cohesity_client = CohesityClient(
-            cluster_vip=cluster_vip, username=username, password=password, domain=domain
-        )
+        api_key = module.params.get("api_key")
+
+        if api_key:
+            cohesity_client = CohesityClient(
+                cluster_vip=cluster_vip, api_key=api_key
+            )
+        else:
+            username = module.params.get("username")
+            password = module.params.get("password")
+            domain = "LOCAL"
+            if "/" in username:
+                user_domain = username.split("/")
+                username = user_domain[1]
+                domain = user_domain[0]
+    
+            elif "@" in username:
+                user_domain = username.split("@")
+                username = user_domain[0]
+                domain = user_domain[1]
+    
+            cohesity_client = CohesityClient(
+                cluster_vip=cluster_vip, username=username, password=password, domain=domain
+            )
+
         return cohesity_client
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
@@ -125,7 +133,8 @@ def get__cluster(self):
         )
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         cluster = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -149,7 +158,7 @@ def get__nodes(self):
         uri = "https://" + self["server"] + "/irisservices/api/v1/public/nodes"
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         nodes = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -187,7 +196,8 @@ def get__prot_source__all(self):
             uri = uri + "?environments=k" + self["environment"]
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         objects = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -243,7 +253,8 @@ def get__prot_policy__all(self):
             uri = uri + "?" + urllib_parse.urlencode({"names": self["policyId"]})
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         objects = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -265,7 +276,8 @@ def get__prot_job__all(self):
             uri = uri + "?environments=k" + self["environment"]
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         objects = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -298,7 +310,8 @@ def get__storage_domain_id__all(self):
 
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         objects = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120
@@ -321,7 +334,8 @@ def get__protection_run__all(self):
             uri = uri + "?jobId=" + str(self["id"])
         headers = {
             "Accept": "application/json",
-            "Authorization": "Bearer " + self["token"],
+            #"Authorization": "Bearer " + self["token"],
+            self["auth_dict"]["auth_key"]: self["auth_dict"]["auth_value"]
         }
         objects = open_url(
             url=uri, headers=headers, validate_certs=self["validate_certs"], timeout=120

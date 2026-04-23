@@ -28,10 +28,11 @@ collections:
   - cohesity.dataprotect
 ```
 # Requirements
-- ansible-core version >= 2.16.0
+- ansible-core version >= 2.16.3
 - requests >= 2.31.0
 - python version >= '3.6'
-- cohesity_management_sdk >= 1.6.0
+- pywinrm
+- cohesity_management_sdk == 1.10.1
 
 To install the requirements, run **pip install -r [requirement.txt](https://github.com/cohesity/ansible-collection/blob/main/requirements.txt)**
 

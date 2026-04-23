@@ -15,8 +15,7 @@ short_description: The **CohesityAuth** utils module provides the authentication
 for Cohesity Platforms.
 version_added: 1.3.0
 description:
-    - The **CohesityAuth** utils module provides the authentication token manage
-for Cohesity Platforms.
+    - The **CohesityAuth** utils module provides the authentication token manage for Cohesity Platforms.
 """
 
 
@@ -44,6 +43,7 @@ class Authentication(object):
         self.username = ""
         self.password = ""
         self.domain = ""
+        self.api_key = ""
         self.ssl_validation = False
 
     def get_token(self, server):
@@ -152,7 +152,10 @@ class Authentication(object):
             else:
                 raise TokenException(e)
 
-
+# => This function returns a bearer token.  Part of original development
+# => work when only username and password authentication supported.  This
+# => eventually be deprecated in favor of the get__cohesity_auth__header
+# => function below.
 def get__cohesity_auth__token(self):
     server = self.params.get("cluster")
 
@@ -174,3 +177,39 @@ def get__cohesity_auth__token(self):
         auth.domain = user_domain[1]
 
     return auth.get_token(server)
+
+# => This function returns a URL header dictionary.  The dictionary
+# => provides the proper Authorization or apKey header values.
+# => If an API key is provided, then that will be used for all
+# => API authorization uses in subsequent modules.
+def get__cohesity_auth__header(self):
+    server = self.params.get("cluster")
+
+    auth = Authentication()
+    if self.params.get("api_key"):
+        # => api_key is set, return the proper key and value pair
+        return dict(
+                auth_key = "apiKey",
+                auth_value = self.params.get("api_key")
+        )
+    else:
+        auth.username = self.params.get("username")
+        auth.password = self.params.get("password")
+    
+        if self.params.get("domain"):
+            auth.domain = self.params.get("domain")
+    
+        if "/" in auth.username:
+            user_domain = auth.username.split("/")
+            auth.username = user_domain[1]
+            auth.domain = user_domain[0]
+    
+        elif "@" in auth.username:
+            user_domain = auth.username.split("@")
+            auth.username = user_domain[0]
+            auth.domain = user_domain[1]
+    
+        return dict(
+                auth_key = "Authorization",
+                auth_value = "Bearer " + auth.get_token(server)
+        )
