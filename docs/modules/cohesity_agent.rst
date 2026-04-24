@@ -157,6 +157,16 @@ Examples
         cohesity_password: password
         state: present
 
+    # Install the current version of the agent with custom User and Group
+    - cohesity_agent:
+        server: cohesity.lab
+        cohesity_admin: admin
+        cohesity_password: password
+        state: present
+        service_user: cagent
+        service_group: cagent
+        create_user: true
+
     # Install the current version of the agent with custom User, Group, and install path
     - cohesity_agent:
         server: cohesity.lab

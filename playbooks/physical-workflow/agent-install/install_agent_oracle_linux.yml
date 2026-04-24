@@ -12,7 +12,6 @@
   vars:
     create_user: false
     native_package: false
-    install_path: /opt/cohesity
 
   # => We need to gather facts to determine the OS type of
   # => the machine
@@ -35,7 +34,6 @@
         validate_certs: "{{ cohesity_validate_certs }}"
         state: "{{ state | default('present') }}"
         create_user: "{{ create_user | default(false) }}"
-        install_path: "{{ install_path | default('') }}"
         native_package: "{{ native_package | default(false) }}"
         # Please don't overwrite/edit the operating_system. Will be automatically
         # fetched from server.

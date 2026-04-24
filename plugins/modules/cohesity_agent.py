@@ -172,6 +172,16 @@ EXAMPLES = """
     cohesity_password: password
     state: present
 
+# Install the current version of the agent with custom User and Group
+- cohesity_agent:
+    server: cohesity.lab
+    cohesity_admin: admin
+    cohesity_password: password
+    state: present
+    service_user: cagent
+    service_group: cagent
+    create_user: true
+
 # Install the current version of the agent with custom User, Group, and install path
 - cohesity_agent:
     server: cohesity.lab
@@ -257,35 +267,57 @@ def check_agent(module, results):
     def_agent_path = "/etc/init.d/cohesity-agent"
 
     # On systemd hosts the installer registers a systemd unit and does NOT
-    # create the SysV script at def_agent_path.  The agent binary lives at
-    # ~<service_user>/<service_user>/software/crux/bin/cohesity_linux_agent.sh
-    # Resolve the actual home directory from the OS user database so this
-    # works regardless of where the home directory is located.
-    crux_agent_path = None
+    # create the SysV script at def_agent_path.  Resolve the agent binary from
+    # install_path when provided, otherwise from the service user's home.
+    crux_agent_paths = []
     service_user = module.params.get("service_user")
     try:
-        if service_user == "root":
+        if module.params.get("install_path"):
+            install_root = module.params.get("install_path")
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
+        elif service_user == "root":
             install_root = "/opt"
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
         else:
             install_root = pwd.getpwnam(service_user).pw_dir
-        crux_agent_path = os.path.join(
-            install_root, "cohesityagent", "software", "crux", "bin",
-            "cohesity_linux_agent.sh"
-        )
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
     except KeyError:
         # Service user does not exist (agent not installed yet).
         pass
 
-    # Check paths in order: SysV script, crux binary, AIX agent.
-    agent_path = (
-        def_agent_path
-        if os.path.exists(def_agent_path)
-        else crux_agent_path
-        if crux_agent_path and os.path.exists(crux_agent_path)
-        else aix_agent_path
-        if os.path.exists(aix_agent_path)
-        else None
+    # Check install_path first when provided, otherwise preserve the existing
+    # path preference.
+    agent_paths = (
+        crux_agent_paths + [def_agent_path, aix_agent_path]
+        if module.params.get("install_path")
+        else [def_agent_path] + crux_agent_paths + [aix_agent_path]
     )
+    agent_path = None
+    for possible_agent_path in agent_paths:
+        if possible_agent_path and os.path.exists(possible_agent_path):
+            agent_path = possible_agent_path
+            break
     if agent_path:
         cmd = "%s version" % agent_path
         rc, out, err = module.run_command(cmd)
