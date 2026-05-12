@@ -39,6 +39,8 @@ To install the requirements, run **pip install -r [requirement.txt](https://gith
 
  - [Getting Started](https://github.com/cohesity/ansible-collection/blob/main/README.md#get-started)
  - [More samples playbooks](https://github.com/cohesity/ansible-collection/blob/main/README.md#examples)
+ - [Changelog](#changelog)
+ - [Support (Red Hat Users)](#support-red-hat-users)
  - [How can you contribute](https://github.com/cohesity/ansible-collection/blob/main/README.md#contribute)
  - [Suggestions and Feedback](https://github.com/cohesity/ansible-collection/blob/main/README.md#suggest)
  - [Disclaimer](#disclaimer)
@@ -52,7 +54,29 @@ To install the requirements, run **pip install -r [requirement.txt](https://gith
 
 * Refer [`playbooks`](https://github.com/cohesity/ansible-collection/tree/main/playbooks) folder to find more examples.
 
+## <a name="changelog"></a> Changelog
+
+See [CHANGELOG.rst](https://github.com/cohesity/ansible-collection/blob/main/CHANGELOG.rst) for a full list of changes by version.
+
+**Recent highlights:**
+
+- **v1.4.3** — Fixed agent detection failing with "Cohesity Agent is partially installed" on systemd hosts where the SysV init script is not created by the installer.
+- **v1.4.2** — Bumped minimum Ansible-Core version to 2.16; fixed `LiteralPath` issue during Windows agent installation and collection failure issues on some Ansible versions.
+
+## Support (Red Hat Users)
+
+This collection is part of **Red Hat Ansible Certified Content** and is entitled to support through the [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible).
+
+If you are an AAP subscriber, you can open a support case directly from **Ansible Automation Hub**:
+
+1. Navigate to the collection page on [Ansible Automation Hub](https://console.redhat.com/ansible/automation-hub/repo/published/cohesity/dataprotect/).
+2. Click the **Create issue** button to file a support ticket with Red Hat.
+
+For issues or feature requests outside of an AAP subscription, use the [GitHub issue tracker](https://github.com/cohesity/ansible-collection/issues/new/choose).
+
 ## <a name="contribute"></a> Contribute
+
+* [Refer our contribution guideline](https://github.com/cohesity/ansible-collection/tree/main/CONTRIBUTING.md).
 
 * [Refer our contribution guideline](https://github.com/cohesity/ansible-collection/tree/main/CONTRIBUTING.md).
 
