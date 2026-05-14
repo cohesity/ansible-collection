@@ -6,6 +6,20 @@ Cohesity.Dataprotect Release Notes
 
 This changelog describes changes after version 1.3.0.
 
+v1.4.4
+======
+
+Security Fixes
+--------------
+
+- Bumped ``requests`` minimum version to ``>=2.31.0`` to address known security vulnerabilities in older versions.
+
+Documentation Changes
+---------------------
+
+- Added Changelog section to README with recent version highlights.
+- Added Support (Red Hat Users) section to README with Ansible Automation Hub guidance.
+
 v1.4.3
 ======
 
