@@ -19,6 +19,7 @@ Documentation Changes
 
 - Added Changelog section to README with recent version highlights.
 - Added Support (Red Hat Users) section to README with Ansible Automation Hub guidance.
+- removed ansible-core from requirements.txt
 
 v1.4.3
 ======
