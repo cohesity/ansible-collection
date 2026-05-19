@@ -65,6 +65,10 @@ Parameters
 
     the directory and installer will not be deleted at the end of the execution.
 
+    This option controls only where the installer is downloaded and extracted.  It does not change
+
+    the Cohesity Agent installation directory.
+
 
   download_uri (optional, str, )
     The download uri from where the installer can be downloaded
@@ -76,6 +80,16 @@ Parameters
 
   host (optional, str, )
     Host name of the source.
+
+
+  install_path (optional, str, )
+    Optional installation root directory for the non-native Linux script installer.
+
+    If not provided, the installer uses its default location under the selected service user's home directory.
+
+    This value is passed to setup.sh as --install-dir.
+
+    This parameter is not supported for native package installations or AIX.
 
 
   native_package (optional, bool, False)
@@ -153,6 +167,17 @@ Examples
         service_group: cagent
         create_user: true
 
+    # Install the current version of the agent with custom User, Group, and install path
+    - cohesity_agent:
+        server: cohesity.lab
+        cohesity_admin: admin
+        cohesity_password: password
+        state: present
+        service_user: cagent
+        service_group: cagent
+        create_user: true
+        install_path: /opt/cohesity
+
     # Removes the current installed agent from the host
     - cohesity_agent:
         server: cohesity.lab
@@ -200,4 +225,3 @@ Authors
 ~~~~~~~
 
 - Naveena (@naveena-maplelabs)
-

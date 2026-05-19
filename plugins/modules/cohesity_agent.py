@@ -54,6 +54,8 @@ options:
       - "Optional directory path to which the installer will be downloaded.  If not selected, then a temporary"
       - "directory will be created in the default System Temp Directory.  When choosing an alternate directory,"
       - "the directory and installer will not be deleted at the end of the execution."
+      - "This option controls only where the installer is downloaded and extracted.  It does not change"
+      - "the Cohesity Agent installation directory."
     type: str
     default: ""
   download_uri:
@@ -71,6 +73,14 @@ options:
     default: ""
     description:
       - "Host name of the source."
+    type: str
+  install_path:
+    default: ""
+    description:
+      - "Optional installation root directory for the non-native Linux script installer."
+      - "If not provided, the installer uses its default location under the selected service user's home directory."
+      - "This value is passed to setup.sh as --install-dir."
+      - "This parameter is not supported for native package installations or AIX."
     type: str
   native_package:
     default: false
@@ -172,6 +182,17 @@ EXAMPLES = """
     service_group: cagent
     create_user: true
 
+# Install the current version of the agent with custom User, Group, and install path
+- cohesity_agent:
+    server: cohesity.lab
+    cohesity_admin: admin
+    cohesity_password: password
+    state: present
+    service_user: cagent
+    service_group: cagent
+    create_user: true
+    install_path: /opt/cohesity
+
 # Removes the current installed agent from the host
 - cohesity_agent:
     server: cohesity.lab
@@ -222,41 +243,81 @@ def verify_dependencies():
     pass
 
 
+def validate_install_path(module):
+    install_path = module.params.get("install_path")
+    if not install_path:
+        return
+
+    if module.params.get("operating_system") == "AIX":
+        module.fail_json(
+            changed=False,
+            msg="install_path is not supported for AIX because the native package manages the install layout",
+        )
+
+    if module.params.get("native_package"):
+        module.fail_json(
+            changed=False,
+            msg="install_path is supported only for non-native Linux script installations",
+        )
+
+
 def check_agent(module, results):
     # => Determine if the Cohesity Agent is currently installed
     aix_agent_path = "/usr/local/cohesity/agent/aix_agent.sh"
     def_agent_path = "/etc/init.d/cohesity-agent"
 
     # On systemd hosts the installer registers a systemd unit and does NOT
-    # create the SysV script at def_agent_path.  The agent binary lives at
-    # ~<service_user>/<service_user>/software/crux/bin/cohesity_linux_agent.sh
-    # Resolve the actual home directory from the OS user database so this
-    # works regardless of where the home directory is located.
-    crux_agent_path = None
+    # create the SysV script at def_agent_path.  Resolve the agent binary from
+    # install_path when provided, otherwise from the service user's home.
+    crux_agent_paths = []
     service_user = module.params.get("service_user")
     try:
-        if service_user == "root":
+        if module.params.get("install_path"):
+            install_root = module.params.get("install_path")
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
+        elif service_user == "root":
             install_root = "/opt"
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
         else:
             install_root = pwd.getpwnam(service_user).pw_dir
-        crux_agent_path = os.path.join(
-            install_root, "cohesityagent", "software", "crux", "bin",
-            "cohesity_linux_agent.sh"
-        )
+            crux_agent_paths.append(
+                os.path.join(
+                    install_root, "cohesityagent", "software", "crux", "bin",
+                    "cohesity_linux_agent.sh"
+                )
+            )
     except KeyError:
         # Service user does not exist (agent not installed yet).
         pass
 
-    # Check paths in order: SysV script, crux binary, AIX agent.
-    agent_path = (
-        def_agent_path
-        if os.path.exists(def_agent_path)
-        else crux_agent_path
-        if crux_agent_path and os.path.exists(crux_agent_path)
-        else aix_agent_path
-        if os.path.exists(aix_agent_path)
-        else None
+    # Check install_path first when provided, otherwise preserve the existing
+    # path preference.
+    agent_paths = (
+        crux_agent_paths + [def_agent_path, aix_agent_path]
+        if module.params.get("install_path")
+        else [def_agent_path] + crux_agent_paths + [aix_agent_path]
     )
+    agent_path = None
+    for possible_agent_path in agent_paths:
+        if possible_agent_path and os.path.exists(possible_agent_path):
+            agent_path = possible_agent_path
+            break
     if agent_path:
         cmd = "%s version" % agent_path
         rc, out, err = module.run_command(cmd)
@@ -455,10 +516,12 @@ def install_agent(module, installer, native):
             )
         if module.params.get("file_based"):
             install_opts += "--skip-lvm-check "
+        if module.params.get("install_path"):
+            install_opts += "--install-dir " + module.params.get("install_path") + " "
         try:
-            cmd = "{0}/setup.sh --install --yes {1}".format(installer, install_opts)
+            cmd = "{0}/setup.sh --install --yes-all {1}".format(installer, install_opts)
         except Exception:
-            cmd = "%s/setup.sh --install --yes %s" % (installer, install_opts)
+            cmd = "%s/setup.sh --install --yes-all %s" % (installer, install_opts)
     else:
         try:
             if module.params.get("service_user"):
@@ -534,9 +597,9 @@ def remove_agent(module, installer, native):
     # => try..except will give us a clean backwards compatibility.
     if not native:
         try:
-            cmd = "{0}/setup.sh --full-uninstall --yes".format(installer)
+            cmd = "{0}/setup.sh --full-uninstall --yes-all".format(installer)
         except Exception:
-            cmd = "%s/setup.sh --full-uninstall --yes" % (installer)
+            cmd = "%s/setup.sh --full-uninstall --yes-all" % (installer)
         rc, out, err = module.run_command(cmd, cwd=installer)
 
         # => Any return code other than 0 is considered a failure.
@@ -784,6 +847,7 @@ def main():
             download_uri=dict(default=""),
             operating_system=dict(default="", type="str"),
             host=dict(type="str", default=""),
+            install_path=dict(default="", type="str"),
             upgrade=dict(type="bool", default=False),
             wait_minutes=dict(type="int", default=30),
         )
@@ -804,6 +868,8 @@ def main():
     # Agent installation for AIX operating system is done using native package.
     if module.params.get("operating_system") == "AIX":
         module.params["native_package"] = True
+
+    validate_install_path(module)
 
     success = True
     try:
