@@ -14,8 +14,6 @@ Bugfixes
 
 - ansible-lint - Removed ``name[template]`` from ``.ansible-lint`` skip_list and fixed task names across playbooks to ensure Jinja2 template variables appear only at the end of task name strings.
 - galaxy.yml - Added ``ansible.cfg`` and ``.ansible`` to ``build_ignore`` to prevent local developer configuration files from being packaged into the collection tarball.
-- install_win_agent - Replaced ``community.windows.win_firewall_rule`` with ``ansible.windows.win_firewall`` in Windows agent install playbook to use the certified Ansible collection.
-- uninstall_win_agent - Replaced ``community.windows.win_firewall_rule`` with ``ansible.windows.win_firewall`` in Windows agent uninstall playbook to use the certified Ansible collection.
 
 Security Fixes
 --------------

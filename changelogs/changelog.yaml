@@ -24,12 +24,6 @@ releases:
       - galaxy.yml - Added ``ansible.cfg`` and ``.ansible`` to ``build_ignore`` to
         prevent local developer configuration files from being packaged into the collection
         tarball.
-      - install_win_agent - Replaced ``community.windows.win_firewall_rule`` with
-        ``ansible.windows.win_firewall`` in Windows agent install playbook to use
-        the certified Ansible collection.
-      - uninstall_win_agent - Replaced ``community.windows.win_firewall_rule`` with
-        ``ansible.windows.win_firewall`` in Windows agent uninstall playbook to use
-        the certified Ansible collection.
       security_fixes:
       - Bumped ``requests`` minimum version to ``>=2.31.0`` to address known security
         vulnerabilities in older versions.
