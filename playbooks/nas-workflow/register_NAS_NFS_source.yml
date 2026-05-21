@@ -7,7 +7,7 @@
     state: present
   become: false
   tasks:
-    - name: "Cohesity Protection Source: Set {{ endpoint | default('endpoint') }} to state of {{ cohesity_source.state | default('present') }}"
+    - name: "Cohesity Protection Source: Set NAS NFS source to state {{ cohesity_source.state | default('present') }}"
       cohesity.dataprotect.cohesity_source:
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"

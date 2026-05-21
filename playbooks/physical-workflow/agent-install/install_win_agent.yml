@@ -29,19 +29,14 @@
       tags: always
       register: installed
 
-    - name: Firewall rule to allow CohesityAgent on TCP port 50051
-      community.windows.win_firewall_rule:
-        name: Cohesity Agent Ansible
-        description:
-          - Automated Firewall rule created by the Cohesity Ansible integration to allow
-          - for the Cohesity Agent to communicate through the firewall.
-        localport: 50051
-        action: allow
-        direction: in
-        protocol: tcp
-        state: "{{ state }}"
-        enabled: true
-      tags: always
+    - name: Enable firewall for Domain, Public and Private profiles
+      ansible.windows.win_firewall:
+        state: enabled
+        profiles:
+          - Domain
+          - Private
+          - Public
+      tags: enable_firewall
 
     # => This reboot will only be triggered if both of the following conditions are true:
     # => - The registered variable 'installed' returns true when the changed state is queried.

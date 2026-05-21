@@ -16,7 +16,7 @@
         include_deleted: false
       register: cohesity
 
-    - name: "Write the Collected Facts to {{ inventory_dir }}/cohesity_facts.json"
+    - name: "Write the Collected Facts to cohesity_facts.json in {{ inventory_dir }}"
       ansible.builtin.copy:
         content: "{{ cohesity | to_nice_json }}"
         dest: "{{ inventory_dir }}/cohesity_facts.json"

@@ -68,7 +68,7 @@
       when: state == "present" and platform == "SapHana"
       changed_when: true
 
-    - name: "UDA scripts will be available in {{ sap_hana_home }}/cohesity_backint_plugin/uda_scripts"
+    - name: "UDA scripts will be available in cohesity_backint_plugin/uda_scripts at {{ sap_hana_home }}"
       when: state == "present" and platform == "SapHana"
       ansible.builtin.command: ls  /opt/cohesity/agent
       changed_when: false
