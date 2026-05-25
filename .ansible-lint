@@ -1,5 +1,2 @@
 ---
-# .ansible-lint
-
-skip_list:
-  - name[template]
+skip_list: []

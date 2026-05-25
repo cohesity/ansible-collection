@@ -61,3 +61,6 @@ issues: https://github.com/cohesity/ansible-collection/issues/new/choose
 build_ignore:
   - dev-requirements.txt
   - "*.gz"
+  - ansible.cfg
+  - .ansible
+  - importer_result.json

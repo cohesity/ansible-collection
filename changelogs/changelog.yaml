@@ -15,3 +15,21 @@ releases:
         installed" on systemd hosts where the SysV init script is not created by the
         installer.
     release_date: '2026-04-22'
+  1.4.4:
+    changes:
+      bugfixes:
+      - ansible-lint - Removed ``name[template]`` from ``.ansible-lint`` skip_list
+        and fixed task names across playbooks to ensure Jinja2 template variables
+        appear only at the end of task name strings.
+      - galaxy.yml - Added ``ansible.cfg`` and ``.ansible`` to ``build_ignore`` to
+        prevent local developer configuration files from being packaged into the collection
+        tarball.
+      security_fixes:
+      - Bumped ``requests`` minimum version to ``>=2.31.0`` to address known security
+        vulnerabilities in older versions.
+      minor_changes:
+      - Added Changelog section to README with recent version highlights.
+      - Added Support (Red Hat Users) section to README with Ansible Automation Hub
+        guidance.
+      - removed ansible-core from requirements.txt
+    release_date: '2026-05-21'
