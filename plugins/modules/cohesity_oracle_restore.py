@@ -277,7 +277,7 @@ def create_recover_job(module, token, database_info):
         module.exit_json(msg="Check Mode: This action will create new recover task")
     try:
         uri = "https://" + server + "/irisservices/api/v1/recoverApplication"
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         response = open_url(
             url=uri,
             data=json.dumps(body),
@@ -322,7 +322,7 @@ def search_for_database(token, module):
             + server
             + "/irisservices/api/v1/searchvms?entityTypes=kOracle&vmName=%s" % sourcedb
         )
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         response = open_url(
             url=uri,
             method="GET",

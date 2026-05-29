@@ -125,6 +125,7 @@ def get__cluster(self):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         cluster = open_url(
@@ -149,6 +150,7 @@ def get__nodes(self):
         uri = "https://" + self["server"] + "/irisservices/api/v1/public/nodes"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         nodes = open_url(
@@ -187,6 +189,7 @@ def get__prot_source__all(self):
             uri = uri + "?environments=k" + self["environment"]
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -216,6 +219,7 @@ def get__prot_source__roots(self):
             uri = uri + "?environments=k" + self["environment"]
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -243,6 +247,7 @@ def get__prot_policy__all(self):
             uri = uri + "?" + urllib_parse.urlencode({"names": self["policyId"]})
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -265,6 +270,7 @@ def get__prot_job__all(self):
             uri = uri + "?environments=k" + self["environment"]
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -298,6 +304,7 @@ def get__storage_domain_id__all(self):
 
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -321,6 +328,7 @@ def get__protection_run__all(self):
             uri = uri + "?jobId=" + str(self["id"])
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
         }
         objects = open_url(
@@ -561,7 +569,7 @@ def get__file_snapshot_information__by_filename(module, self):
             + filename
         )
 
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
         )
@@ -592,7 +600,7 @@ def get__vmware_snapshot_information__by_vmname(module, self):
             + str(self["restore_obj"]["jobUid"]["id"])
         )
 
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
         )
@@ -643,7 +651,7 @@ def get__restore_job__by_type(module, self):
 
         if "count" in self:
             uri = uri + "&pageCount=" + str(self["count"])
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
         )
@@ -665,7 +673,7 @@ def get__restore_task_status__by_id(module, self):
     token = self["token"]
     try:
         uri = "https://" + server + "/v2/data-protect/recoveries?ids=" + self["id"]
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         objects = open_url(
             url=uri, headers=headers, validate_certs=validate_certs, timeout=120
         )
@@ -696,6 +704,7 @@ def unregister_source(module, self):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -770,6 +779,7 @@ def check__protection_group__exists(module, self):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + self["token"],
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -829,6 +839,7 @@ def get_resource_pool_id(module, self):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

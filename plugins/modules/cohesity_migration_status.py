@@ -160,6 +160,7 @@ def get_migration_status(module, self):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -192,6 +193,7 @@ def get_task_status(module, task_id):
         uri = "https://" + server + "/v2/data-protect/recoveries/%s" % task_id
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

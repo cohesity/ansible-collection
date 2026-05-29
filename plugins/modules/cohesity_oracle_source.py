@@ -166,7 +166,7 @@ def register_oracle_source(module, self, _id):
 
     try:
         uri = "https://" + server + "/irisservices/api/v1/applicationSourceRegistration"
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         # Payload to register Oracle source.
         payload = dict(
             appEnvVec=[19], usesPersistentAgent=True, ownerEntity=dict(type=6)

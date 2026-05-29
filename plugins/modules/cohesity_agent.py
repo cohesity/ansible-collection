@@ -642,6 +642,7 @@ def get_source_details(module, source_id):
             )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -694,6 +695,7 @@ def update_agent(module):
             )
             headers = {
                 "Accept": "application/json",
+                "Content-Type": "application/json",
                 "Authorization": "Bearer " + token,
                 "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
             }

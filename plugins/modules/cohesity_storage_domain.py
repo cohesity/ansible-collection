@@ -359,6 +359,7 @@ def delete_storage_domain(module, domain_id):
         uri = "https://" + server + "/v2/storage-domains/%s" % str(domain_id)
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
