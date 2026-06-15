@@ -6,7 +6,6 @@ imported by test files in subdirectories (unit_test/, e2e/).
 
 from __future__ import absolute_import, division, print_function
 
-import sys
 from unittest.mock import MagicMock
 
 import pytest

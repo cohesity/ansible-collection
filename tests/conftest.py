@@ -11,8 +11,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from helpers import mock_protection_sources_client, oracle_job_endpoint, skip_unless_e2e  # noqa: F401 — re-exported for test use
-
 COLLECTION_ROOT = Path(__file__).resolve().parent.parent
 MODULES_DIR = COLLECTION_ROOT / "plugins" / "modules"
 MODULE_UTILS_DIR = COLLECTION_ROOT / "plugins" / "module_utils"
