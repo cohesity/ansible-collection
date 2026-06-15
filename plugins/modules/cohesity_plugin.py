@@ -211,6 +211,7 @@ def download_datastore_plugin(module):
         ) % platform
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -258,6 +259,7 @@ def update_global_allow_lists(module):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-plugin": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

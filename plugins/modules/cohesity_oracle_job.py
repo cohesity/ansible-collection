@@ -69,7 +69,17 @@ options:
   endpoint:
     type: str
     default: ""
-    description: Ip address of the Oracle source.
+    description: Ip address or SCAN/VIP of the Oracle source.
+  source_type:
+    description:
+      - "Specifies the type of Oracle deployment."
+      - "Use C(standalone) for a single-node Oracle host."
+      - "Use C(rac) for Oracle Real Application Clusters where the endpoint is a SCAN address or cluster VIP."
+    choices:
+      - standalone
+      - rac
+    default: standalone
+    type: str
   environment:
     default: kOracle
     description:
@@ -162,6 +172,9 @@ RETURN = """
 # Returns the registered Protection Job ID
 """
 
+ACTIVE_RUN_STATUSES = ("kAccepted", "kRunning", "kCanceling")
+FINISHED_RUN_STATUSES = ("kCanceled", "kSuccess")
+
 import copy
 import time
 from ansible.module_utils.basic import AnsibleModule
@@ -240,6 +253,7 @@ def get_source_id_by_endpoint(module):
     try:
         endpoint = module.params.get("endpoint")
         env = module.params.get("environment")
+        source_type = module.params.get("source_type", "standalone")
         resp = cohesity_client.protection_sources.list_protection_sources(
             environments=env
         )
@@ -248,8 +262,14 @@ def get_source_id_by_endpoint(module):
             nodes = resp[0].nodes
             for node in nodes:
                 if node["protectionSource"]["name"] == endpoint:
-                    source = node["protectionSource"]
-                    return parent_id, source["id"]
+                    return parent_id, node["protectionSource"]["id"]
+                # RAC fallback: reachable host is stored in accessInfo.endpoint when
+                # the lookup address differs from the registered SCAN/VIP name.
+                if source_type == "rac":
+                    reg_info = node.get("registrationInfo", {})
+                    access_endpoint = reg_info.get("accessInfo", {}).get("endpoint", "")
+                    if access_endpoint == endpoint:
+                        return parent_id, node["protectionSource"]["id"]
         return None, None
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
@@ -319,11 +339,11 @@ def get_protection_run__status__by_id(module, job_id):
         # Fetch the status of last job run.
         last_run = job_run[0]
         status = last_run.backup_run.status
-        if status == "kAccepted":
+        if status in ACTIVE_RUN_STATUSES:
             return True, status, last_run
-        elif status in ["kCanceled", "kSuccess"]:
+        elif status in FINISHED_RUN_STATUSES:
             return False, status, last_run
-        return False, status, ""
+        return False, status, last_run
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
@@ -355,9 +375,9 @@ def wait__for_job_state__transition(module, job_id, state="start"):
         currently_active, status, last_run = get_protection_run__status__by_id(
             module, job_id
         )
-        if state == "start" and status == "kAccepted":
+        if state == "start" and status in ACTIVE_RUN_STATUSES:
             return
-        elif state == "stop" and status in ["kSuccess", "kCanceled"]:
+        elif state == "stop" and status in FINISHED_RUN_STATUSES:
             return
         else:
             time.sleep(5)
@@ -482,6 +502,11 @@ def main():
             cancel_active=dict(type="bool", default=False),
             validate_certs=dict(type="bool", default=False, aliases=["cohesity_validate_certs"]),
             endpoint=dict(type="str", default=""),
+            source_type=dict(
+                type="str",
+                choices=["standalone", "rac"],
+                default="standalone",
+            ),
             databases=dict(type="list", default=[], elements="str"),
             archive_log_keep_days=dict(type="int", required=False),
         )

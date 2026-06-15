@@ -1,19 +1,33 @@
 # => Create a Oracle protection job for oracle sources.
+#
+# Standalone (default):
+#   ansible-playbook create_oracle_job.yml -i ../ansible_config.ini
+#
+# RAC:
+#   ansible-playbook create_oracle_job.yml -i ../ansible_config.ini \
+#     -e "oracle_source_type=rac"
+#
+# Protect specific databases only (optional):
+#   -e 'oracle_databases=["db1"]'
 ---
 - name: Create a Oracle protection job for oracle sources
   hosts: localhost
   gather_facts: false
+
+  vars:
+    oracle_source_type: standalone
+
   tasks:
     - name: "Oracle Protection job"
       cohesity.dataprotect.cohesity_oracle_job:
         state: present
-        job_name: protect_oracle
-        storage_domain: "DefaultStorageDomain"
-        policy: "Silver"
-        endpoint: "orcl-serv2-eng-db.com"
+        job_name: "{{ oracle_job_name }}"
+        storage_domain: "{{ oracle_storage_domain }}"
+        policy: "{{ oracle_job_policy }}"
+        source_type: "{{ oracle_source_type }}"
+        endpoint: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
         cancel_active: true
-        databases:
-          - "clone1"
+        databases: "{{ oracle_databases | default([]) }}"
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"

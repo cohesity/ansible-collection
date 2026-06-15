@@ -1,8 +1,19 @@
 # Playbook to refresh Oracle source available in the cluster.
+#
+# Standalone (default):
+#   ansible-playbook refresh_oracle_source.yml -i ../ansible_config.ini
+#
+# RAC:
+#   ansible-playbook refresh_oracle_source.yml -i ../ansible_config.ini \
+#     -e "oracle_source_type=rac"
 ---
 - name: Playbook to refresh Oracle source available in the cluster
   hosts: localhost
   become: false
+
+  vars:
+    oracle_source_type: standalone
+
   tasks:
     - name: "Cohesity Protection Source: Refresh Source"
       cohesity.dataprotect.cohesity_oracle_source:
@@ -12,4 +23,6 @@
         validate_certs: "{{ cohesity_validate_certs }}"
         state: present
         refresh: true
-        endpoint: "orcl-serv2-eng-db.com"
+        source_type: "{{ oracle_source_type }}"
+        endpoint: "{{ rac_endpoint | default('') if oracle_source_type == 'rac' else oracle_endpoint }}"
+        scan_vip_address: "{{ scan_vip_address | default('') }}"

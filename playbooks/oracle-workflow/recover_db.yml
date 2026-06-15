@@ -1,8 +1,20 @@
-# Playbook to register Oracle source to the cluster.
+# Playbook to recover Oracle database from the cluster.
+#
+# Standalone (default):
+#   ansible-playbook recover_db.yml -i ../ansible_config.ini
+#
+# RAC:
+#   ansible-playbook recover_db.yml -i ../ansible_config.ini \
+#     -e "oracle_source_type=rac"
 ---
-- name: Playbook to register Oracle source to the cluster
+- name: Playbook to recover Oracle database from the cluster
   hosts: localhost
   become: false
+
+  vars:
+    oracle_source_type: standalone
+    oracle_target_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
+
   tasks:
     - name: "Cohesity Oracle Restore Task: Set Source to state of present"
       cohesity.dataprotect.cohesity_oracle_restore:
@@ -11,11 +23,12 @@
         password: "{{ cohesity_password }}"
         validate_certs: "{{ cohesity_validate_certs }}"
         state: present
-        source_db: cdb1
-        task_name: recover_tasks_1
-        source_server: 192.168.1.1
-        target_server: 192.168.1.1
-        target_db: cdb2
-        oracle_home: /u01/app/oracle/product/12.1.0.2/db_1
-        oracle_base: /u01/app/oracle
-        oracle_data: /u01/app/oracle/product/12.1.0.2/db_1
+        source_type: "{{ oracle_source_type }}"
+        source_db: "{{ oracle_source_db }}"
+        task_name: "{{ oracle_task_name }}"
+        source_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
+        target_server: "{{ oracle_target_server }}"
+        target_db: "{{ oracle_target_db }}"
+        oracle_home: "{{ oracle_home }}"
+        oracle_base: "{{ oracle_base }}"
+        oracle_data: "{{ oracle_data }}"

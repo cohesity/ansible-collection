@@ -49,7 +49,16 @@ options:
       - Determines if the oracle recovery should be C(present) or C(absent).
       - absent is currently not implemented.
     type: str
-
+  source_type:
+    description:
+      - "Specifies the type of Oracle deployment of the source database."
+      - "Use C(standalone) for a single-node Oracle host."
+      - "Use C(rac) for Oracle RAC where the source_server is the SCAN address or cluster VIP."
+    choices:
+      - standalone
+      - rac
+    default: standalone
+    type: str
   audit_path:
     default: ''
     description: Yet to be implemented.
@@ -277,7 +286,7 @@ def create_recover_job(module, token, database_info):
         module.exit_json(msg="Check Mode: This action will create new recover task")
     try:
         uri = "https://" + server + "/irisservices/api/v1/recoverApplication"
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         response = open_url(
             url=uri,
             data=json.dumps(body),
@@ -308,13 +317,41 @@ def check_for_status(module, task_id):
         module.exit_json(msg=err)
 
 
+def get_rac_source_aliases(source_server):
+    """
+    For a RAC source registered via SCAN/VIP, resolve all name aliases that
+    Cohesity may store (registered name + accessInfo.endpoint).
+    Returns a list of strings to match against objectAliases.
+    Falls back gracefully on any error.
+    """
+    try:
+        resp = cohesity_client.protection_sources.list_protection_sources(
+            environments="kPhysical"
+        )
+        if not resp:
+            return []
+        for node in resp[0].nodes:
+            reg_info = node.get("registrationInfo", {})
+            access_endpoint = reg_info.get("accessInfo", {}).get("endpoint", "")
+            node_name = node["protectionSource"]["name"]
+            if node_name == source_server or access_endpoint == source_server:
+                return [a for a in [node_name, access_endpoint] if a]
+    except Exception:
+        pass
+    return []
+
+
 def search_for_database(token, module):
     """
     Function to fetch database details if available.
+    For RAC, if the SCAN/VIP is not directly in objectAliases, a secondary
+    pass resolves the registered source aliases and retries the match.
+    Standalone path is unchanged.
     """
     server = module.params.get("cluster")
     sourcedb = module.params.get("source_db")
     source_server = module.params.get("source_server")
+    source_type = module.params.get("source_type", "standalone")
     validate_certs = module.params.get("validate_certs")
     try:
         uri = (
@@ -322,7 +359,7 @@ def search_for_database(token, module):
             + server
             + "/irisservices/api/v1/searchvms?entityTypes=kOracle&vmName=%s" % sourcedb
         )
-        headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+        headers = {"Accept": "application/json", "Content-Type": "application/json", "Authorization": "Bearer " + token}
         response = open_url(
             url=uri,
             method="GET",
@@ -347,6 +384,21 @@ def search_for_database(token, module):
             ):
                 snapshot_timesecs = time_secs
                 search_info = vm
+
+        # RAC fallback: SCAN/VIP may not appear directly in objectAliases;
+        # resolve registered source aliases and retry.
+        if not search_info and source_type == "rac":
+            rac_aliases = get_rac_source_aliases(source_server)
+            snapshot_timesecs = 0
+            for vm in vms:
+                time_secs = vm["vmDocument"]["versions"][0]["snapshotTimestampUsecs"]
+                if any(
+                    alias in vm["vmDocument"]["objectAliases"]
+                    for alias in rac_aliases
+                ) and time_secs > snapshot_timesecs:
+                    snapshot_timesecs = time_secs
+                    search_info = vm
+
         if not search_info:
             err_msg = "Source database %s not available in source %s." % (
                 sourcedb,
@@ -366,6 +418,11 @@ def main():
     argument_spec.update(
         dict(
             task_name=dict(type="str"),
+            source_type=dict(
+                type="str",
+                choices=["standalone", "rac"],
+                default="standalone",
+            ),
             source_db=dict(type="str", required=True),
             source_server=dict(type="str", required=True),
             target_db=dict(type="str", required=True),
