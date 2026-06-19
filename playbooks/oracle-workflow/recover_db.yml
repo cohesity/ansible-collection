@@ -5,9 +5,13 @@
   become: false
 
   vars:
-    oracle_source_type: standalone
-    oracle_target_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
-    oracle_source_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
+    oracle_source_type: standalone  # standalone | rac
+    # endpoint — standalone: Oracle host IP or hostname (required)
+    endpoint: ""
+    # scan_vip_address — RAC only: SCAN/VIP address (required when oracle_source_type=rac)
+    scan_vip_address: ""
+    oracle_source_server: "{{ scan_vip_address if oracle_source_type == 'rac' else endpoint }}"
+    oracle_target_server: "{{ scan_vip_address if oracle_source_type == 'rac' else endpoint }}"
 
   tasks:
     - name: "Cohesity Oracle Restore Task: Set Source to state of present"
