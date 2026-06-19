@@ -7,6 +7,7 @@
   vars:
     oracle_source_type: standalone
     oracle_target_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
+    oracle_source_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
 
   tasks:
     - name: "Cohesity Oracle Restore Task: Set Source to state of present"
@@ -19,7 +20,7 @@
         source_type: "{{ oracle_source_type }}"
         source_db: "{{ oracle_source_db }}"
         task_name: "{{ oracle_task_name }}"
-        source_server: "{{ scan_vip_address if oracle_source_type == 'rac' else oracle_endpoint }}"
+        source_server: "{{ oracle_source_server }}"
         target_server: "{{ oracle_target_server }}"
         target_db: "{{ oracle_target_db }}"
         oracle_home: "{{ oracle_home }}"

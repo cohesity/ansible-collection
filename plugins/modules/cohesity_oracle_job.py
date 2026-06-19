@@ -71,7 +71,7 @@ options:
     default: ""
     description:
       - "When I(source_type=standalone), hostname or IP of the registered Oracle host."
-      - "When I(source_type=rac), optional reachable RAC host IP or hostname 
+      - "When I(source_type=rac), optional reachable RAC host IP or hostname."
   scan_vip_address:
     type: str
     default: ""
