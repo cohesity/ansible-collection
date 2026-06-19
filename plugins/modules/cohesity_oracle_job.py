@@ -69,12 +69,20 @@ options:
   endpoint:
     type: str
     default: ""
-    description: Ip address or SCAN/VIP of the Oracle source.
+    description:
+      - "When I(source_type=standalone), hostname or IP of the registered Oracle host."
+      - "When I(source_type=rac), optional reachable RAC host IP or hostname 
+  scan_vip_address:
+    type: str
+    default: ""
+    description:
+      - "Oracle RAC SCAN/VIP address. Same label as C(SCAN/VIP Address) in the Cohesity UI."
+      - "Required when I(source_type=rac)."
   source_type:
     description:
       - "Specifies the type of Oracle deployment."
-      - "Use C(standalone) for a single-node Oracle host."
-      - "Use C(rac) for Oracle Real Application Clusters where the endpoint is a SCAN address or cluster VIP."
+      - "Use C(standalone) for a single-node Oracle host with I(endpoint)."
+      - "Use C(rac) for Oracle Real Application Clusters with I(scan_vip_address)."
     choices:
       - standalone
       - rac
@@ -166,6 +174,30 @@ EXAMPLES = """
     endpoint: cohesity-source-ip
     protection_policy: Bronze
     storage_domain: Default
+
+# Create an Oracle Standalone protection job.
+- cohesity.dataprotect.cohesity_oracle_job:
+    cluster: cohesity.lab
+    username: admin
+    password: password
+    state: present
+    name: protect_oracle_standalone
+    endpoint: oracle-host.example.com
+    source_type: standalone
+    protection_policy: Bronze
+    storage_domain: DefaultStorageDomain
+
+# Create an Oracle RAC protection job
+- cohesity.dataprotect.cohesity_oracle_job:
+    cluster: cohesity.lab
+    username: admin
+    password: password
+    state: present
+    name: protect_oracle_rac
+    scan_vip_address: scan-vip.example.com
+    source_type: rac
+    protection_policy: Bronze
+    storage_domain: DefaultStorageDomain
 """
 
 RETURN = """
@@ -249,11 +281,16 @@ def get_timezone():
 
 
 def get_source_id_by_endpoint(module):
-    # Fetch source id using endpoint
+    # Fetch source id using endpoint (standalone) or scan_vip_address (RAC).
     try:
-        endpoint = module.params.get("endpoint")
-        env = module.params.get("environment")
         source_type = module.params.get("source_type", "standalone")
+        env = module.params.get("environment")
+        if source_type == "rac":
+            lookup_name = module.params.get("scan_vip_address") or ""
+            lookup_fallback = module.params.get("endpoint") or ""
+        else:
+            lookup_name = module.params.get("endpoint") or ""
+            lookup_fallback = ""
         resp = cohesity_client.protection_sources.list_protection_sources(
             environments=env
         )
@@ -261,14 +298,14 @@ def get_source_id_by_endpoint(module):
             parent_id = resp[0].protection_source.id
             nodes = resp[0].nodes
             for node in nodes:
-                if node["protectionSource"]["name"] == endpoint:
+                if node["protectionSource"]["name"] == lookup_name:
                     return parent_id, node["protectionSource"]["id"]
                 # RAC fallback: reachable host is stored in accessInfo.endpoint when
                 # the lookup address differs from the registered SCAN/VIP name.
-                if source_type == "rac":
+                if source_type == "rac" and lookup_fallback:
                     reg_info = node.get("registrationInfo", {})
                     access_endpoint = reg_info.get("accessInfo", {}).get("endpoint", "")
-                    if access_endpoint == endpoint:
+                    if access_endpoint == lookup_fallback:
                         return parent_id, node["protectionSource"]["id"]
         return None, None
     except Exception as error:
@@ -284,8 +321,13 @@ def check__mandatory__params(module):
 
     if module.params.get("state") == "present":
         action = "creation"
+        source_type = module.params.get("source_type", "standalone")
 
-        if not module.params.get("endpoint"):
+        if source_type == "rac":
+            if not module.params.get("scan_vip_address"):
+                success = False
+                missing_params.append("scan_vip_address")
+        elif not module.params.get("endpoint"):
             success = False
             missing_params.append("endpoint")
         if not module.params.get("protection_policy"):
@@ -343,7 +385,7 @@ def get_protection_run__status__by_id(module, job_id):
             return True, status, last_run
         elif status in FINISHED_RUN_STATUSES:
             return False, status, last_run
-        return False, status, last_run
+        return False, status, ""
     except Exception as error:
         raise__cohesity_exception__handler(error, module)
 
@@ -502,6 +544,7 @@ def main():
             cancel_active=dict(type="bool", default=False),
             validate_certs=dict(type="bool", default=False, aliases=["cohesity_validate_certs"]),
             endpoint=dict(type="str", default=""),
+            scan_vip_address=dict(type="str", default=""),
             source_type=dict(
                 type="str",
                 choices=["standalone", "rac"],
@@ -558,9 +601,14 @@ def main():
     elif module.params.get("state") == "present":
         parent_id, source_id = get_source_id_by_endpoint(module)
         if not (parent_id and source_id):
+            source_type = module.params.get("source_type", "standalone")
+            if source_type == "rac":
+                lookup = module.params.get("scan_vip_address")
+            else:
+                lookup = module.params.get("endpoint")
             module.fail_json(
                 msg="Source '%s' is not registered to cluster, Please register the source and try again."
-                % module.params.get("endpoint")
+                % lookup
             )
         check__mandatory__params(module)
         body = ProtectionJobRequestBody()

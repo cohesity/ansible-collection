@@ -35,8 +35,15 @@ def skip_unless_e2e(e2e_config):
         pytest.skip("COHESITY_SERVER is required for E2E tests")
 
 
-def oracle_job_endpoint(e2e_config):
-    """Return the endpoint to use for Oracle job E2E tests."""
+def oracle_job_module_args(e2e_config):
+    """Return module args for Oracle job E2E tests."""
     if e2e_config["oracle_source_type"] == "rac":
-        return e2e_config["scan_vip_address"]
-    return e2e_config["oracle_endpoint"]
+        if not e2e_config["scan_vip_address"]:
+            return None
+        args = "scan_vip_address=%s source_type=rac" % e2e_config["scan_vip_address"]
+        if e2e_config.get("oracle_endpoint"):
+            args += " endpoint=%s" % e2e_config["oracle_endpoint"]
+        return args
+    if not e2e_config["oracle_endpoint"]:
+        return None
+    return "endpoint=%s source_type=standalone" % e2e_config["oracle_endpoint"]

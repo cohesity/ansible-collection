@@ -15,6 +15,7 @@ class TestGetSourceIdByEndpoint:
         mock_protection_sources_client(oracle_job_module, nodes, parent_id=1)
         mock_ansible_module.params = {
             "endpoint": "host.example.com",
+            "scan_vip_address": "",
             "environment": "kOracle",
             "source_type": "standalone",
         }
@@ -35,7 +36,8 @@ class TestGetSourceIdByEndpoint:
         ]
         mock_protection_sources_client(oracle_job_module, nodes, parent_id=1)
         mock_ansible_module.params = {
-            "endpoint": "10.14.40.96",
+            "endpoint": "",
+            "scan_vip_address": "10.14.40.96",
             "environment": "kOracle",
             "source_type": "rac",
         }
@@ -45,12 +47,12 @@ class TestGetSourceIdByEndpoint:
         assert parent_id == 1
         assert source_id == 602
 
-    def test_rac_matches_reachable_in_access_info(
+    def test_rac_matches_reachable_endpoint_fallback(
         self, oracle_job_module, mock_ansible_module
     ):
         nodes = [
             {
-                "protectionSource": {"name": "10.14.40.96", "id": 603},
+                "protectionSource": {"name": "10.14.40.96", "id": 604},
                 "registrationInfo": {
                     "accessInfo": {"endpoint": "10.14.40.74"}
                 },
@@ -59,6 +61,7 @@ class TestGetSourceIdByEndpoint:
         mock_protection_sources_client(oracle_job_module, nodes, parent_id=1)
         mock_ansible_module.params = {
             "endpoint": "10.14.40.74",
+            "scan_vip_address": "unreachable-scan.example.com",
             "environment": "kOracle",
             "source_type": "rac",
         }
@@ -66,12 +69,13 @@ class TestGetSourceIdByEndpoint:
             mock_ansible_module
         )
         assert parent_id == 1
-        assert source_id == 603
+        assert source_id == 604
 
     def test_returns_none_when_not_found(self, oracle_job_module, mock_ansible_module):
         mock_protection_sources_client(oracle_job_module, [], parent_id=1)
         mock_ansible_module.params = {
             "endpoint": "missing.example.com",
+            "scan_vip_address": "",
             "environment": "kOracle",
             "source_type": "standalone",
         }
@@ -89,7 +93,9 @@ class TestCheckMandatoryParams:
         mock_ansible_module.params = {
             "state": "present",
             "environment": "kOracle",
+            "source_type": "standalone",
             "endpoint": "",
+            "scan_vip_address": "",
             "protection_policy": "",
             "storage_domain": "",
         }
@@ -99,13 +105,33 @@ class TestCheckMandatoryParams:
         mock_ansible_module.fail_json.assert_called_once()
         assert "endpoint" in mock_ansible_module.fail_json.call_args[1]["missing"]
 
+    def test_present_rac_requires_scan_vip_address(
+        self, oracle_job_module, mock_ansible_module
+    ):
+        mock_ansible_module.params = {
+            "state": "present",
+            "environment": "kOracle",
+            "source_type": "rac",
+            "endpoint": "",
+            "scan_vip_address": "",
+            "protection_policy": "Bronze",
+            "storage_domain": "DefaultStorageDomain",
+        }
+        with pytest.raises(SystemExit) as exc_info:
+            oracle_job_module.check__mandatory__params(mock_ansible_module)
+        assert exc_info.value.code == 1
+        mock_ansible_module.fail_json.assert_called_once()
+        assert "scan_vip_address" in mock_ansible_module.fail_json.call_args[1]["missing"]
+
     def test_present_passes_with_required_fields(
         self, oracle_job_module, mock_ansible_module
     ):
         mock_ansible_module.params = {
             "state": "present",
             "environment": "kOracle",
+            "source_type": "standalone",
             "endpoint": "host.example.com",
+            "scan_vip_address": "",
             "protection_policy": "Bronze",
             "storage_domain": "DefaultStorageDomain",
         }

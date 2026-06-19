@@ -115,6 +115,22 @@ version_added: 1.3.0
 
 
 EXAMPLES = """
+# Register a Physical Cohesity Protection Source and register the physical source
+# as Oracle server.
+- cohesity_oracle:
+    server: cohesity-cluster-vip
+    username: admin
+    password: password
+    endpoint: endpoint
+    state: present
+# Unegister an existing Cohesity Protection Source on a selected endpoint
+- cohesity_oracle:
+    server: cohesity-cluster-vip
+    username: admin
+    password: password
+    endpoint: endpoint
+    state: absent
+
 # Register an Oracle standalone host as a Protection Source.
 - cohesity.dataprotect.cohesity_oracle_source:
     cluster: cohesity-cluster-vip
@@ -124,21 +140,13 @@ EXAMPLES = """
     source_type: standalone
     state: present
 
-# Unregister an existing Cohesity Protection Source on a selected endpoint.
-- cohesity.dataprotect.cohesity_oracle_source:
-    cluster: cohesity-cluster-vip
-    username: admin
-    password: password
-    endpoint: oracle-host.example.com
-    state: absent
-
 # Register an Oracle RAC cluster as a Protection Source.
 - cohesity.dataprotect.cohesity_oracle_source:
     cluster: cohesity-cluster-vip
     username: admin
     password: password
-    scan_vip_address: scan-vip.example.com
-    endpoint: reachable-host.example.com
+    scan_vip_address: scan vip address
+    endpoint: reachable host address
     source_type: rac
     state: present
 """

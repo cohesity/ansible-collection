@@ -40,8 +40,6 @@ To install the requirements, run **pip install -r [requirement.txt](https://gith
  - [Getting Started](https://github.com/cohesity/ansible-collection/blob/main/README.md#get-started)
  - [More samples playbooks](https://github.com/cohesity/ansible-collection/blob/main/README.md#examples)
  - [Changelog](#changelog)
- - [Oracle Workflow](#oracle-workflow)
- - [Testing](#testing)
  - [Support (Red Hat Users)](#support-red-hat-users)
  - [How can you contribute](https://github.com/cohesity/ansible-collection/blob/main/README.md#contribute)
  - [Suggestions and Feedback](https://github.com/cohesity/ansible-collection/blob/main/README.md#suggest)
@@ -66,23 +64,6 @@ See [CHANGELOG.rst](https://github.com/cohesity/ansible-collection/blob/main/CHA
 - **v1.4.4** — Bumped `requests` minimum version to `>=2.31.0` to address known security vulnerabilities; added Changelog and Support (Red Hat Users) sections to README.
 - **v1.4.3** — Fixed agent detection failing with "Cohesity Agent is partially installed" on systemd hosts where the SysV init script is not created by the installer.
 - **v1.4.2** — Bumped minimum Ansible-Core version to 2.16; fixed `LiteralPath` issue during Windows agent installation and collection failure issues on some Ansible versions.
-
-## Oracle Workflow
-
-Oracle standalone and RAC protection playbooks are under [`playbooks/oracle-workflow/`](playbooks/oracle-workflow/).
-
-See [playbooks/oracle-workflow/README.md](playbooks/oracle-workflow/README.md) for setup, `ansible_config.ini` configuration, and step-by-step commands.
-
-## Testing
-
-Unit tests run without a live cluster. E2E tests require Cohesity cluster credentials configured in `tests/.env`.
-
-```bash
-./tests/run_all_tests.sh                              # unit tests only
-source tests/.env && ./tests/run_all_tests.sh --e2e   # unit + E2E
-```
-
-See [tests/README.md](tests/README.md) for `.env` setup, environment variables, and all run options.
 
 ## Support (Red Hat Users)
 

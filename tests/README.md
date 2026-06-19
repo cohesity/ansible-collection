@@ -68,9 +68,9 @@ export COHESITY_VALIDATE_CERTS=false
 # export RAC_ENDPOINT=<reachable-rac-host>   # optional
 
 # --- Job E2E settings (optional — defaults shown) ---
-export ORACLE_JOB_NAME=<protection-job-name>
-export ORACLE_JOB_POLICY=<protection-policy-name>
-export ORACLE_STORAGE_DOMAIN=<storage-domain-name>
+export COHESITY_JOB_NAME=<protection-job-name>
+export COHESITY_JOB_POLICY=<protection-policy-name>
+export COHESITY_STORAGE_DOMAIN=<storage-domain-name>
 
 # --- Restore E2E settings (optional — defaults shown) ---
 export ORACLE_SOURCE_DB=<source-database-name>
@@ -95,9 +95,9 @@ export ORACLE_DATA=<oracle-data-path>
 | `SCAN_VIP_ADDRESS` | RAC E2E | — | SCAN or VIP address for RAC registration |
 | `RAC_ENDPOINT` | No | — | Reachable RAC host (optional for some RAC tests) |
 | `RAC_AGENT_NODE` | No | — | Legacy alias for `SCAN_VIP_ADDRESS` |
-| `ORACLE_JOB_NAME` | No | `protect_oracle` | Protection job name used in job E2E tests |
-| `ORACLE_JOB_POLICY` | No | `Bronze` | Protection policy name |
-| `ORACLE_STORAGE_DOMAIN` | No | `DefaultStorageDomain` | Storage domain name |
+| `COHESITY_JOB_NAME` | No | `protect_oracle` | Protection job name used in job E2E tests |
+| `COHESITY_JOB_POLICY` | No | `Bronze` | Protection policy name |
+| `COHESITY_STORAGE_DOMAIN` | No | `DefaultStorageDomain` | Storage domain name |
 | `ORACLE_SOURCE_DB` | No | `cdb1` | Source database for restore E2E |
 | `ORACLE_TARGET_DB` | No | `cdb2` | Target database for restore E2E |
 | `ORACLE_TARGET_SERVER` | No | source server | Target host for restore E2E |

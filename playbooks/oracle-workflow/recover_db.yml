@@ -1,11 +1,4 @@
 # Playbook to recover Oracle database from the cluster.
-#
-# Standalone (default):
-#   ansible-playbook recover_db.yml -i ../ansible_config.ini
-#
-# RAC:
-#   ansible-playbook recover_db.yml -i ../ansible_config.ini \
-#     -e "oracle_source_type=rac"
 ---
 - name: Playbook to recover Oracle database from the cluster
   hosts: localhost

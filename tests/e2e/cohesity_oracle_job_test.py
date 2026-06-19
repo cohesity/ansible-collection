@@ -10,9 +10,9 @@ Requires a live Cohesity cluster with a registered Oracle source.
   export ORACLE_ENDPOINT=<standalone-host>
   export SCAN_VIP_ADDRESS=<scan-or-vip>
   export RAC_ENDPOINT=<reachable-host>
-  export ORACLE_JOB_NAME=protect_oracle
-  export ORACLE_JOB_POLICY=Bronze              # default: Bronze
-  export ORACLE_STORAGE_DOMAIN=DefaultStorageDomain  # default: DefaultStorageDomain
+  export COHESITY_JOB_NAME=protect_oracle
+  export COHESITY_JOB_POLICY=Bronze              # default: Bronze
+  export COHESITY_STORAGE_DOMAIN=DefaultStorageDomain  # default: DefaultStorageDomain
 """
 
 from __future__ import absolute_import, division, print_function
@@ -22,7 +22,7 @@ import subprocess
 
 import pytest
 
-from helpers import oracle_job_endpoint, skip_unless_e2e
+from helpers import oracle_job_module_args, skip_unless_e2e
 
 pytestmark = pytest.mark.e2e
 
@@ -30,12 +30,15 @@ pytestmark = pytest.mark.e2e
 class TestCohesityOracleJobE2E:
     def test_check_mode_create_job(self, e2e_config):
         skip_unless_e2e(e2e_config)
-        endpoint = oracle_job_endpoint(e2e_config)
-        job_name = os.environ.get("ORACLE_JOB_NAME", "protect_oracle")
-        policy = os.environ.get("ORACLE_JOB_POLICY", "Bronze")
-        storage_domain = os.environ.get("ORACLE_STORAGE_DOMAIN", "DefaultStorageDomain")
-        if not endpoint:
-            pytest.skip("Oracle endpoint not configured for E2E job test")
+        source_args = oracle_job_module_args(e2e_config)
+        job_name = os.environ.get("COHESITY_JOB_NAME", os.environ.get("ORACLE_JOB_NAME", "protect_oracle"))
+        policy = os.environ.get("COHESITY_JOB_POLICY", os.environ.get("ORACLE_JOB_POLICY", "Bronze"))
+        storage_domain = os.environ.get(
+            "COHESITY_STORAGE_DOMAIN",
+            os.environ.get("ORACLE_STORAGE_DOMAIN", "DefaultStorageDomain"),
+        )
+        if not source_args:
+            pytest.skip("Oracle source args not configured for E2E job test")
 
         cmd = [
             "ansible",
@@ -45,7 +48,7 @@ class TestCohesityOracleJobE2E:
             "-m", "cohesity.dataprotect.cohesity_oracle_job",
             "-a",
             "cluster=%s username=%s password=%s validate_certs=%s "
-            "name=%s endpoint=%s source_type=%s state=present "
+            "name=%s %s state=present "
             "protection_policy=%s storage_domain=%s"
             % (
                 e2e_config["cluster"],
@@ -53,8 +56,7 @@ class TestCohesityOracleJobE2E:
                 e2e_config["password"],
                 str(e2e_config["validate_certs"]).lower(),
                 job_name,
-                endpoint,
-                e2e_config["oracle_source_type"],
+                source_args,
                 policy,
                 storage_domain,
             ),
@@ -65,10 +67,10 @@ class TestCohesityOracleJobE2E:
 
     def test_check_mode_start_job(self, e2e_config):
         skip_unless_e2e(e2e_config)
-        endpoint = oracle_job_endpoint(e2e_config)
-        job_name = os.environ.get("ORACLE_JOB_NAME", "protect_oracle")
-        if not endpoint:
-            pytest.skip("Oracle endpoint not configured for E2E job test")
+        source_args = oracle_job_module_args(e2e_config)
+        job_name = os.environ.get("COHESITY_JOB_NAME", os.environ.get("ORACLE_JOB_NAME", "protect_oracle"))
+        if not source_args:
+            pytest.skip("Oracle source args not configured for E2E job test")
 
         cmd = [
             "ansible",
@@ -78,15 +80,14 @@ class TestCohesityOracleJobE2E:
             "-m", "cohesity.dataprotect.cohesity_oracle_job",
             "-a",
             "cluster=%s username=%s password=%s validate_certs=%s "
-            "name=%s endpoint=%s source_type=%s state=started"
+            "name=%s %s state=started"
             % (
                 e2e_config["cluster"],
                 e2e_config["username"],
                 e2e_config["password"],
                 str(e2e_config["validate_certs"]).lower(),
                 job_name,
-                endpoint,
-                e2e_config["oracle_source_type"],
+                source_args,
             ),
             "--check",
         ]

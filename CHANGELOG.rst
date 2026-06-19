@@ -12,8 +12,7 @@ v1.4.5
 Minor Changes
 -------------
 
-- Added Oracle module unit tests (``cohesity_oracle_source``, ``cohesity_oracle_job``, ``cohesity_oracle_restore``) and E2E test coverage with ``tests/run_all_tests.sh`` for standalone and RAC execution.
-- Oracle workflow playbooks updated for Standalone and RAC modes (``register_oracle_source``, ``refresh_oracle_source``, ``create_oracle_job``, ``recover_db``). Cluster, RAC, job, and recovery settings are read from ``ansible_config.ini``; use ``-e "oracle_source_type=rac"`` for RAC and ``-e`` to overwrite any config value.
+- Oracle workflow playbooks updated for Standalone and RAC modes (``register_oracle_source``, ``refresh_oracle_source``, ``create_oracle_job``, ``recover_db``). Pass all settings with ``-i localhost,`` and ``-e`` (``ansible_connection=local``, cluster credentials, ``oracle_source_type``, ``scan_vip_address``, optional ``rac_endpoint``).
 - cohesity_oracle_job - Added ``source_type`` parameter (``standalone``/``rac``) for Oracle RAC protection job creation with SCAN/VIP endpoint resolution.
 - cohesity_oracle_restore - Added ``source_type`` parameter (``standalone``/``rac``) and RAC source alias fallback when searching backups for database recovery.
 - cohesity_oracle_source - Added Oracle RAC cluster registration via ``source_type`` (``standalone``/``rac``) and ``scan_vip_address`` (SCAN/VIP Address; alias ``rac_agent_node``), UI-equivalent ``/backupsources`` physical registration, and RAC source lookup by SCAN name and reachable endpoint.
