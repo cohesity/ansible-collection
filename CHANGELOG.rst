@@ -26,23 +26,23 @@ Bugfixes
 v1.4.4
 ======
 
-Minor Changes
--------------
+Bugfixes
+--------
 
-- Added Changelog section to README with recent version highlights.
-- Added Support (Red Hat Users) section to README with Ansible Automation Hub guidance.
-- removed ansible-core from requirements.txt
+- ansible-lint - Removed ``name[template]`` from ``.ansible-lint`` skip_list and fixed task names across playbooks to ensure Jinja2 template variables appear only at the end of task name strings.
+- galaxy.yml - Added ``ansible.cfg`` and ``.ansible`` to ``build_ignore`` to prevent local developer configuration files from being packaged into the collection tarball.
 
 Security Fixes
 --------------
 
 - Bumped ``requests`` minimum version to ``>=2.31.0`` to address known security vulnerabilities in older versions.
 
-Bugfixes
---------
+Documentation Changes
+---------------------
 
-- ansible-lint - Removed ``name[template]`` from ``.ansible-lint`` skip_list and fixed task names across playbooks to ensure Jinja2 template variables appear only at the end of task name strings.
-- galaxy.yml - Added ``ansible.cfg`` and ``.ansible`` to ``build_ignore`` to prevent local developer configuration files from being packaged into the collection tarball.
+- Added Changelog section to README with recent version highlights.
+- Added Support (Red Hat Users) section to README with Ansible Automation Hub guidance.
+- removed ansible-core from requirements.txt
 
 v1.4.3
 ======
