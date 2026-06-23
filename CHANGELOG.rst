@@ -20,22 +20,8 @@ Minor Changes
 Bugfixes
 --------
 
-- cohesity_agent - Added ``Content-Type: application/json`` header to agent update REST calls.
-- cohesity_auth - Added ``Content-Type: application/json`` header to access token requests to prevent HTTP 415 errors when urllib defaults to ``application/x-www-form-urlencoded``.
-- cohesity_cancel_migration - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_finalize_migration - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_job - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_migrate_vm - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_oracle_restore - Added ``Content-Type: application/json`` header to recovery task REST calls.
+- Added ``Content-Type: application/json`` header to REST requests across collection modules to prevent HTTP 415 errors.
 - cohesity_oracle_source - Fixed ``register_oracle_source()`` return value handling and RAC source registration status lookup.
-- cohesity_plugin - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_restore_file - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_restore_vm - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_restore_vmware_file - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_source - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_sync_objects - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_uda_protection_group - Added missing ``Content-Type: application/json`` header on JSON POST requests.
-- cohesity_uda_source - Added missing ``Content-Type: application/json`` header on JSON POST requests.
 
 v1.4.4
 ======
