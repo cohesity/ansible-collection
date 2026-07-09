@@ -1,1 +1,0 @@
-plugins/modules/cohesity_job.py compile-2.6!skip

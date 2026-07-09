@@ -291,6 +291,7 @@ def get_source_details(module):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -341,6 +342,7 @@ def get_vm_folder_id(module, source_id, resource_pool_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -391,6 +393,7 @@ def get_resource_pool_id(module, source_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -452,6 +455,7 @@ def get_datastore_id(module, source_id, resource_pool_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -501,6 +505,7 @@ def get_network_id(module, source_id, resource_pool_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -548,6 +553,7 @@ def get_backup_job_run_id(module, job_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -588,6 +594,7 @@ def get_backup_job_ids(module, job_names):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -632,6 +639,7 @@ def get_vmware_source_objects(module, source_id):
         )
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -694,6 +702,7 @@ def start_restore(module, uri, self):
         uri = "https://" + server + uri
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -736,6 +745,7 @@ def create_migration_task(module, body):
         uri = "https://" + server + "/v2/data-protect/recoveries"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -826,6 +836,7 @@ def get_protection_groups(module):
         uri = "https://" + server + "/v2/data-protect/protection-groups?isDeleted=false"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

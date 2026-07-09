@@ -1,3 +1,11 @@
 ### Python ###
 __pycache__/
 *.py[cod]
+
+### Secrets / local config ###
+.env
+tests/.env
+*.env
+
+### Local Ansible / developer artifacts ###
+.ansible/

@@ -227,6 +227,7 @@ def register_source(module, self):
         uri = "https://" + server + "/v2/data-protect/sources/registrations"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

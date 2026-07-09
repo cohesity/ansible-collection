@@ -164,6 +164,7 @@ def finalize_migration(module, self):
         uri = "https://" + server + "/irisservices/api/v1/public/restore/recover"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }

@@ -128,6 +128,7 @@ def check__protection_restore__exists(module, self):
         uri = "https://" + server + "/v2/data-protect/recoveries"
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
@@ -175,6 +176,7 @@ def cancel_migration(module, task_id):
         uri = "https://" + server + "/v2/data-protect/recoveries/%s/cancel" % task_id
         headers = {
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + token,
             "user-agent": "cohesity-ansible/v{}".format(RELEASE_VERSION),
         }
