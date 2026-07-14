@@ -33,3 +33,22 @@ releases:
         guidance.
       - removed ansible-core from requirements.txt
     release_date: '2026-05-21'
+  1.4.5:
+    changes:
+      bugfixes:
+      - 'Added ``Content-Type: application/json`` header to REST requests across
+        collection modules to prevent HTTP 415 errors.'
+      minor_changes:
+      - Oracle workflow playbooks (``register_oracle_source``, ``refresh_oracle_source``,
+        ``create_oracle_job``, ``recover_db``) support standalone and RAC. Pass all
+        settings with ``-i localhost,`` and ``-e`` (``ansible_connection=local``, cluster
+        credentials, ``oracle_source_type``, ``scan_vip_address``, optional ``rac_endpoint``).
+      - cohesity_oracle_job - Added ``source_type`` option for standalone and RAC
+        protection jobs.
+      - cohesity_oracle_restore - Added ``source_type`` option to recover standalone
+        and RAC databases.
+      - cohesity_oracle_source - Added support to register Oracle RAC clusters using
+        ``scan_vip_address`` (SCAN/VIP address) and optional ``rac_endpoint`` when the
+        cluster cannot reach the SCAN/VIP directly.
+    fragments: []
+    release_date: '2026-06-03'

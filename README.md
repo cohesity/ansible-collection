@@ -60,6 +60,7 @@ See [CHANGELOG.rst](https://github.com/cohesity/ansible-collection/blob/main/CHA
 
 **Recent highlights:**
 
+- **v1.4.5** — Added Oracle RAC cluster support (`source_type`, `scan_vip_address` / SCAN/VIP Address) across Oracle source, job, and restore modules; config-driven Oracle workflow playbooks; fixed missing `Content-Type: application/json` headers on REST API calls.
 - **v1.4.4** — Bumped `requests` minimum version to `>=2.31.0` to address known security vulnerabilities; added Changelog and Support (Red Hat Users) sections to README.
 - **v1.4.3** — Fixed agent detection failing with "Cohesity Agent is partially installed" on systemd hosts where the SysV init script is not created by the installer.
 - **v1.4.2** — Bumped minimum Ansible-Core version to 2.16; fixed `LiteralPath` issue during Windows agent installation and collection failure issues on some Ansible versions.

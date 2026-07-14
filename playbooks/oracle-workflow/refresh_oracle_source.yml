@@ -3,6 +3,15 @@
 - name: Playbook to refresh Oracle source available in the cluster
   hosts: localhost
   become: false
+
+  vars:
+    oracle_source_type: standalone  # standalone | rac
+    # endpoint — standalone: Oracle host IP or hostname (required)
+    #          — RAC: reachable IP/hostname when cluster cannot reach scan_vip_address (optional)
+    endpoint: ""
+    # scan_vip_address — RAC only: SCAN/VIP address (required when oracle_source_type=rac)
+    scan_vip_address: ""
+
   tasks:
     - name: "Cohesity Protection Source: Refresh Source"
       cohesity.dataprotect.cohesity_oracle_source:
@@ -12,4 +21,6 @@
         validate_certs: "{{ cohesity_validate_certs }}"
         state: present
         refresh: true
-        endpoint: "orcl-serv2-eng-db.com"
+        source_type: "{{ oracle_source_type }}"
+        endpoint: "{{ endpoint }}"
+        scan_vip_address: "{{ scan_vip_address }}"

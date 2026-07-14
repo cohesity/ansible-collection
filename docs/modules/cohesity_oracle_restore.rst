@@ -51,9 +51,17 @@ Parameters
 
 
   state (optional, str, present)
-    Determines if the oracle recovery should be \ :literal:`present`\  or \ :literal:`absent`\ .
+    Determines if the oracle recovery should be :literal:`present` or :literal:`absent`.
 
     absent is currently not implemented.
+
+
+  source_type (optional, str, standalone)
+    Specifies the type of Oracle deployment of the source database.
+
+    Use :literal:`standalone` for a single\-node Oracle host.
+
+    Use :literal:`rac` for Oracle RAC where the source\_server is the SCAN address or cluster VIP.
 
 
   audit_path (optional, str, )

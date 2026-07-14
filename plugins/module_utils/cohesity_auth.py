@@ -80,7 +80,7 @@ class Authentication(object):
         # => Without a valid token, we will need to make a call to request the accessToken.
         if not valid_token:
             uri = "https://" + server + "/irisservices/api/v1/public/accessTokens"
-            headers = {"Accept": "application/json", "Content-Type": "application/json",}
+            headers = {"Accept": "application/json", "Content-Type": "application/json"}
             payload = {"username": self.username, "password": self.password}
             # => If the domain property is set, then we should include this into the Dict
             if self.domain:

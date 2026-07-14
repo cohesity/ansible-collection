@@ -16,6 +16,7 @@ description:
   - "Ansible Module used to register or remove the Oracle Sources to/from a Cohesity Cluster."
   - "When executed in a playbook, the Cohesity Protection Source will be validated and the appropriate"
   - "state action will be applied."
+  - "Supports both Oracle Standalone and Oracle RAC (Real Application Clusters) deployments."
 module: cohesity_oracle_source
 options:
   cluster:
@@ -46,7 +47,32 @@ options:
     description:
       - "Specifies the network endpoint of the Protection Source where it is reachable. It could"
       - "be an URL or hostname or an IP address of the Protection Source or a NAS Share/Export Path."
-    required: true
+      - "Required when I(source_type=standalone)."
+      - "Optional when I(source_type=rac). Use as a reachable agent host when the Cohesity cluster"
+      - "cannot reach the SCAN/VIP in I(scan_vip_address); sent as the connection endpoint during"
+      - "RAC physical registration."
+    required: false
+    default: ""
+    type: str
+  scan_vip_address:
+    description:
+      - "Oracle RAC SCAN/VIP address. Same label as C(SCAN/VIP Address) in the Cohesity UI."
+      - "Required when I(source_type=rac)."
+      - "Used as the registered physical source name during RAC registration."
+    aliases:
+      - rac_agent_node
+    type: str
+    default: ""
+  source_type:
+    description:
+      - "Specifies the type of Oracle deployment being registered."
+      - "Use C(standalone) for a single-node Oracle host. This is the default."
+      - "Use C(rac) for Oracle RAC with I(scan_vip_address) as SCAN/VIP and optional I(endpoint)"
+      - "as a reachable host when the cluster cannot reach the SCAN/VIP."
+    choices:
+      - standalone
+      - rac
+    default: standalone
     type: str
   force_register:
     default: false
@@ -104,6 +130,25 @@ EXAMPLES = """
     password: password
     endpoint: endpoint
     state: absent
+
+# Register an Oracle standalone host as a Protection Source.
+- cohesity.dataprotect.cohesity_oracle_source:
+    cluster: cohesity-cluster-vip
+    username: admin
+    password: password
+    endpoint: oracle-host.example.com
+    source_type: standalone
+    state: present
+
+# Register an Oracle RAC cluster as a Protection Source.
+- cohesity.dataprotect.cohesity_oracle_source:
+    cluster: cohesity-cluster-vip
+    username: admin
+    password: password
+    scan_vip_address: scan vip address
+    endpoint: reachable host address
+    source_type: rac
+    state: present
 """
 
 RETURN = """
@@ -142,12 +187,78 @@ except Exception:
     pass
 
 
-class ProtectionException(Exception):
-    pass
+def _rac_connect_address(module):
+    """Reachable host for physical registration; falls back to SCAN/VIP."""
+    reachable = module.params.get("endpoint") or ""
+    if reachable:
+        return reachable
+    return module.params.get("scan_vip_address") or ""
 
 
-# => Determine if the Endpoint is presently registered to the Cohesity Cluster
-# => and if so, then return the Protection Source ID.
+def _build_prot_sources(module, environment):
+    prot_sources = dict(
+        token=get__cohesity_auth__token(module),
+        endpoint=module.params.get("endpoint") or "",
+        environment=environment,
+    )
+    if module.params.get("source_type") == "rac":
+        prot_sources["source_type"] = "rac"
+        rac_scan = module.params.get("scan_vip_address")
+        if rac_scan:
+            prot_sources["scan_vip_address"] = rac_scan
+    return prot_sources
+
+
+def register_rac_physical_source(module, self):
+    """Register RAC physical source via /backupsources (UI-equivalent payload)."""
+    server = module.params.get("cluster")
+    validate_certs = module.params.get("validate_certs")
+    token = self["token"]
+    scan_address = self["scan_vip_address"]
+    connect_address = self.get("endpoint") or scan_address
+    try:
+        uri = "https://" + server + "/irisservices/api/v1/backupsources"
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token,
+        }
+        payload = dict(
+            entity=dict(
+                physicalEntity=dict(
+                    hostType=1,
+                    name=scan_address,
+                    type=6,
+                ),
+                type=6,
+            ),
+            entityInfo=dict(
+                endPoint=connect_address,
+                hostType=1,
+                type=6,
+            ),
+            forceRegister=module.params.get("force_register"),
+            sourceSideDedupEnabled=True,
+            registeredEntityParams=dict(
+                throttlingPolicy=dict(isThrottlingEnabled=False)
+            ),
+            connectionId=None,
+        )
+        response = open_url(
+            url=uri,
+            data=json.dumps(payload),
+            headers=headers,
+            validate_certs=validate_certs,
+            method="POST",
+            timeout=REQUEST_TIMEOUT,
+        )
+        return json.loads(response.read())
+    except urllib_error.URLError as e:
+        raise__cohesity_exception__handler(e.read(), module)
+        return None
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
+        return None
 
 
 def register_oracle_source(module, self, _id):
@@ -159,7 +270,7 @@ def register_oracle_source(module, self, _id):
     server = module.params.get("cluster")
     validate_certs = module.params.get("validate_certs")
     token = self["token"]
-    endpoint = self["endpoint"]
+    endpoint = self.get("scan_vip_address") or self.get("endpoint")
     source_id = _id
     db_user = module.params.get("db_username")
     db_pwd = module.params.get("db_password")
@@ -187,9 +298,11 @@ def register_oracle_source(module, self, _id):
         )
 
         response = json.loads(response.read())
-        return response
-    except Exception:
-        return payload
+        return bool(response)
+    except urllib_error.URLError as e:
+        raise__cohesity_exception__handler(e.read(), module)
+    except Exception as error:
+        raise__cohesity_exception__handler(error, module)
 
 
 def get__protection_source_registration__status(module, self):
@@ -198,7 +311,8 @@ def get__protection_source_registration__status(module, self):
     """
     try:
         env = self["environment"]
-        endpoint = self["endpoint"]
+        endpoint = self.get("endpoint") or ""
+        scan = self.get("scan_vip_address") or ""
         resp = cohesity_client.protection_sources.list_protection_sources(
             environments=env
         )
@@ -207,6 +321,14 @@ def get__protection_source_registration__status(module, self):
             for node in nodes:
                 if node["protectionSource"]["name"] == endpoint:
                     return node["protectionSource"]["id"]
+                if self.get("source_type") == "rac":
+                    reg_info = node.get("registrationInfo", {})
+                    access_endpoint = reg_info.get("accessInfo", {}).get("endpoint", "")
+                    source_name = node["protectionSource"]["name"]
+                    if scan and source_name == scan:
+                        return node["protectionSource"]["id"]
+                    if endpoint and access_endpoint == endpoint:
+                        return node["protectionSource"]["id"]
         return False
     except urllib_error.URLError as e:
         # => Capture and report any error messages.
@@ -257,7 +379,13 @@ def main():
     argument_spec.update(
         dict(
             state=dict(choices=["present", "absent"], default="present"),
-            endpoint=dict(type="str", required=True),
+            endpoint=dict(type="str", default=""),
+            source_type=dict(
+                type="str",
+                choices=["standalone", "rac"],
+                default="standalone",
+            ),
+            scan_vip_address=dict(default="", type="str", aliases=["rac_agent_node"]),
             force_register=dict(default=False, type="bool"),
             refresh=dict(default=False, type="bool"),
             db_username=dict(default="", type="str"),
@@ -270,6 +398,19 @@ def main():
     global cohesity_client
     cohesity_client = get_cohesity_client(module)
 
+    if module.params.get("source_type") == "rac":
+        if not module.params.get("scan_vip_address"):
+            module.fail_json(
+                msg=(
+                    "scan_vip_address (SCAN/VIP Address) is required when "
+                    "source_type is rac."
+                )
+            )
+    elif not module.params.get("endpoint"):
+        module.fail_json(
+            msg="endpoint is required when source_type is standalone."
+        )
+
     results = dict(
         changed=False,
         msg="Attempting to manage Protection Source",
@@ -277,11 +418,7 @@ def main():
     )
 
     # Check the endpoint is already registred as a Physical source.
-    prot_sources = dict(
-        token=get__cohesity_auth__token(module),
-        endpoint=module.params.get("endpoint"),
-        environment="kPhysical",
-    )
+    prot_sources = _build_prot_sources(module, "kPhysical")
     current_status = get__protection_source_registration__status(module, prot_sources)
 
     if module.check_mode:
@@ -304,7 +441,10 @@ def main():
                     "msg"
                 ] = "Check Mode: Cohesity Protection Source is not currently registered.  This action would register the Protection Source."
                 check_mode_results["id"] = current_status
-                status = check_source_reachability(module.params.get("endpoint"))
+                reachability_target = module.params.get("endpoint")
+                if module.params.get("source_type") == "rac":
+                    reachability_target = _rac_connect_address(module)
+                status = check_source_reachability(reachability_target)
                 if status is None:
                     check_mode_results[
                         "msg"
@@ -312,7 +452,7 @@ def main():
                 elif not status:
                     check_mode_results[
                         "msg"
-                    ] += "Source '%s' is not reachable" % module.params.get("endpoint")
+                    ] += "Source '%s' is not reachable" % reachability_target
 
         else:
             if current_status:
@@ -328,11 +468,7 @@ def main():
 
     elif module.params.get("state") == "present":
         if current_status:
-            prot_sources = dict(
-                token=get__cohesity_auth__token(module),
-                endpoint=module.params.get("endpoint"),
-                environment="kOracle",
-            )
+            prot_sources = _build_prot_sources(module, "kOracle")
             oracle_status = get__protection_source_registration__status(
                 module, prot_sources
             )
@@ -354,7 +490,9 @@ def main():
                 if module.params.get("refresh"):
                     refresh_protection_source(module, current_status)
                     msg = "Successfully refreshed the Oracle Source '%s'." % (
-                        module.params.get("endpoint")
+                        module.params.get("scan_vip_address")
+                        if module.params.get("source_type") == "rac"
+                        else module.params.get("endpoint")
                     )
 
                 results = dict(
@@ -364,21 +502,31 @@ def main():
                     endpoint=module.params.get("endpoint"),
                 )
         else:
+            is_rac = module.params.get("source_type") == "rac"
+
             sleep_count = 0
+            response = None
 
             # Register the endpoint as Physical source first.
-            response = register_source(module, prot_sources)
+            if is_rac:
+                register_rac_physical_source(module, prot_sources)
+            else:
+                response = register_source(module, prot_sources)
 
             # Wait until Physical source is successfully registered.
+            wait_sources = dict(
+                environment="kPhysical",
+                token=prot_sources["token"],
+                endpoint=prot_sources.get("endpoint") or "",
+            )
+            if is_rac:
+                wait_sources["source_type"] = "rac"
+                wait_sources["scan_vip_address"] = prot_sources["scan_vip_address"]
+
             while sleep_count < 5:
                 sleep_count += 1
                 status = get__protection_source_registration__status(
-                    module,
-                    dict(
-                        environment="kPhysical",
-                        token=prot_sources["token"],
-                        endpoint=prot_sources["endpoint"],
-                    ),
+                    module, wait_sources
                 )
                 time.sleep(10)
 
@@ -388,7 +536,14 @@ def main():
                     msg="Error while registering Cohesity Physical Protection Source",
                 )
 
-            response = register_oracle_source(module, prot_sources, response.id)
+            if not is_rac and response is None:
+                module.fail_json(
+                    changed=False,
+                    msg="Error while registering Cohesity Physical Protection Source",
+                )
+
+            source_id = status if is_rac else response.id
+            response = register_oracle_source(module, prot_sources, source_id)
             if response is True:
                 results = dict(
                     changed=True,

@@ -3,17 +3,27 @@
 - name: Create a Oracle protection job for oracle sources
   hosts: localhost
   gather_facts: false
+
+  vars:
+    oracle_source_type: standalone  # standalone | rac
+    # endpoint — standalone: Oracle host IP or hostname (required)
+    #          — RAC: reachable IP/hostname when registered source lookup differs from scan_vip_address (optional)
+    endpoint: ""
+    # scan_vip_address — RAC only: SCAN/VIP address (required when oracle_source_type=rac)
+    scan_vip_address: ""
+
   tasks:
     - name: "Oracle Protection job"
       cohesity.dataprotect.cohesity_oracle_job:
         state: present
-        job_name: protect_oracle
-        storage_domain: "DefaultStorageDomain"
-        policy: "Silver"
-        endpoint: "orcl-serv2-eng-db.com"
+        job_name: "{{ cohesity_job_name }}"
+        storage_domain: "{{ cohesity_storage_domain }}"
+        policy: "{{ cohesity_job_policy }}"
+        source_type: "{{ oracle_source_type }}"
+        endpoint: "{{ endpoint }}"
+        scan_vip_address: "{{ scan_vip_address }}"
         cancel_active: true
-        databases:
-          - "clone1"
+        databases: "{{ oracle_databases | default([]) }}"
         cluster: "{{ cohesity_server }}"
         username: "{{ cohesity_username }}"
         password: "{{ cohesity_password }}"
