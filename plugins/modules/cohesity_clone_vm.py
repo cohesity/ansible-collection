@@ -171,6 +171,39 @@ EXAMPLES = """
     network_connected: false
 """
 
+RETURN = """
+changed:
+  description: Whether the module changed the state of the Cohesity Cluster.
+  returned: always
+  type: bool
+  sample: true
+msg:
+  description: Human readable message describing the outcome of the operation.
+  returned: always
+  type: str
+  sample: "Cohesity clone task is created successfully"
+id:
+  description: Identifier of the clone task.
+  returned: when a clone task is created, already exists, or is destroyed
+  type: str
+  sample: "48291"
+task_name:
+  description: Name of the clone task as provided in the I(name) option.
+  returned: when a clone task is created or destroyed
+  type: str
+  sample: "ansible-clone"
+name:
+  description: Name of the clone task as provided in the I(name) option.
+  returned: when the clone task already exists
+  type: str
+  sample: "ansible-clone"
+state:
+  description: The requested state of the clone task.
+  returned: when no other action is performed
+  type: str
+  sample: "present"
+"""
+
 
 import json
 import time

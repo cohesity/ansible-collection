@@ -117,6 +117,55 @@ EXAMPLES = """
     active_only: true
 """
 
+RETURN = """
+changed:
+  description: Always C(false) because this module only gathers information.
+  returned: always
+  type: bool
+  sample: false
+cluster:
+  description: Facts gathered about the Cohesity Cluster.
+  returned: always
+  type: dict
+  contains:
+    nodes:
+      description: List of nodes that are part of the cluster.
+      returned: always
+      type: list
+      elements: dict
+    protection:
+      description: Protection related facts.
+      returned: always
+      type: dict
+      contains:
+        sources:
+          description:
+            - Registered protection sources, keyed by environment type
+              (C(Physical), C(VMware) and C(GenericNas)).
+          returned: success
+          type: dict
+        policies:
+          description: List of protection policies.
+          returned: success
+          type: list
+          elements: dict
+        jobs:
+          description: List of protection jobs (protection groups).
+          returned: success
+          type: list
+          elements: dict
+        runs:
+          description: List of protection job runs.
+          returned: success
+          type: list
+          elements: dict
+    storage_domains:
+      description: List of storage domains (view boxes) configured on the cluster.
+      returned: success
+      type: list
+      elements: dict
+"""
+
 from ansible.module_utils.basic import AnsibleModule
 
 import traceback
