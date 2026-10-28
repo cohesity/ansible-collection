@@ -64,3 +64,4 @@ build_ignore:
   - ansible.cfg
   - .ansible
   - importer_result.json
+  - built-docs
