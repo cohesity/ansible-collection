@@ -1,0 +1,13 @@
+---
+sections:
+  - title: User Guide
+    toctree:
+      - guide_overview
+      - guide_prerequisites
+      - guide_setup
+      - guide_inventory
+      - guide_faq
+      - guide_feedback
+  - title: Scenario Guides
+    toctree:
+      - guide_vmware_migration
