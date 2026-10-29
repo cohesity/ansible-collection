@@ -24,6 +24,49 @@ If you find a bug in the source code, you can help us by
 ## <a name="doc"></a> Have any suggestions for the Documentation? :bulb:
 If you find any discrepancies in our Documentation or you any awesome suggestions for us, report it to us by opening a new issue using the  [Documentation template](https://github.com/cohesity/ansible-collection/issues/new?assignees=&labels=&template=documentation.md&title=) provided in our GitHub repo.
 
+### Building the documentation site locally
+
+Module documentation is generated from the `DOCUMENTATION`, `EXAMPLES` and `RETURN` blocks in `plugins/modules/`
+with [antsibull-docs](https://docs.ansible.com/projects/antsibull-docs/). Guides live in `docs/docsite/rst/` and
+are listed in `docs/docsite/extra-docs.yml`.
+
+Use [`docs/build_docs.py`](docs/build_docs.py) from the repository root. It runs `antsibull-docs` and Sphinx,
+fixes `rst/` permissions required by `antsibull-docs`, and writes HTML to `built-docs/html/`.
+
+```shell
+# 1. Install the tooling (use a virtual environment)
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r dev-requirements.txt
+
+# 2. (Recommended) Validate module and guide documentation
+antsibull-docs lint-collection-docs --plugin-docs --skip-rstcheck \
+  --validate-collection-refs=dependent --check-extra-docs-refs .
+
+# 3. Build the site
+python docs/build_docs.py
+
+# 4. Preview locally
+python docs/build_docs.py --serve
+# Open http://127.0.0.1:8000/  (use --port if 8000 is in use)
+
+# Optional: preview from another machine (for example a dev VM IP)
+python docs/build_docs.py --serve --bind 0.0.0.0 --port 8767
+
+# Optional: treat Sphinx warnings as errors (stricter, CI-style)
+python docs/build_docs.py --strict
+```
+
+Generated output under `built-docs/` is git-ignored. If you only need static files without starting a server:
+
+```shell
+python docs/build_docs.py
+python -m http.server 8000 --bind 127.0.0.1 --directory built-docs/html
+```
+
+Guide pages are published under paths such as `/docsite/guide_setup.html`, which matches the usual Ansible
+collection docsite layout.
+
 
 ## <a name="feature"></a> Missing a Feature? :star:	
 You can *request* a new feature by [submitting an issue](#submit-issue) to our GitHub

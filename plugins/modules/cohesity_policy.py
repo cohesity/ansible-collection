@@ -127,6 +127,39 @@ EXAMPLES = """
     name: 'Ansible'
 """
 
+RETURN = """
+changed:
+  description: Whether the module changed the state of the Cohesity Cluster.
+  returned: always
+  type: bool
+  sample: true
+msg:
+  description: Human readable message describing the outcome of the operation.
+  returned: always
+  type: str
+  sample: "Cohesity protection policy is created successfully"
+id:
+  description: Identifier of the protection policy.
+  returned: when a policy is created, already exists, or is deleted
+  type: str
+  sample: "5712345678901234:1700000000000:123"
+task_name:
+  description: Name of the protection policy as provided in the I(name) option.
+  returned: when a policy is created
+  type: str
+  sample: "Ansible"
+policy_name:
+  description: Name of the protection policy as provided in the I(name) option.
+  returned: when a policy is deleted or does not exist
+  type: str
+  sample: "Ansible"
+state:
+  description: The requested state of the policy.
+  returned: when no other action is performed
+  type: str
+  sample: "present"
+"""
+
 import json
 
 from ansible.module_utils.basic import AnsibleModule

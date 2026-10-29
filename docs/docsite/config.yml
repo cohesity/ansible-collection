@@ -1,0 +1,13 @@
+---
+# antsibull-docs docsite configuration for cohesity.dataprotect.
+# See https://docs.ansible.com/projects/antsibull-docs/collection-docs/
+
+# This collection does not flatten subdirectories under plugins/*/.
+flatmap: false
+
+# No custom ``.. envvar::`` directives are used in the extra docs.
+envvar_directives: []
+
+changelog:
+  # Render changelogs/changelog.yaml and link it from the collection index page.
+  write_changelog: true

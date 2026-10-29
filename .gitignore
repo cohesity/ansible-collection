@@ -9,3 +9,9 @@ tests/.env
 
 ### Local Ansible / developer artifacts ###
 .ansible/
+
+### Virtual Environment
+.venv
+
+### Generated antsibull-docs site (local build output)
+built-docs/

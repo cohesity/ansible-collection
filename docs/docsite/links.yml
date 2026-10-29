@@ -1,0 +1,14 @@
+---
+# Adds "Edit on GitHub" links to the generated module pages.
+# The collection root (galaxy.yml) is the repository root, so no path_prefix is needed.
+edit_on_github:
+  repository: cohesity/ansible-collection
+  branch: main
+  path_prefix: ''
+
+# The issue tracker and repository links are added automatically from galaxy.yml.
+extra_links:
+  - description: Request a feature or ask a question
+    url: https://github.com/cohesity/ansible-collection/issues/new/choose
+  - description: Ansible Automation Hub
+    url: https://console.redhat.com/ansible/automation-hub/repo/published/cohesity/dataprotect/

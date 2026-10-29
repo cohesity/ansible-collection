@@ -161,6 +161,19 @@ EXAMPLES = """
     oracle_data: /u01/app/oracle/product/12.1.0.2/db_1
 """
 
+RETURN = """
+changed:
+  description: Whether a new restore task was created.
+  returned: always
+  type: bool
+  sample: true
+msg:
+  description: Human readable message describing the outcome of the operation.
+  returned: always
+  type: str
+  sample: "Successfully created restore task 'recover_tasks'"
+"""
+
 import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
