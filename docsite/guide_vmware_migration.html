@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migrate VMware virtual machines &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cohesity.dataprotect.cohesity_agent module – Management of Cohesity Physical Agent" href="../cohesity_agent_module.html" />
+    <link rel="prev" title="Feedback" href="guide_feedback.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide_overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_inventory.html">Configure your Ansible inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_feedback.html">Feedback</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scenario Guides</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Migrate VMware virtual machines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#workflow">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-migration-task">Create a migration task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#poll-for-the-migration-status">Poll for the migration status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finalize-or-cancel-the-migration">Finalize or cancel the migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#related-modules">Related modules</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_agent_module.html">cohesity_agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_cancel_migration_module.html">cohesity_cancel_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_clone_vm_module.html">cohesity_clone_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_facts_module.html">cohesity_facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_finalize_migration_module.html">cohesity_finalize_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_job_module.html">cohesity_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migrate_vm_module.html">cohesity_migrate_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migration_status_module.html">cohesity_migration_status</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_job_module.html">cohesity_oracle_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_restore_module.html">cohesity_oracle_restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_source_module.html">cohesity_oracle_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_plugin_module.html">cohesity_plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_policy_module.html">cohesity_policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_file_module.html">cohesity_restore_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vm_module.html">cohesity_restore_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vmware_file_module.html">cohesity_restore_vmware_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_source_module.html">cohesity_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_storage_domain_module.html">cohesity_storage_domain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_sync_objects_module.html">cohesity_sync_objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_protection_group_module.html">cohesity_uda_protection_group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_source_module.html">cohesity_uda_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_view_module.html">cohesity_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_win_agent_module.html">cohesity_win_agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changelog</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Release notes</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Migrate VMware virtual machines</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="migrate-vmware-virtual-machines">
+<span id="ansible-collections-cohesity-dataprotect-docsite-guide-vmware-migration"></span><h1>Migrate VMware virtual machines<a class="headerlink" href="#migrate-vmware-virtual-machines" title="Link to this heading"></a></h1>
+<p>This guide describes the VM migration workflow: create a migration task, poll its status, then either finalize
+or cancel it. The example playbooks are in the
+<a class="reference external" href="https://github.com/cohesity/ansible-collection/tree/main/playbooks/vmware-workflow/migration">migration directory</a>
+of the repository.</p>
+<p>All examples assume that the cluster address and credentials are provided as the variables <code class="docutils literal notranslate"><span class="pre">cohesity_server</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cohesity_username</span></code>, <code class="docutils literal notranslate"><span class="pre">cohesity_password</span></code> and <code class="docutils literal notranslate"><span class="pre">cohesity_validate_certs</span></code>.</p>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Create the migration task with <a class="reference internal" href="../cohesity_migrate_vm_module.html#ansible-collections-cohesity-dataprotect-cohesity-migrate-vm-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migrate_vm</span></a>. The module
+returns the task ID.</p></li>
+<li><p>Poll the task with <a class="reference internal" href="../cohesity_migration_status_module.html#ansible-collections-cohesity-dataprotect-cohesity-migration-status-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migration_status</span></a> using that task ID. The
+response includes the total number of VMs, the number of VMs in sync, and a list of errors if any occurred.</p></li>
+<li><p>Based on the status, finalize the migration with
+<a class="reference internal" href="../cohesity_finalize_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-finalize-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_finalize_migration</span></a> or cancel it with
+<a class="reference internal" href="../cohesity_cancel_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-cancel-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_cancel_migration</span></a>.</p></li>
+</ol>
+</section>
+<section id="create-a-migration-task">
+<h2>Create a migration task<a class="headerlink" href="#create-a-migration-task" title="Link to this heading"></a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a migration task</span>
+<span class="w">  </span><span class="nt">cohesity.dataprotect.cohesity_migrate_vm</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_server</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_username</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_password</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_validate_certs</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Testing"</span>
+<span class="w">    </span><span class="nt">job_vm_pair</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">job_name_1</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VM1</span>
+<span class="w">      </span><span class="nt">job_name_2</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VM2</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VM3</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="w">    </span><span class="nt">datacenter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Datacenter</span>
+<span class="w">    </span><span class="nt">cluster_compute_resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster1</span>
+<span class="w">    </span><span class="nt">network_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VLAN</span>
+<span class="w">    </span><span class="nt">preserve_mac_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">enable_network</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">vm_folder_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cohesity_folder</span>
+<span class="w">    </span><span class="nt">resource_pool_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">resource_pool</span>
+<span class="w">    </span><span class="nt">datastore_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">datastore_name</span>
+<span class="w">    </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vcenter.domain.com</span>
+<span class="w">    </span><span class="nt">detach_network</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">suffix</span><span class="p">:</span><span class="w"> </span><span class="s">"_1"</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="s">"copy_"</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">task</span>
+</pre></div>
+</div>
+</section>
+<section id="poll-for-the-migration-status">
+<h2>Poll for the migration status<a class="headerlink" href="#poll-for-the-migration-status" title="Link to this heading"></a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Poll for migration status of VMs</span>
+<span class="w">  </span><span class="nt">cohesity.dataprotect.cohesity_migration_status</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_server</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_username</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_password</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_validate_certs</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">task.id</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">job_result</span>
+<span class="w">  </span><span class="nt">until</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">job_result.status in ['Succeeded', 'Canceled', 'Failed', 'OnHold']</span>
+<span class="w">  </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="w">  </span><span class="nt">delay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+</pre></div>
+</div>
+</section>
+<section id="finalize-or-cancel-the-migration">
+<h2>Finalize or cancel the migration<a class="headerlink" href="#finalize-or-cancel-the-migration" title="Link to this heading"></a></h2>
+<p>Finalize the task when the objects are in sync, or cancel it when too few objects synchronized. The
+<code class="docutils literal notranslate"><span class="pre">migrate_task.yml</span></code> example playbook shows how to combine the three steps with <code class="docutils literal notranslate"><span class="pre">when</span></code> conditions based on the
+<code class="docutils literal notranslate"><span class="pre">sync_vms</span></code> and <code class="docutils literal notranslate"><span class="pre">total_vms</span></code> values from the status response.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Finalize the migration</span>
+<span class="w">  </span><span class="nt">cohesity.dataprotect.cohesity_finalize_migration</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_server</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_username</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_password</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_validate_certs</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">task.id</span><span class="nv"> </span><span class="s">}}"</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cancel the migration</span>
+<span class="w">  </span><span class="nt">cohesity.dataprotect.cohesity_cancel_migration</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_server</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_username</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_password</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_validate_certs</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">    </span><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">task.id</span><span class="nv"> </span><span class="s">}}"</span>
+</pre></div>
+</div>
+</section>
+<section id="related-modules">
+<h2>Related modules<a class="headerlink" href="#related-modules" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../cohesity_migrate_vm_module.html#ansible-collections-cohesity-dataprotect-cohesity-migrate-vm-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migrate_vm</span></a></p></li>
+<li><p><a class="reference internal" href="../cohesity_migration_status_module.html#ansible-collections-cohesity-dataprotect-cohesity-migration-status-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migration_status</span></a></p></li>
+<li><p><a class="reference internal" href="../cohesity_finalize_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-finalize-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_finalize_migration</span></a></p></li>
+<li><p><a class="reference internal" href="../cohesity_cancel_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-cancel-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_cancel_migration</span></a></p></li>
+<li><p><a class="reference internal" href="../cohesity_sync_objects_module.html#ansible-collections-cohesity-dataprotect-cohesity-sync-objects-module"><span class="std std-ref">cohesity.dataprotect.cohesity_sync_objects</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guide_feedback.html" class="btn btn-neutral float-left" title="Feedback" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../cohesity_agent_module.html" class="btn btn-neutral float-right" title="cohesity.dataprotect.cohesity_agent module – Management of Cohesity Physical Agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

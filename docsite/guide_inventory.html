@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configure your Ansible inventory &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="guide_faq.html" />
+    <link rel="prev" title="Setup" href="guide_setup.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide_overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_setup.html">Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configure your Ansible inventory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-an-inventory-file">What is an inventory file?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#special-note-about-windows-hosts">Special note about Windows hosts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#required-components">Required components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-inventory-file">Example inventory file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide_faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_feedback.html">Feedback</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scenario Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide_vmware_migration.html">Migrate VMware virtual machines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_agent_module.html">cohesity_agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_cancel_migration_module.html">cohesity_cancel_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_clone_vm_module.html">cohesity_clone_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_facts_module.html">cohesity_facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_finalize_migration_module.html">cohesity_finalize_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_job_module.html">cohesity_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migrate_vm_module.html">cohesity_migrate_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migration_status_module.html">cohesity_migration_status</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_job_module.html">cohesity_oracle_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_restore_module.html">cohesity_oracle_restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_source_module.html">cohesity_oracle_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_plugin_module.html">cohesity_plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_policy_module.html">cohesity_policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_file_module.html">cohesity_restore_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vm_module.html">cohesity_restore_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vmware_file_module.html">cohesity_restore_vmware_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_source_module.html">cohesity_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_storage_domain_module.html">cohesity_storage_domain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_sync_objects_module.html">cohesity_sync_objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_protection_group_module.html">cohesity_uda_protection_group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_source_module.html">cohesity_uda_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_view_module.html">cohesity_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_win_agent_module.html">cohesity_win_agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changelog</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Release notes</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configure your Ansible inventory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="configure-your-ansible-inventory">
+<span id="ansible-collections-cohesity-dataprotect-docsite-guide-inventory"></span><h1>Configure your Ansible inventory<a class="headerlink" href="#configure-your-ansible-inventory" title="Link to this heading"></a></h1>
+<p>The example playbooks in the collection are designed to work with the Ansible inventory to streamline the
+process of deploying an entire solution. The inventory is a collection of hosts and variables that controls how
+connections are made.</p>
+<section id="what-is-an-inventory-file">
+<h2>What is an inventory file?<a class="headerlink" href="#what-is-an-inventory-file" title="Link to this heading"></a></h2>
+<p>Ansible works against multiple systems in your infrastructure at the same time. It does this by selecting
+portions of the systems listed in the inventory. You can specify an inventory file with the <code class="docutils literal notranslate"><span class="pre">-i</span> <span class="pre">&lt;path&gt;</span></code> option
+on the command line.</p>
+<p>For more details, see
+<a class="reference external" href="https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html">Working with inventory</a>
+in the Ansible documentation.</p>
+</section>
+<section id="special-note-about-windows-hosts">
+<h2>Special note about Windows hosts<a class="headerlink" href="#special-note-about-windows-hosts" title="Link to this heading"></a></h2>
+<p>By default, Ansible uses Python and SSH to communicate. This collection is written to be used from a Linux based
+workstation. The <a class="reference internal" href="../cohesity_win_agent_module.html#ansible-collections-cohesity-dataprotect-cohesity-win-agent-module"><span class="std std-ref">cohesity.dataprotect.cohesity_win_agent</span></a> module is the exception: it installs
+the Cohesity Agent on physical Windows servers using WinRM and PowerShell. To connect to Windows hosts, see
+<a class="reference external" href="https://docs.ansible.com/projects/ansible/latest/os_guide/windows_setup.html">Setting up a Windows host</a>.</p>
+</section>
+<section id="required-components">
+<h2>Required components<a class="headerlink" href="#required-components" title="Link to this heading"></a></h2>
+<p>The following table lists the settings that the example playbooks expect.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 45.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key name</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[workstation]</span></code></p></td>
+<td><p>Required. A single host from which calls to the Cohesity cluster are made. This can be your local machine
+or a remote Linux workstation.</p></td>
+<td><p>If local, use the <code class="docutils literal notranslate"><span class="pre">ansible_connection=local</span></code> option to prevent SSH calls.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[physical:children]</span></code></p></td>
+<td><p>Collection of groups to include in all physical environment actions.</p></td>
+<td><p>A collection of other groups, for example <code class="docutils literal notranslate"><span class="pre">linux</span></code> and <code class="docutils literal notranslate"><span class="pre">windows</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[group_name]</span></code></p></td>
+<td><p>Organized by platform, operating system, or any other common characteristic. If the name of the server
+does not resolve, add <code class="docutils literal notranslate"><span class="pre">ansible_host=IP</span></code> to handle the registration.</p></td>
+<td><p>If each item needs different values, include the supported inventory options on that item.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[group_name:vars]</span></code></p></td>
+<td><p>Variables belonging to the named group, such as default authentication settings.</p></td>
+<td><p>A variable set on an item in <code class="docutils literal notranslate"><span class="pre">[group_name]</span></code> overrides the value in this section.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[vmware]</span></code></p></td>
+<td><p>Inventory name followed by <code class="docutils literal notranslate"><span class="pre">ansible_host</span></code> set to the vCenter IP for managed VMware endpoints.</p></td>
+<td><p>If the inventory name is resolvable, <code class="docutils literal notranslate"><span class="pre">ansible_host</span></code> is not required.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[vmware:vars]</span></code></p></td>
+<td><p>Variables required for VMware environment management.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">type=VMware</span></code>, <code class="docutils literal notranslate"><span class="pre">vmware_type=VCenter</span></code>, <code class="docutils literal notranslate"><span class="pre">source_username</span></code>, <code class="docutils literal notranslate"><span class="pre">source_password</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[generic_nas]</span></code></p></td>
+<td><p>Inventory name followed by <code class="docutils literal notranslate"><span class="pre">endpoint</span></code> set to the path of the managed GenericNas endpoint.</p></td>
+<td><p>Backslashes in Windows shares must be escaped, for example <code class="docutils literal notranslate"><span class="pre">\\\\windows_host\\share_name</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[generic_nas:vars]</span></code></p></td>
+<td><p>Variables required for GenericNas environment management.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">type=GenericNas</span></code>, <code class="docutils literal notranslate"><span class="pre">nas_protocol=SMB</span></code>, <code class="docutils literal notranslate"><span class="pre">nas_username</span></code>, <code class="docutils literal notranslate"><span class="pre">nas_password</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-inventory-file">
+<h2>Example inventory file<a class="headerlink" href="#example-inventory-file" title="Link to this heading"></a></h2>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Workstation declaration, which is also included in the backup.</span>
+<span class="k">[workstation]</span>
+<span class="na">control ansible_connection</span><span class="o">=</span><span class="s">local ansible_host=192.168.1.1 type=Linux</span>
+
+<span class="k">[centos]</span>
+<span class="na">centos6 ansible_host</span><span class="o">=</span><span class="s">192.168.1.1</span>
+<span class="na">centos7 ansible_host</span><span class="o">=</span><span class="s">192.168.1.2</span>
+
+<span class="c1"># Default variables for all CentOS environments.</span>
+<span class="k">[centos:vars]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">Linux</span>
+<span class="na">ansible_user</span><span class="o">=</span><span class="s">root</span>
+<span class="na">ansible_become</span><span class="o">=</span><span class="s">False</span>
+
+<span class="c1"># Grouping of all Linux hosts.</span>
+<span class="k">[linux:children]</span>
+<span class="na">centos</span>
+<span class="na">workstation</span>
+
+<span class="c1"># Physical Windows servers.</span>
+<span class="k">[windows]</span>
+<span class="na">windows12 ansible_host</span><span class="o">=</span><span class="s">192.168.1.1</span>
+<span class="na">windows16 ansible_host</span><span class="o">=</span><span class="s">192.168.1.2</span>
+
+<span class="c1"># Windows variables for each Windows server.</span>
+<span class="k">[windows:vars]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">Windows</span>
+<span class="na">install_type</span><span class="o">=</span><span class="s">volcbt</span>
+<span class="na">reboot_after_install</span><span class="o">=</span><span class="s">True</span>
+<span class="na">ansible_user</span><span class="o">=</span><span class="s">administrator</span>
+<span class="na">ansible_password</span><span class="o">=</span><span class="s">password</span>
+<span class="na">ansible_port</span><span class="o">=</span><span class="s">5986</span>
+<span class="na">ansible_connection</span><span class="o">=</span><span class="s">winrm</span>
+<span class="na">ansible_winrm_server_cert_validation</span><span class="o">=</span><span class="s">ignore</span>
+
+<span class="c1"># Group all physical servers. This grouping is used by the example</span>
+<span class="c1"># playbooks to identify physical servers.</span>
+<span class="k">[physical:children]</span>
+<span class="na">linux</span>
+<span class="na">windows</span>
+
+<span class="c1"># Declare the VMware environments to manage.</span>
+<span class="k">[vmware]</span>
+<span class="na">vcenter01 ansible_host</span><span class="o">=</span><span class="s">192.168.1.1</span>
+
+<span class="k">[vmware:vars]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">VMware</span>
+<span class="na">vmware_type</span><span class="o">=</span><span class="s">VCenter</span>
+<span class="na">source_username</span><span class="o">=</span><span class="s">administrator</span>
+<span class="na">source_password</span><span class="o">=</span><span class="s">password</span>
+
+<span class="c1"># Declare the GenericNas endpoints to manage.</span>
+<span class="k">[generic_nas]</span>
+<span class="na">export_path endpoint</span><span class="o">=</span><span class="s">"192.168.1.1:/export_path"</span><span class="w"> </span><span class="na">nas_protocol</span><span class="o">=</span><span class="s">NFS</span>
+<span class="na">nas_share endpoint</span><span class="o">=</span><span class="s">"\\\\192.168.1.1\\nas_share"</span>
+<span class="na">data endpoint</span><span class="o">=</span><span class="s">"\\\\192.168.1.1\\data"</span>
+
+<span class="c1"># Default variables for GenericNas endpoints.</span>
+<span class="k">[generic_nas:vars]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">GenericNas</span>
+<span class="na">nas_protocol</span><span class="o">=</span><span class="s">SMB</span>
+<span class="na">nas_username</span><span class="o">=</span><span class="s">.\cohesity</span>
+<span class="na">nas_password</span><span class="o">=</span><span class="s">password</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The example above uses plain text passwords for illustration only. Use Ansible Vault or another secrets
+mechanism for real credentials.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guide_setup.html" class="btn btn-neutral float-left" title="Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guide_faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequently Asked Questions &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Feedback" href="guide_feedback.html" />
+    <link rel="prev" title="Configure your Ansible inventory" href="guide_inventory.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide_overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_inventory.html">Configure your Ansible inventory</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#do-the-modules-support-active-directory-based-cohesity-accounts">Do the modules support Active Directory based Cohesity accounts?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-privileges-does-the-active-directory-based-account-require">What privileges does the Active Directory based account require?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide_feedback.html">Feedback</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scenario Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide_vmware_migration.html">Migrate VMware virtual machines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_agent_module.html">cohesity_agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_cancel_migration_module.html">cohesity_cancel_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_clone_vm_module.html">cohesity_clone_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_facts_module.html">cohesity_facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_finalize_migration_module.html">cohesity_finalize_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_job_module.html">cohesity_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migrate_vm_module.html">cohesity_migrate_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migration_status_module.html">cohesity_migration_status</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_job_module.html">cohesity_oracle_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_restore_module.html">cohesity_oracle_restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_source_module.html">cohesity_oracle_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_plugin_module.html">cohesity_plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_policy_module.html">cohesity_policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_file_module.html">cohesity_restore_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vm_module.html">cohesity_restore_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vmware_file_module.html">cohesity_restore_vmware_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_source_module.html">cohesity_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_storage_domain_module.html">cohesity_storage_domain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_sync_objects_module.html">cohesity_sync_objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_protection_group_module.html">cohesity_uda_protection_group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_source_module.html">cohesity_uda_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_view_module.html">cohesity_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_win_agent_module.html">cohesity_win_agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changelog</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Release notes</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Frequently Asked Questions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="frequently-asked-questions">
+<span id="ansible-collections-cohesity-dataprotect-docsite-guide-faq"></span><h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading"></a></h1>
+<section id="do-the-modules-support-active-directory-based-cohesity-accounts">
+<h2>Do the modules support Active Directory based Cohesity accounts?<a class="headerlink" href="#do-the-modules-support-active-directory-based-cohesity-accounts" title="Link to this heading"></a></h2>
+<p>Yes. You can configure domain specific credentials in the following formats:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">username&#64;AD.domain.com</span></code>: AD user</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AD.domain.com/username&#64;tenant</span></code>: AD tenant user</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LOCAL/username&#64;tenant</span></code>: local tenant user</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Domain/username</span></code>: will be deprecated in a future release</p></li>
+</ul>
+</section>
+<section id="what-privileges-does-the-active-directory-based-account-require">
+<h2>What privileges does the Active Directory based account require?<a class="headerlink" href="#what-privileges-does-the-active-directory-based-account-require" title="Link to this heading"></a></h2>
+<p>The Active Directory account must have administrator level privileges on the cluster.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guide_inventory.html" class="btn btn-neutral float-left" title="Configure your Ansible inventory" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guide_feedback.html" class="btn btn-neutral float-right" title="Feedback" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

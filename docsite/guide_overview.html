@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Prerequisites" href="guide_prerequisites.html" />
+    <link rel="prev" title="Cohesity.Dataprotect" href="../index.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-the-collection-covers">What the collection covers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide_prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_inventory.html">Configure your Ansible inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_feedback.html">Feedback</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scenario Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide_vmware_migration.html">Migrate VMware virtual machines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_agent_module.html">cohesity_agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_cancel_migration_module.html">cohesity_cancel_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_clone_vm_module.html">cohesity_clone_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_facts_module.html">cohesity_facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_finalize_migration_module.html">cohesity_finalize_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_job_module.html">cohesity_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migrate_vm_module.html">cohesity_migrate_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migration_status_module.html">cohesity_migration_status</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_job_module.html">cohesity_oracle_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_restore_module.html">cohesity_oracle_restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_source_module.html">cohesity_oracle_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_plugin_module.html">cohesity_plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_policy_module.html">cohesity_policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_file_module.html">cohesity_restore_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vm_module.html">cohesity_restore_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vmware_file_module.html">cohesity_restore_vmware_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_source_module.html">cohesity_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_storage_domain_module.html">cohesity_storage_domain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_sync_objects_module.html">cohesity_sync_objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_protection_group_module.html">cohesity_uda_protection_group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_source_module.html">cohesity_uda_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_view_module.html">cohesity_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_win_agent_module.html">cohesity_win_agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changelog</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Release notes</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<span id="ansible-collections-cohesity-dataprotect-docsite-guide-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="../index.html#plugins-in-cohesity-dataprotect"><span class="std std-ref">cohesity.dataprotect collection</span></a> provides Ansible modules for
+interacting with <a class="reference external" href="https://www.cohesity.com/products/data-platform">Cohesity DataPlatform</a>.</p>
+<p>Leveraging Python, this collection can be used from Linux or macOS control nodes, and it can manage Windows hosts
+through WinRM. It includes modules and example playbooks that are useful for automating common tasks and for
+orchestrating workflows in your environment.</p>
+<p>The collection uses the Cohesity REST API (through the Cohesity Management SDK) to interact with the Cohesity
+cluster.</p>
+<section id="what-the-collection-covers">
+<h2>What the collection covers<a class="headerlink" href="#what-the-collection-covers" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Cluster information: <a class="reference internal" href="../cohesity_facts_module.html#ansible-collections-cohesity-dataprotect-cohesity-facts-module"><span class="std std-ref">cohesity.dataprotect.cohesity_facts</span></a>.</p></li>
+<li><p>Protection sources: <a class="reference internal" href="../cohesity_source_module.html#ansible-collections-cohesity-dataprotect-cohesity-source-module"><span class="std std-ref">cohesity.dataprotect.cohesity_source</span></a>,
+<a class="reference internal" href="../cohesity_oracle_source_module.html#ansible-collections-cohesity-dataprotect-cohesity-oracle-source-module"><span class="std std-ref">cohesity.dataprotect.cohesity_oracle_source</span></a> and
+<a class="reference internal" href="../cohesity_uda_source_module.html#ansible-collections-cohesity-dataprotect-cohesity-uda-source-module"><span class="std std-ref">cohesity.dataprotect.cohesity_uda_source</span></a>.</p></li>
+<li><p>Protection policies and groups: <a class="reference internal" href="../cohesity_policy_module.html#ansible-collections-cohesity-dataprotect-cohesity-policy-module"><span class="std std-ref">cohesity.dataprotect.cohesity_policy</span></a>,
+<a class="reference internal" href="../cohesity_job_module.html#ansible-collections-cohesity-dataprotect-cohesity-job-module"><span class="std std-ref">cohesity.dataprotect.cohesity_job</span></a>,
+<a class="reference internal" href="../cohesity_oracle_job_module.html#ansible-collections-cohesity-dataprotect-cohesity-oracle-job-module"><span class="std std-ref">cohesity.dataprotect.cohesity_oracle_job</span></a> and
+<a class="reference internal" href="../cohesity_uda_protection_group_module.html#ansible-collections-cohesity-dataprotect-cohesity-uda-protection-group-module"><span class="std std-ref">cohesity.dataprotect.cohesity_uda_protection_group</span></a>.</p></li>
+<li><p>Restore and recovery: <a class="reference internal" href="../cohesity_restore_vm_module.html#ansible-collections-cohesity-dataprotect-cohesity-restore-vm-module"><span class="std std-ref">cohesity.dataprotect.cohesity_restore_vm</span></a>,
+<a class="reference internal" href="../cohesity_restore_file_module.html#ansible-collections-cohesity-dataprotect-cohesity-restore-file-module"><span class="std std-ref">cohesity.dataprotect.cohesity_restore_file</span></a>,
+<a class="reference internal" href="../cohesity_restore_vmware_file_module.html#ansible-collections-cohesity-dataprotect-cohesity-restore-vmware-file-module"><span class="std std-ref">cohesity.dataprotect.cohesity_restore_vmware_file</span></a>,
+<a class="reference internal" href="../cohesity_oracle_restore_module.html#ansible-collections-cohesity-dataprotect-cohesity-oracle-restore-module"><span class="std std-ref">cohesity.dataprotect.cohesity_oracle_restore</span></a> and
+<a class="reference internal" href="../cohesity_clone_vm_module.html#ansible-collections-cohesity-dataprotect-cohesity-clone-vm-module"><span class="std std-ref">cohesity.dataprotect.cohesity_clone_vm</span></a>.</p></li>
+<li><p>VMware migration: <a class="reference internal" href="../cohesity_migrate_vm_module.html#ansible-collections-cohesity-dataprotect-cohesity-migrate-vm-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migrate_vm</span></a>,
+<a class="reference internal" href="../cohesity_migration_status_module.html#ansible-collections-cohesity-dataprotect-cohesity-migration-status-module"><span class="std std-ref">cohesity.dataprotect.cohesity_migration_status</span></a>,
+<a class="reference internal" href="../cohesity_finalize_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-finalize-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_finalize_migration</span></a>,
+<a class="reference internal" href="../cohesity_cancel_migration_module.html#ansible-collections-cohesity-dataprotect-cohesity-cancel-migration-module"><span class="std std-ref">cohesity.dataprotect.cohesity_cancel_migration</span></a> and
+<a class="reference internal" href="../cohesity_sync_objects_module.html#ansible-collections-cohesity-dataprotect-cohesity-sync-objects-module"><span class="std std-ref">cohesity.dataprotect.cohesity_sync_objects</span></a>.</p></li>
+<li><p>Agents and connectors: <a class="reference internal" href="../cohesity_agent_module.html#ansible-collections-cohesity-dataprotect-cohesity-agent-module"><span class="std std-ref">cohesity.dataprotect.cohesity_agent</span></a>,
+<a class="reference internal" href="../cohesity_win_agent_module.html#ansible-collections-cohesity-dataprotect-cohesity-win-agent-module"><span class="std std-ref">cohesity.dataprotect.cohesity_win_agent</span></a> and
+<a class="reference internal" href="../cohesity_plugin_module.html#ansible-collections-cohesity-dataprotect-cohesity-plugin-module"><span class="std std-ref">cohesity.dataprotect.cohesity_plugin</span></a>.</p></li>
+<li><p>Storage: <a class="reference internal" href="../cohesity_storage_domain_module.html#ansible-collections-cohesity-dataprotect-cohesity-storage-domain-module"><span class="std std-ref">cohesity.dataprotect.cohesity_storage_domain</span></a> and
+<a class="reference internal" href="../cohesity_view_module.html#ansible-collections-cohesity-dataprotect-cohesity-view-module"><span class="std std-ref">cohesity.dataprotect.cohesity_view</span></a>.</p></li>
+</ul>
+<p>Example playbooks for these workflows are available in the
+<a class="reference external" href="https://github.com/cohesity/ansible-collection/tree/main/playbooks">playbooks directory</a> of the repository.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Cohesity.Dataprotect" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guide_prerequisites.html" class="btn btn-neutral float-right" title="Prerequisites" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>

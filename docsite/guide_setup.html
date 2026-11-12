@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup &mdash; Ansible collections  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=41de9001" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/ansible.css?v=b54c304f" />
+      <link rel="stylesheet" type="text/css" href="../_static/antsibull-minimal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/rtd-ethical-ads.css?v=289b023e" />
+
+  
+    <link rel="shortcut icon" href="../_static/images/Ansible-Mark-RGB_Black.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7f41d439"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configure your Ansible inventory" href="guide_inventory.html" />
+    <link rel="prev" title="Prerequisites" href="guide_prerequisites.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
+
+
+
+
+</head>
+
+<body class="wy-body-for-nav"><!-- extra body elements for Ansible beyond RTD Sphinx Theme -->
+
+<div class="DocSite-globalNav ansibleNav">
+  <ul>
+    <li><a href="https://www.ansible.com/blog" target="_blank">Blog</a></li>
+    <li><a href="https://forum.ansible.com/" target="_blank">Ansible community forum</a></li>
+    <li><a href="https://docs.ansible.com/" target="_blank">Documentation</a></li>
+  </ul>
+</div>
+
+<a class="DocSite-nav" href="/" style="padding-bottom: 30px;">
+
+  <img class="DocSiteNav-logo"
+    src="../_static/images/Ansible-Mark-RGB_White.png"
+    alt="Ansible Logo">
+  <div class="DocSiteNav-title">Ansible Collections Documentation</div>
+</a>
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ansible collections
+          </a><!--- Based on https://github.com/rtfd/sphinx_rtd_theme/pull/438/files -->
+
+<div class="version">
+  
+    
+  
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <label class="sr-only" for="q">Search docs:</label>
+    <input type="text" class="st-default-search-input" id="q" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+  
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide_overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#steps-to-install">Steps to install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-the-inventory">Configure the inventory</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide_inventory.html">Configure your Ansible inventory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide_feedback.html">Feedback</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scenario Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide_vmware_migration.html">Migrate VMware virtual machines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_agent_module.html">cohesity_agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_cancel_migration_module.html">cohesity_cancel_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_clone_vm_module.html">cohesity_clone_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_facts_module.html">cohesity_facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_finalize_migration_module.html">cohesity_finalize_migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_job_module.html">cohesity_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migrate_vm_module.html">cohesity_migrate_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_migration_status_module.html">cohesity_migration_status</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_job_module.html">cohesity_oracle_job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_restore_module.html">cohesity_oracle_restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_oracle_source_module.html">cohesity_oracle_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_plugin_module.html">cohesity_plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_policy_module.html">cohesity_policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_file_module.html">cohesity_restore_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vm_module.html">cohesity_restore_vm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_restore_vmware_file_module.html">cohesity_restore_vmware_file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_source_module.html">cohesity_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_storage_domain_module.html">cohesity_storage_domain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_sync_objects_module.html">cohesity_sync_objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_protection_group_module.html">cohesity_uda_protection_group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_uda_source_module.html">cohesity_uda_source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_view_module.html">cohesity_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cohesity_win_agent_module.html">cohesity_win_agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changelog</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Release notes</a></li>
+</ul>
+<!-- extra nav elements for Ansible beyond RTD Sphinx Theme -->
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible collections</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Setup</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+  
+           <div itemprop="articleBody">
+             
+  <section id="setup">
+<span id="ansible-collections-cohesity-dataprotect-docsite-guide-setup"></span><h1>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h1>
+<section id="steps-to-install">
+<h2>Steps to install<a class="headerlink" href="#steps-to-install" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Make sure that the <a class="reference internal" href="guide_prerequisites.html#ansible-collections-cohesity-dataprotect-docsite-guide-prerequisites"><span class="std std-ref">prerequisites</span></a>
+are installed.</p></li>
+<li><p>Install the collection on the Ansible control node using <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ansible-galaxy<span class="w"> </span>collection<span class="w"> </span>install<span class="w"> </span>cohesity.dataprotect
+</pre></div>
+</div>
+</li>
+<li><p>Install the Python dependencies used by the modules:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</li>
+<li><p>Reference the collection in your plays. You can either use the fully qualified collection name for every
+task, or list the collection in a play:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gather facts from a Cohesity cluster</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">  </span><span class="nt">collections</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cohesity.dataprotect</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gather cluster facts</span>
+<span class="w">      </span><span class="nt">cohesity_facts</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_server</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">        </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_username</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">        </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_password</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="w">        </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">cohesity_validate_certs</span><span class="nv"> </span><span class="s">}}"</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">collections</span></code> keyword is optional. Using fully qualified collection names, such as
+<a class="reference internal" href="../cohesity_facts_module.html#ansible-collections-cohesity-dataprotect-cohesity-facts-module"><span class="std std-ref">cohesity.dataprotect.cohesity_facts</span></a>, is recommended.</p>
+</div>
+</li>
+</ol>
+</section>
+<section id="configure-the-inventory">
+<h2>Configure the inventory<a class="headerlink" href="#configure-the-inventory" title="Link to this heading"></a></h2>
+<p>The example playbooks read the cluster address and credentials from inventory variables. See
+<a class="reference internal" href="guide_inventory.html#ansible-collections-cohesity-dataprotect-docsite-guide-inventory"><span class="std std-ref">Configure your Ansible inventory</span></a> for details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          
+
+<footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guide_prerequisites.html" class="btn btn-neutral float-left" title="Prerequisites" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guide_inventory.html" class="btn btn-neutral float-right" title="Configure your Ansible inventory" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Ansible contributors.</p>
+  </div>
+
+  
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script><!-- extra footer elements for Ansible beyond RTD Sphinx Theme -->
+
+</body>
+</html>
