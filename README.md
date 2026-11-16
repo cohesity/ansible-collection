@@ -5,10 +5,9 @@
   -->
 # Ansible Collection - cohesity.dataprotect
 
-![](https://github.com/cohesity/ansible-collection/blob/main/docs/assets/images/cohesity_ansible.png)
-
 ## Overview
-[![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://github.com/cohesity/ansible-collection/blob/main/LICENSE)
+
+[![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 This project provides an Ansible Collection for interacting with the [Cohesity DataPlatform](https://www.cohesity.com/products/data-platform).
 
@@ -33,30 +32,32 @@ collections:
 - python version >= '3.6'
 - cohesity_management_sdk >= 1.6.0
 
-To install the requirements, run **pip install -r [requirement.txt](https://github.com/cohesity/ansible-collection/blob/main/requirements.txt)**
+To install the requirements, run `pip install -r requirements.txt`
 
 ## Table of contents
 
- - [Getting Started](https://github.com/cohesity/ansible-collection/blob/main/README.md#get-started)
- - [More samples playbooks](https://github.com/cohesity/ansible-collection/blob/main/README.md#examples)
+ - [Getting Started](#get-started)
+ - [More samples playbooks](#examples)
  - [Changelog](#changelog)
  - [Support (Red Hat Users)](#support-red-hat-users)
- - [How can you contribute](https://github.com/cohesity/ansible-collection/blob/main/README.md#contribute)
- - [Suggestions and Feedback](https://github.com/cohesity/ansible-collection/blob/main/README.md#suggest)
+ - [Suggestions and Feedback](#suggest)
  - [Disclaimer](#disclaimer)
 
 
 ## <a name="get-started"></a> Let's get started
 
-* [Documentation for Cohesity Ansible Collection](https://github.com/cohesity/ansible-collection/tree/main/docs).
+Module, plugin, and release-note documentation is on the **Documentation** tab for this collection:
+
+* [Ansible Galaxy – cohesity.dataprotect documentation](https://galaxy.ansible.com/ui/repo/published/cohesity/dataprotect/docs/)
+* [Ansible Automation Hub – cohesity.dataprotect documentation](https://console.redhat.com/ansible/automation-hub/repo/published/cohesity/dataprotect/docs/)
 
 ## <a name="examples"></a> Some samples to get you going :bulb:
 
-* Refer [`playbooks`](https://github.com/cohesity/ansible-collection/tree/main/playbooks) folder to find more examples.
+Example playbooks are included in the `playbooks/` directory in the collection package (workflow folders for VMware, Oracle, physical, NAS, and related scenarios).
 
 ## <a name="changelog"></a> Changelog
 
-See [CHANGELOG.rst](https://github.com/cohesity/ansible-collection/blob/main/CHANGELOG.rst) for a full list of changes by version.
+See `CHANGELOG.rst` file for a full list of changes by version.
 
 **Recent highlights:**
 
@@ -65,7 +66,7 @@ See [CHANGELOG.rst](https://github.com/cohesity/ansible-collection/blob/main/CHA
 - **v1.4.3** — Fixed agent detection failing with "Cohesity Agent is partially installed" on systemd hosts where the SysV init script is not created by the installer.
 - **v1.4.2** — Bumped minimum Ansible-Core version to 2.16; fixed `LiteralPath` issue during Windows agent installation and collection failure issues on some Ansible versions.
 
-## Support (Red Hat Users)
+## <a name="support-red-hat-users"></a> Support (Red Hat Users)
 
 This collection is part of **Red Hat Ansible Certified Content** and is entitled to support through the [Ansible Automation Platform (AAP)](https://www.redhat.com/en/technologies/management/ansible).
 
@@ -73,14 +74,6 @@ If you are an AAP subscriber, you can open a support case directly from **Ansibl
 
 1. Navigate to the collection page on [Ansible Automation Hub](https://console.redhat.com/ansible/automation-hub/repo/published/cohesity/dataprotect/).
 2. Click the **Create issue** button to file a support ticket with Red Hat.
-
-For issues or feature requests outside of an AAP subscription, use the [GitHub issue tracker](https://github.com/cohesity/ansible-collection/issues/new/choose).
-
-## <a name="contribute"></a> Contribute
-
-* [Refer our contribution guideline](https://github.com/cohesity/ansible-collection/tree/main/CONTRIBUTING.md).
-
-* [Refer our contribution guideline](https://github.com/cohesity/ansible-collection/tree/main/CONTRIBUTING.md).
 
 ## <a name="suggest"></a> Suggestions and Feedback
 
