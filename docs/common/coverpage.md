@@ -9,4 +9,3 @@
 * Supports multiple operating systems — Windows, Linux, and MacOS.
 
 [Get Started](overview.md)
-[GitHub](https://github.com/cohesity/ansible-collection/)

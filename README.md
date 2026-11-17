@@ -7,7 +7,7 @@
 
 ## Overview
 
-[![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![License: GNU General Public License v3.0](https://img.shields.io/badge/LICENSE-GPL--v3.0-blue)](https://www.cohesity.com/agreements/)
 
 This project provides an Ansible Collection for interacting with the [Cohesity DataPlatform](https://www.cohesity.com/products/data-platform).
 
