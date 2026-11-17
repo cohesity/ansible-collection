@@ -46,8 +46,6 @@ tags:
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
 dependencies: {}
-# The URL of the originating SCM repository
-repository: https://github.com/cohesity/ansible-collection
 
 # The URL to any online docs
 # documentation: https://developer.cohesity.com
@@ -55,8 +53,6 @@ repository: https://github.com/cohesity/ansible-collection
 # The URL to the homepage of the collection/project
 # homepage: cohesity
 
-# The URL to the collection issue tracker
-issues: https://github.com/cohesity/ansible-collection/issues/new/choose
 
 build_ignore:
   - dev-requirements.txt
